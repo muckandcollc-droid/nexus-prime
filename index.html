@@ -37,15 +37,18 @@
             user-select: none;
             transition: filter 0.2s ease;
         }
+        body.user-mode .dev-only {
+            display: none !important;
+        }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0b0f19; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-cyan-500 selection:text-black">
+<body class="min-h-screen flex flex-col selection:bg-cyan-500 selection:text-black user-mode">
 
-    <!-- PIN UNLOCK OVERLAY (Only active when PIN encryption is enabled) -->
+    <!-- PIN UNLOCK OVERLAY (Vault Encryption Lock) -->
     <div id="pinLockOverlay" class="fixed inset-0 z-[100] bg-[#030712]/95 backdrop-blur-xl hidden items-center justify-center p-4">
         <div class="glass-panel p-8 rounded-2xl max-w-sm w-full border border-cyan-500/40 text-center space-y-6">
             <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-600 to-emerald-500 flex items-center justify-center text-white text-2xl glow-cyan">
@@ -53,7 +56,7 @@
             </div>
             <div>
                 <h2 class="text-xl font-extrabold text-white">NEXUS-PRIME Vault Locked</h2>
-                <p class="text-xs text-slate-400 mt-1">AES-256-GCM Local Encryption Active. Enter your PIN to decrypt.</p>
+                <p class="text-xs text-slate-400 mt-1">AES-256-GCM Local Encryption Active. Enter your Vault PIN to decrypt.</p>
             </div>
             <form id="unlockForm" class="space-y-4">
                 <input type="password" id="unlockPinInput" inputmode="numeric" pattern="[0-9]*" maxlength="8" required
@@ -73,11 +76,11 @@
         </div>
     </div>
 
-    <!-- SET / CHANGE PIN MODAL -->
+    <!-- SET / CHANGE VAULT PIN MODAL -->
     <div id="setPinModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="glass-panel p-6 rounded-2xl max-w-md w-full border border-cyan-500/30 space-y-5">
             <div class="flex justify-between items-center">
-                <h3 class="text-lg font-extrabold text-white"><i class="fa-solid fa-shield-halved text-cyan-400 mr-2"></i>Configure AES-256-GCM PIN Lock</h3>
+                <h3 class="text-lg font-extrabold text-white"><i class="fa-solid fa-shield-halved text-cyan-400 mr-2"></i>Configure AES-256-GCM Vault PIN</h3>
                 <button onclick="closeSetPinModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <p class="text-xs text-slate-400">
@@ -85,13 +88,13 @@
             </p>
             <form id="setPinForm" class="space-y-4">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">New PIN (4 to 8 digits)</label>
+                    <label class="block text-xs text-slate-400 mb-1">New Vault PIN (4 to 8 digits)</label>
                     <input type="password" id="newPinInput" inputmode="numeric" pattern="[0-9]{4,8}" minlength="4" maxlength="8" required
                         placeholder="Enter 4–8 digit PIN"
                         class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-cyan-500">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Confirm PIN</label>
+                    <label class="block text-xs text-slate-400 mb-1">Confirm Vault PIN</label>
                     <input type="password" id="confirmPinInput" inputmode="numeric" pattern="[0-9]{4,8}" minlength="4" maxlength="8" required
                         placeholder="Re-enter PIN"
                         class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-cyan-500">
@@ -100,6 +103,45 @@
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeSetPinModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl">Cancel</button>
                     <button type="submit" class="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl">Enable Encryption</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DEVELOPER MODE PASSWORD MODAL -->
+    <div id="devModeModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="glass-panel p-6 rounded-2xl max-w-md w-full border border-purple-500/40 space-y-5">
+            <div class="flex justify-between items-center">
+                <h3 id="devModalTitle" class="text-lg font-extrabold text-white">
+                    <i class="fa-solid fa-terminal text-purple-400 mr-2"></i>Developer Mode Authentication
+                </h3>
+                <button onclick="closeDevModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p id="devModalDesc" class="text-xs text-slate-400">
+                Enter your Developer Mode password to unlock the 3D Cyber-City Bot Farm, Live xAI/Gemini Console, and Test Operations Sandbox.
+            </p>
+            <form id="devModeForm" class="space-y-4">
+                <div>
+                    <label id="devPassLabel" class="block text-xs text-slate-400 mb-1">Developer Password</label>
+                    <input type="password" id="devPassInput" minlength="4" required placeholder="Enter Developer Password"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-purple-200 focus:outline-none focus:border-purple-500">
+                </div>
+                <div id="devConfirmWrap" class="hidden">
+                    <label class="block text-xs text-slate-400 mb-1">Confirm Developer Password</label>
+                    <input type="password" id="devPassConfirmInput" minlength="4" placeholder="Re-enter Developer Password"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm font-mono text-purple-200 focus:outline-none focus:border-purple-500">
+                </div>
+                <p id="devModalError" class="text-xs text-rose-400 hidden"></p>
+                <div class="flex justify-between items-center pt-2">
+                    <button type="button" id="resetDevPassBtn" onclick="resetDeveloperPassword()" class="text-[11px] text-slate-500 hover:text-rose-400 transition hidden">
+                        Reset Dev Password
+                    </button>
+                    <div class="flex gap-2 ml-auto">
+                        <button type="button" onclick="closeDevModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl">Cancel</button>
+                        <button type="submit" id="devModalSubmitBtn" class="px-5 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white text-xs font-bold rounded-xl">
+                            Unlock Dev Mode
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -115,13 +157,27 @@
             <div>
                 <div class="flex items-center space-x-2">
                     <h1 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 tracking-wider text-base lg:text-xl">NEXUS-PRIME</h1>
-                    <span class="px-2 py-0.5 text-[10px] font-mono bg-cyan-950/80 text-cyan-300 border border-cyan-800 rounded">SOLO VAULT</span>
+                    <span id="roleModeBadge" class="px-2 py-0.5 text-[10px] font-mono bg-emerald-950/90 text-emerald-300 border border-emerald-700 rounded">USER MODE</span>
                 </div>
-                <p class="text-[11px] text-slate-400 hidden sm:block">Zero-Knowledge Local Ledger • GitHub Safe</p>
+                <p class="text-[11px] text-slate-400 hidden sm:block">Zero-Knowledge Local Ledger • Direct Gemini Copilot in Both Modes</p>
             </div>
         </div>
 
         <div class="flex items-center space-x-2">
+            <!-- Quick CSV Export Button -->
+            <button onclick="exportVaultCSV()" title="Quick Export CSV"
+                class="px-3 py-2 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-200 text-xs font-bold rounded-lg transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-file-csv text-emerald-400"></i>
+                <span class="hidden md:inline">Export CSV</span>
+            </button>
+
+            <!-- User <-> Developer Mode Switcher -->
+            <button onclick="handleModeSwitchClick()" id="modeSwitchBtn" title="Switch Between User & Developer Mode"
+                class="px-3 py-2 bg-purple-950/80 hover:bg-purple-900/80 border border-purple-600/50 text-purple-200 text-xs font-bold rounded-lg transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-code" id="modeSwitchIcon"></i>
+                <span id="modeSwitchLabel">Dev Mode</span>
+            </button>
+
             <!-- Privacy Blur Toggle -->
             <button onclick="togglePrivacyBlur()" id="privacyBlurBtn" title="Blur Dollar Figures"
                 class="px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition flex items-center space-x-1.5">
@@ -136,7 +192,7 @@
                 <span class="hidden md:inline" id="liteModeLabel">Lite: OFF</span>
             </button>
 
-            <!-- PIN / Lock Button -->
+            <!-- Vault PIN / Lock Button -->
             <button onclick="handleHeaderPinClick()" id="headerPinBtn"
                 class="px-3.5 py-2 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white text-xs font-bold rounded-lg transition flex items-center space-x-1.5">
                 <i class="fa-solid fa-key" id="headerPinIcon"></i>
@@ -150,6 +206,7 @@
         <!-- Sidebar -->
         <aside class="w-full lg:w-64 glass-panel border-r border-slate-800 p-4 flex lg:flex-col justify-between shrink-0">
             <nav class="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-1.5 overflow-x-auto w-full pb-2 lg:pb-0">
+                <!-- Clean User Mode Tabs (Includes Direct Gemini Assistant) -->
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 whitespace-nowrap">
                     <i class="fa-solid fa-chart-pie w-4"></i><span>Dashboard</span>
                 </button>
@@ -159,27 +216,39 @@
                 <button onclick="switchTab('ocr')" id="nav-ocr" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
                     <i class="fa-solid fa-camera w-4"></i><span>Statement OCR</span>
                 </button>
-                <button onclick="switchTab('botfarm')" id="nav-botfarm" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
-                    <i class="fa-solid fa-city w-4"></i><span>AI Bot Farm</span>
-                </button>
-                <button onclick="switchTab('xai')" id="nav-xai" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
-                    <i class="fa-solid fa-terminal w-4"></i><span>Live xAI Console</span>
-                </button>
-                <button onclick="switchTab('testing')" id="nav-testing" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
-                    <i class="fa-solid fa-vials w-4"></i><span>Test Operations</span>
+                <button onclick="switchTab('gemini')" id="nav-gemini" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
+                    <i class="fa-solid fa-sparkles w-4 text-cyan-400"></i><span>Gemini Copilot</span>
                 </button>
                 <button onclick="switchTab('security')" id="nav-security" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
                     <i class="fa-solid fa-shield-halved w-4"></i><span>Security &amp; Backup</span>
+                </button>
+
+                <!-- Developer Mode Only Tabs -->
+                <div class="dev-only hidden lg:block pt-3 pb-1 px-2 text-[10px] font-mono uppercase tracking-wider text-purple-400">
+                    Developer Tools
+                </div>
+                <button onclick="switchTab('botfarm')" id="nav-botfarm" class="dev-only nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
+                    <i class="fa-solid fa-city w-4 text-purple-400"></i><span>AI Bot Farm</span>
+                </button>
+                <button onclick="switchTab('xai')" id="nav-xai" class="dev-only nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
+                    <i class="fa-solid fa-terminal w-4 text-purple-400"></i><span>Live xAI Console</span>
+                </button>
+                <button onclick="switchTab('testing')" id="nav-testing" class="dev-only nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
+                    <i class="fa-solid fa-vials w-4 text-purple-400"></i><span>Test Operations</span>
                 </button>
             </nav>
 
             <div class="hidden lg:block mt-6 p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs space-y-2">
                 <div class="flex justify-between items-center text-slate-400 font-mono">
-                    <span>Storage Mode</span>
-                    <span id="sidebar-crypto-status" class="text-amber-400 font-bold">UNENCRYPTED</span>
+                    <span>Active Mode</span>
+                    <span id="sidebar-role-status" class="text-emerald-400 font-bold">USER</span>
                 </div>
                 <div class="flex justify-between items-center text-slate-400 font-mono">
-                    <span>Active Nodes</span>
+                    <span>Storage Crypto</span>
+                    <span id="sidebar-crypto-status" class="text-amber-400 font-bold">UNENCRYPTED</span>
+                </div>
+                <div class="dev-only flex justify-between items-center text-slate-400 font-mono">
+                    <span>Bot Nodes</span>
                     <span class="text-cyan-400 font-bold" id="sidebar-nodes">14/14</span>
                 </div>
                 <div class="flex justify-between items-center text-slate-400 font-mono">
@@ -195,7 +264,6 @@
             <!-- TAB 1: DASHBOARD -->
             <section id="tab-dashboard" class="tab-content space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Target Milestone -->
                     <div class="glass-panel p-6 rounded-2xl relative overflow-hidden flex flex-col justify-between glow-cyan">
                         <div>
                             <div class="w-11 h-11 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center mb-3 text-cyan-400">
@@ -210,7 +278,6 @@
                         </div>
                     </div>
 
-                    <!-- Debt Summary -->
                     <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
                         <div class="flex justify-between items-center mb-3">
                             <h4 class="font-bold text-white text-base">Portfolio Summary</h4>
@@ -232,7 +299,6 @@
                         </div>
                     </div>
 
-                    <!-- Allocation Donut -->
                     <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center relative">
                         <h4 class="absolute top-4 left-6 font-bold text-white text-xs">Debt Mix</h4>
                         <div class="w-36 h-36 relative mt-4">
@@ -287,17 +353,32 @@
                                 </div>
                             </div>
                         </div>
-                        <button onclick="switchTab('vault')" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">
-                            + Add Bills or Credit Accounts
-                        </button>
+                        <div class="flex gap-2">
+                            <button onclick="switchTab('vault')" class="flex-1 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">
+                                + Add Accounts
+                            </button>
+                            <button onclick="exportVaultCSV()" class="px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition" title="Quick Export CSV">
+                                <i class="fa-solid fa-file-csv mr-1"></i>CSV
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- TAB 2: BILLS & CREDIT VAULT -->
             <section id="tab-vault" class="tab-content hidden space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-white">Bills &amp; Credit Ledger</h3>
+                        <p class="text-xs text-slate-400">All entries stay local on your device and export cleanly to CSV anytime.</p>
+                    </div>
+                    <button onclick="exportVaultCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>Quick Export CSV</span>
+                    </button>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Add Debt / Credit Account Form -->
                     <div class="glass-panel p-6 rounded-2xl space-y-4">
                         <h3 class="text-lg font-extrabold text-white"><i class="fa-solid fa-credit-card text-cyan-400 mr-2"></i>Add Credit / Loan Account</h3>
                         <form id="addDebtForm" class="space-y-3 text-sm">
@@ -346,7 +427,6 @@
                         </form>
                     </div>
 
-                    <!-- Add Recurring Bill Form -->
                     <div class="glass-panel p-6 rounded-2xl space-y-4">
                         <h3 class="text-lg font-extrabold text-white"><i class="fa-solid fa-file-invoice text-emerald-400 mr-2"></i>Add Recurring Bill</h3>
                         <form id="addBillForm" class="space-y-3 text-sm">
@@ -494,12 +574,132 @@
                 </div>
             </section>
 
-            <!-- TAB 4: ANIMATED 3D CYBER-CITY BOT FARM -->
-            <section id="tab-botfarm" class="tab-content hidden space-y-6">
+            <!-- TAB 4: DIRECT GEMINI COPILOT (AVAILABLE IN BOTH USER & DEV MODES) -->
+            <section id="tab-gemini" class="tab-content hidden space-y-6">
+                <div class="glass-panel p-6 rounded-2xl flex flex-col h-[640px] border border-cyan-500/30 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                        <div>
+                            <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-sparkles text-cyan-400"></i>
+                                <span>Direct Gemini Financial Copilot</span>
+                            </h3>
+                            <p class="text-xs text-slate-400">Talk directly to Gemini inside your app—no middle-manning required. API key stays local in your browser session/storage, never in GitHub code.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <select id="geminiModelSelect" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-cyan-200">
+                                <option value="gemini-2.5-flash" selected>gemini-2.5-flash</option>
+                                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                            </select>
+                            <button onclick="attachLiveVaultContextToInput()" class="px-3 py-1.5 bg-emerald-950 hover:bg-emerald-900 border border-emerald-700 text-emerald-300 rounded-lg text-xs font-semibold transition">
+                                Attach Vault Snapshot
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Local Gemini Key Bar (Never stored in source code or pushed to Git) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 bg-slate-950/90 p-3 rounded-xl border border-slate-800 text-xs">
+                        <input type="password" id="geminiApiKeyInput" onchange="saveGeminiKeyPref()"
+                            placeholder="Paste Gemini API Key (AIza...) — saved locally only"
+                            class="md:col-span-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 font-mono text-cyan-200 focus:outline-none focus:border-cyan-500">
+                        <label class="flex items-center gap-2 px-2 text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="includeVaultContextCheck" checked class="accent-cyan-500 rounded">
+                            <span>Share live totals with Gemini</span>
+                        </label>
+                    </div>
+
+                    <!-- Chat Feed -->
+                    <div id="geminiChatFeed" class="flex-1 overflow-y-auto bg-slate-950/70 border border-slate-800/90 rounded-xl p-4 space-y-3 text-xs sm:text-sm">
+                        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-cyan-500/20 text-slate-200">
+                            <span class="text-cyan-400 font-mono text-xs font-bold block mb-1">GEMINI COPILOT</span>
+                            Direct link ready. Paste your Gemini API key above, add your debts or bills, and ask me how to cut interest, optimize Snowball vs. Avalanche, or plan your payoff timeline—straight from inside your app.
+                        </div>
+                    </div>
+
+                    <!-- Prompt Input -->
+                    <form id="geminiChatForm" class="flex gap-2">
+                        <input type="text" id="geminiPromptInput" required
+                            placeholder="Ask Gemini about your payoff math, APR priorities, or monthly budget..."
+                            class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500">
+                        <button type="submit" id="geminiSendBtn"
+                            class="px-5 py-3 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white font-bold rounded-xl text-xs sm:text-sm transition">
+                            Ask Gemini
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 5: SECURITY & PORTABLE ENCRYPTED BACKUP -->
+            <section id="tab-security" class="tab-content hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h3 class="text-lg font-extrabold text-white"><i class="fa-solid fa-lock text-cyan-400 mr-2"></i>Local Vault Encryption (Web Crypto)</h3>
+                        <p class="text-xs text-slate-400">
+                            When enabled, your Vault PIN derives an <code class="text-cyan-300">AES-256-GCM</code> key via <code class="text-cyan-300">PBKDF2-SHA256</code> (310,000 iterations) with a fresh 96-bit IV on every write.
+                        </p>
+                        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Vault Encryption:</span>
+                                <span id="sec-panel-status" class="font-bold text-amber-400">Not Set (Opens Immediately)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Developer Mode Password:</span>
+                                <span id="sec-devpass-status" class="font-bold text-slate-300">Not Configured Yet</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Idle Auto-Lock:</span>
+                                <span class="text-slate-200">10 Minutes (when PIN active)</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="openSetPinModal()" class="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">
+                                Set / Change Vault PIN
+                            </button>
+                            <button onclick="openChangeDevPassword()" class="px-4 py-2.5 bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold rounded-xl transition">
+                                Set / Change Dev Password
+                            </button>
+                            <button onclick="lockVaultNow()" id="secLockNowBtn" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition hidden">
+                                Lock Vault Now
+                            </button>
+                            <button onclick="disablePinEncryption()" id="secDisablePinBtn" class="px-4 py-2.5 bg-rose-950 border border-rose-800 hover:bg-rose-900 text-rose-300 text-xs font-bold rounded-xl transition hidden">
+                                Remove Vault PIN
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h3 class="text-lg font-extrabold text-white"><i class="fa-solid fa-file-shield text-emerald-400 mr-2"></i>Export CSV &amp; Encrypted <code class="text-emerald-300">.nexusvault</code></h3>
+                        <p class="text-xs text-slate-400">
+                            Download a spreadsheet-ready CSV report anytime or export an AES-256-GCM encrypted <code class="text-emerald-300">.nexusvault</code> backup (both ignored by Git via <code class="text-cyan-300">.gitignore</code>).
+                        </p>
+                        <div class="space-y-3 text-xs">
+                            <button onclick="exportVaultCSV()" class="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl transition">
+                                <i class="fa-solid fa-file-csv mr-1.5"></i>Quick Export Ledger CSV (.csv)
+                            </button>
+                            <input type="password" id="backupPassphrase" placeholder="Backup password (or uses your active PIN)"
+                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500">
+                            <div class="flex gap-2">
+                                <button onclick="exportEncryptedVault()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition">
+                                    Export .nexusvault
+                                </button>
+                                <label class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-center cursor-pointer transition">
+                                    Import .nexusvault
+                                    <input type="file" accept=".nexusvault,.json" class="hidden" onchange="importEncryptedVault(event)">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DEV-ONLY TAB 6: ANIMATED 3D CYBER-CITY BOT FARM -->
+            <section id="tab-botfarm" class="dev-only tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                         <div>
-                            <h3 class="text-xl font-extrabold text-white">Animated 3D Cyber-City Bot Farm</h3>
+                            <div class="flex items-center space-x-2">
+                                <h3 class="text-xl font-extrabold text-white">Animated 3D Cyber-City Bot Farm</h3>
+                                <span class="px-2 py-0.5 text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-700 rounded">DEV ONLY</span>
+                            </div>
                             <p class="text-slate-400 text-xs">Live WebGL skyline with grid traffic pulses, breathing towers, and ascending data packets.</p>
                         </div>
                         <div class="flex space-x-2">
@@ -520,12 +720,15 @@
                 </div>
             </section>
 
-            <!-- TAB 5: LIVE xAI GROK CONSOLE -->
-            <section id="tab-xai" class="tab-content hidden space-y-6">
+            <!-- DEV-ONLY TAB 7: LIVE xAI GROK CONSOLE -->
+            <section id="tab-xai" class="dev-only tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
                         <div>
-                            <h3 class="text-lg font-extrabold text-cyan-300">LIVE xAI GROK CONSOLE</h3>
+                            <div class="flex items-center space-x-2">
+                                <h3 class="text-lg font-extrabold text-cyan-300">LIVE xAI GROK CONSOLE</h3>
+                                <span class="px-2 py-0.5 text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-700 rounded">DEV ONLY</span>
+                            </div>
                             <p class="text-xs text-slate-400">Streams via your backend proxy (<code class="text-emerald-400">XAI_API_KEY</code> stays off GitHub &amp; browser storage)</p>
                         </div>
                         <div class="flex items-center gap-2">
@@ -559,15 +762,20 @@
                 </div>
             </section>
 
-            <!-- TAB 6: TEST OPERATIONS -->
-            <section id="tab-testing" class="tab-content hidden space-y-6">
+            <!-- DEV-ONLY TAB 8: TEST OPERATIONS -->
+            <section id="tab-testing" class="dev-only tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                         <div>
-                            <h3 class="text-xl font-extrabold text-white">Operations Sandbox &amp; Clean Slate Controls</h3>
-                            <p class="text-slate-400 text-xs">Test local calculations or reset the app to a brand-new blank state.</p>
+                            <div class="flex items-center space-x-2">
+                                <h3 class="text-xl font-extrabold text-white">Operations Sandbox &amp; Clean Slate Controls</h3>
+                                <span class="px-2 py-0.5 text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-700 rounded">DEV ONLY</span>
+                            </div>
+                            <p class="text-slate-400 text-xs">Test local calculations, export CSV, or reset the app to a brand-new blank state.</p>
                         </div>
-                        <span id="fresh-run-badge" class="px-3 py-1 bg-cyan-950 text-cyan-300 border border-cyan-800 rounded text-xs font-mono">CLEAN SLATE</span>
+                        <button onclick="lockDeveloperMode()" class="px-3 py-1.5 bg-emerald-950 border border-emerald-700 text-emerald-300 rounded-lg text-xs font-bold hover:bg-emerald-900">
+                            Return to User Mode
+                        </button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -590,67 +798,14 @@
                         <div class="p-5 rounded-xl bg-slate-900/90 border border-rose-500/40 flex flex-col justify-between space-y-4">
                             <div>
                                 <h5 class="text-white font-bold text-sm">Reset to Brand New</h5>
-                                <p class="text-xs text-slate-400 mt-1">Wipes all local storage and PIN keys back to a clean $0.00 first-run app.</p>
+                                <p class="text-xs text-slate-400 mt-1">Wipes all local storage, PIN keys, and Dev password back to a clean $0.00 first-run app.</p>
                             </div>
                             <button onclick="resetToBrandNewApp(false)" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-lg transition">Reset to Brand New</button>
                         </div>
                     </div>
 
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 h-44 overflow-y-auto space-y-1" id="test-terminal">
-                        <div class="text-cyan-400">[SYSTEM] Solo Blank-Slate Vault initialized. Ready.</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 7: SECURITY & PORTABLE ENCRYPTED BACKUP -->
-            <section id="tab-security" class="tab-content hidden space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="glass-panel p-6 rounded-2xl space-y-4">
-                        <h3 class="text-lg font-extrabold text-white"><i class="fa-solid fa-lock text-cyan-400 mr-2"></i>Local Vault Encryption (Web Crypto)</h3>
-                        <p class="text-xs text-slate-400">
-                            When enabled, your PIN derives an <code class="text-cyan-300">AES-256-GCM</code> key via <code class="text-cyan-300">PBKDF2-SHA256</code> (310,000 iterations) with a fresh 96-bit IV on every write.
-                        </p>
-                        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2">
-                            <div class="flex justify-between">
-                                <span class="text-slate-400">Encryption Status:</span>
-                                <span id="sec-panel-status" class="font-bold text-amber-400">Not Set (Opens Immediately)</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-400">Idle Auto-Lock:</span>
-                                <span class="text-slate-200">10 Minutes (when PIN active)</span>
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="openSetPinModal()" class="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">
-                                Set / Change PIN
-                            </button>
-                            <button onclick="lockVaultNow()" id="secLockNowBtn" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition hidden">
-                                Lock Vault Now
-                            </button>
-                            <button onclick="disablePinEncryption()" id="secDisablePinBtn" class="px-4 py-2.5 bg-rose-950 border border-rose-800 hover:bg-rose-900 text-rose-300 text-xs font-bold rounded-xl transition hidden">
-                                Remove PIN
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="glass-panel p-6 rounded-2xl space-y-4">
-                        <h3 class="text-lg font-extrabold text-white"><i class="fa-solid fa-file-shield text-emerald-400 mr-2"></i>Encrypted <code class="text-emerald-300">.nexusvault</code> Backup</h3>
-                        <p class="text-xs text-slate-400">
-                            Export an AES-256-GCM encrypted backup file to your tablet's Downloads folder (blocked from Git via <code class="text-cyan-300">.gitignore</code>) so you never lose your data if you clear browser cache.
-                        </p>
-                        <div class="space-y-3 text-xs">
-                            <input type="password" id="backupPassphrase" placeholder="Backup password (or uses your active PIN)"
-                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500">
-                            <div class="flex gap-2">
-                                <button onclick="exportEncryptedVault()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition">
-                                    Export .nexusvault
-                                </button>
-                                <label class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-center cursor-pointer transition">
-                                    Import .nexusvault
-                                    <input type="file" accept=".nexusvault,.json" class="hidden" onchange="importEncryptedVault(event)">
-                                </label>
-                            </div>
-                        </div>
+                        <div class="text-cyan-400">[SYSTEM] Developer Sandbox ready.</div>
                     </div>
                 </div>
             </section>
@@ -661,6 +816,8 @@
     <script>
         const VAULT_STORAGE_KEY = 'nexus_prime_solo_vault_v1';
         const PIN_META_KEY = 'nexus_prime_pin_meta_v1';
+        const DEV_PASS_HASH_KEY = 'nexus_prime_dev_pass_hash_v1';
+        const GEMINI_KEY_STORAGE = 'nexus_prime_gemini_key_v1';
         const IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 
         const BLANK_STATE = {
@@ -673,11 +830,14 @@
 
         let appState = structuredClone(BLANK_STATE);
         let activePin = null;
+        let isDeveloperMode = false;
+        let devModalAction = 'unlock';
+        let currentTab = 'dashboard';
         let idleTimer = null;
         let donutChart = null;
         let paydownChart = null;
 
-        // --- WEB CRYPTO AES-256-GCM ENGINE ---
+        // --- WEB CRYPTO UTILITIES ---
         function bufToB64(buf) {
             return btoa(String.fromCharCode(...new Uint8Array(buf)));
         }
@@ -685,22 +845,23 @@
             return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
         }
 
+        async function hashPasswordWithSalt(password, saltB64) {
+            const salt = saltB64 ? b64ToBuf(saltB64) : crypto.getRandomValues(new Uint8Array(16));
+            const enc = new TextEncoder();
+            const baseKey = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+            const bits = await crypto.subtle.deriveBits(
+                { name: 'PBKDF2', salt, iterations: 210000, hash: 'SHA-256' },
+                baseKey,
+                256
+            );
+            return { salt: bufToB64(salt), hash: bufToB64(bits) };
+        }
+
         async function deriveAesKey(pin, saltBytes) {
             const enc = new TextEncoder();
-            const keyMaterial = await crypto.subtle.importKey(
-                'raw',
-                enc.encode(pin),
-                'PBKDF2',
-                false,
-                ['deriveKey']
-            );
+            const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveKey']);
             return crypto.subtle.deriveKey(
-                {
-                    name: 'PBKDF2',
-                    salt: saltBytes,
-                    iterations: 310000,
-                    hash: 'SHA-256'
-                },
+                { name: 'PBKDF2', salt: saltBytes, iterations: 310000, hash: 'SHA-256' },
                 keyMaterial,
                 { name: 'AES-GCM', length: 256 },
                 false,
@@ -733,6 +894,325 @@
             return JSON.parse(new TextDecoder().decode(plainBuf));
         }
 
+        // --- QUICK EXPORT CSV ---
+        function csvEscape(val) {
+            const str = String(val ?? '');
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+
+        function exportVaultCSV() {
+            const rows = [
+                ['RecordType', 'Name', 'CategoryOrType', 'BalanceOrAmount', 'CreditLimit', 'APR_Percent', 'MinPayment', 'DueDay', 'Strategy', 'ExtraMonthly']
+            ];
+
+            appState.debts.forEach(d => {
+                rows.push([
+                    'Debt',
+                    d.name,
+                    d.type,
+                    Number(d.balance || 0).toFixed(2),
+                    Number(d.limit || 0).toFixed(2),
+                    Number(d.apr || 0).toFixed(2),
+                    Number(d.minPay || 0).toFixed(2),
+                    '',
+                    appState.strategy,
+                    Number(appState.extraMonthly || 0).toFixed(2)
+                ]);
+            });
+
+            appState.bills.forEach(b => {
+                rows.push([
+                    'Bill',
+                    b.name,
+                    b.category,
+                    Number(b.amount || 0).toFixed(2),
+                    '',
+                    '',
+                    '',
+                    b.dueDay || '',
+                    appState.strategy,
+                    Number(appState.extraMonthly || 0).toFixed(2)
+                ]);
+            });
+
+            if (rows.length === 1) {
+                rows.push(['Summary', 'Empty Vault', 'Blank Slate', '0.00', '0.00', '0.00', '0.00', '', appState.strategy, Number(appState.extraMonthly || 0).toFixed(2)]);
+            }
+
+            const csvContent = rows.map(r => r.map(csvEscape).join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nexus-prime-ledger-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            logTerminal('Exported quick CSV ledger snapshot.', 'text-emerald-400');
+        }
+
+        // --- DIRECT GEMINI COPILOT (IN BOTH USER & DEV MODES) ---
+        function saveGeminiKeyPref() {
+            const k = document.getElementById('geminiApiKeyInput').value.trim();
+            if (k) {
+                localStorage.setItem(GEMINI_KEY_STORAGE, k);
+            } else {
+                localStorage.removeItem(GEMINI_KEY_STORAGE);
+            }
+        }
+
+        function attachLiveVaultContextToInput() {
+            const totalDebt = appState.debts.reduce((s, d) => s + d.balance, 0);
+            const totalBills = appState.bills.reduce((s, b) => s + b.amount, 0);
+            const sim = simulatePayoffSchedule();
+            document.getElementById('geminiPromptInput').value =
+                `Review my ledger: ${appState.debts.length} debt accounts (${fmtMoney(totalDebt)}), ${appState.bills.length} recurring bills (${fmtMoney(totalBills)}/mo), extra monthly payment ${fmtMoney(appState.extraMonthly)}, strategy ${appState.strategy}, projected payoff ${sim.payoffLabel} (${sim.months} mos). What should my next move be?`;
+            document.getElementById('geminiPromptInput').focus();
+        }
+
+        function appendGeminiBubble(sender, text, isUser = false) {
+            const feed = document.getElementById('geminiChatFeed');
+            const div = document.createElement('div');
+            div.className = isUser
+                ? 'p-3.5 rounded-xl bg-cyan-950/50 border border-cyan-700/40 text-cyan-100 ml-6'
+                : 'p-3.5 rounded-xl bg-slate-900/95 border border-slate-800 text-slate-200 mr-6 whitespace-pre-wrap';
+            const labelColor = isUser ? 'text-cyan-300' : 'text-emerald-400';
+            div.innerHTML = `<span class="${labelColor} font-mono text-xs font-bold block mb-1">${sender}</span>${escapeHtml(text)}`;
+            feed.appendChild(div);
+            feed.scrollTop = feed.scrollHeight;
+            return div;
+        }
+
+        function escapeHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        document.getElementById('geminiChatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const promptInput = document.getElementById('geminiPromptInput');
+            const sendBtn = document.getElementById('geminiSendBtn');
+            const apiKey = document.getElementById('geminiApiKeyInput').value.trim() || localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+            const model = document.getElementById('geminiModelSelect').value;
+            const shareVault = document.getElementById('includeVaultContextCheck').checked;
+            const userPrompt = promptInput.value.trim();
+            if (!userPrompt) return;
+
+            if (!apiKey) {
+                appendGeminiBubble('GEMINI COPILOT', 'Please paste your Gemini API key in the key bar above first so the app can call Gemini directly without middle-manning.');
+                return;
+            }
+
+            appendGeminiBubble('YOU', userPrompt, true);
+            promptInput.value = '';
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Thinking...';
+
+            const thinkingBubble = appendGeminiBubble('GEMINI COPILOT', 'Analyzing...');
+
+            let finalPrompt = userPrompt;
+            if (shareVault) {
+                const totalDebt = appState.debts.reduce((s, d) => s + d.balance, 0);
+                const totalBills = appState.bills.reduce((s, b) => s + b.amount, 0);
+                const sim = simulatePayoffSchedule();
+                finalPrompt =
+                    `Vault Context (Mode: ${isDeveloperMode ? 'Developer' : 'User'}): ` +
+                    `Debts=${appState.debts.length} accounts totaling ${fmtMoney(totalDebt)}; ` +
+                    `Monthly Bills=${fmtMoney(totalBills)}; Strategy=${appState.strategy}; ` +
+                    `Extra Monthly=${fmtMoney(appState.extraMonthly)}; Projected Payoff=${sim.payoffLabel} (${sim.months} mos).\n\nUser Question: ${userPrompt}`;
+            }
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        systemInstruction: {
+                            parts: [{ text: 'You are Gemini inside NEXUS-PRIME, a sharp, clear, mathematically accurate personal debt and bill payoff copilot. Keep answers concise, actionable, and grounded in the user numbers.' }]
+                        },
+                        contents: [{ parts: [{ text: finalPrompt }] }]
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.error?.message || `HTTP ${res.status}`);
+                }
+                const replyText =
+                    data.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('\n')
+                    || 'No text returned.';
+                thinkingBubble.innerHTML = `<span class="text-emerald-400 font-mono text-xs font-bold block mb-1">GEMINI COPILOT (${model})</span>${escapeHtml(replyText)}`;
+            } catch (err) {
+                thinkingBubble.innerHTML = `<span class="text-rose-400 font-mono text-xs font-bold block mb-1">GEMINI ERROR</span>${escapeHtml(err.message)}`;
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Ask Gemini';
+            }
+        });
+
+        // --- USER <-> DEVELOPER MODE SWITCHER ---
+        function applyRoleModeUI() {
+            const badge = document.getElementById('roleModeBadge');
+            const switchBtn = document.getElementById('modeSwitchBtn');
+            const switchIcon = document.getElementById('modeSwitchIcon');
+            const switchLabel = document.getElementById('modeSwitchLabel');
+            const sideRole = document.getElementById('sidebar-role-status');
+            const secDevStatus = document.getElementById('sec-devpass-status');
+            const hasDevPass = Boolean(localStorage.getItem(DEV_PASS_HASH_KEY));
+
+            if (secDevStatus) {
+                secDevStatus.textContent = hasDevPass ? 'Configured (SHA-256 Salted)' : 'Not Configured Yet';
+                secDevStatus.className = hasDevPass ? 'font-bold text-purple-400' : 'font-bold text-slate-300';
+            }
+
+            if (isDeveloperMode) {
+                document.body.classList.remove('user-mode');
+                document.body.classList.add('dev-mode');
+                badge.textContent = 'DEV MODE';
+                badge.className = 'px-2 py-0.5 text-[10px] font-mono bg-purple-950/90 text-purple-300 border border-purple-600 rounded';
+                switchBtn.className = 'px-3 py-2 bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-600/60 text-emerald-200 text-xs font-bold rounded-lg transition flex items-center space-x-1.5';
+                switchIcon.className = 'fa-solid fa-user-shield';
+                switchLabel.textContent = 'User Mode';
+                if (sideRole) {
+                    sideRole.textContent = 'DEVELOPER';
+                    sideRole.className = 'text-purple-400 font-bold';
+                }
+            } else {
+                document.body.classList.add('user-mode');
+                document.body.classList.remove('dev-mode');
+                badge.textContent = 'USER MODE';
+                badge.className = 'px-2 py-0.5 text-[10px] font-mono bg-emerald-950/90 text-emerald-300 border border-emerald-700 rounded';
+                switchBtn.className = 'px-3 py-2 bg-purple-950/80 hover:bg-purple-900/80 border border-purple-600/50 text-purple-200 text-xs font-bold rounded-lg transition flex items-center space-x-1.5';
+                switchIcon.className = 'fa-solid fa-code';
+                switchLabel.textContent = 'Dev Mode';
+                if (sideRole) {
+                    sideRole.textContent = 'USER';
+                    sideRole.className = 'text-emerald-400 font-bold';
+                }
+                if (['botfarm', 'xai', 'testing'].includes(currentTab)) {
+                    switchTab('dashboard');
+                }
+            }
+        }
+
+        function handleModeSwitchClick() {
+            if (isDeveloperMode) {
+                lockDeveloperMode();
+                return;
+            }
+            const stored = localStorage.getItem(DEV_PASS_HASH_KEY);
+            if (!stored) {
+                openDevModal('setup');
+            } else {
+                openDevModal('unlock');
+            }
+        }
+
+        function openChangeDevPassword() {
+            openDevModal('change');
+        }
+
+        function openDevModal(action) {
+            devModalAction = action;
+            const modal = document.getElementById('devModeModal');
+            const title = document.getElementById('devModalTitle');
+            const desc = document.getElementById('devModalDesc');
+            const passLabel = document.getElementById('devPassLabel');
+            const confirmWrap = document.getElementById('devConfirmWrap');
+            const submitBtn = document.getElementById('devModalSubmitBtn');
+            const resetBtn = document.getElementById('resetDevPassBtn');
+            const err = document.getElementById('devModalError');
+
+            document.getElementById('devPassInput').value = '';
+            document.getElementById('devPassConfirmInput').value = '';
+            err.classList.add('hidden');
+
+            if (action === 'setup' || action === 'change') {
+                title.innerHTML = '<i class="fa-solid fa-key text-purple-400 mr-2"></i>' +
+                    (action === 'setup' ? 'Create Developer Mode Password' : 'Change Developer Mode Password');
+                desc.textContent = 'Set a password required whenever switching from clean User Mode into Developer Mode.';
+                passLabel.textContent = 'New Developer Password (min 4 characters)';
+                confirmWrap.classList.remove('hidden');
+                submitBtn.textContent = 'Save & Enter Dev Mode';
+                resetBtn.classList.add('hidden');
+            } else {
+                title.innerHTML = '<i class="fa-solid fa-terminal text-purple-400 mr-2"></i>Unlock Developer Mode';
+                desc.textContent = 'Enter your Developer Mode password to reveal the 3D Bot Farm, Live xAI Console, and Test Operations.';
+                passLabel.textContent = 'Developer Password';
+                confirmWrap.classList.add('hidden');
+                submitBtn.textContent = 'Unlock Dev Mode';
+                resetBtn.classList.remove('hidden');
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => document.getElementById('devPassInput').focus(), 50);
+        }
+
+        function closeDevModal() {
+            const modal = document.getElementById('devModeModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.getElementById('devModeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pw = document.getElementById('devPassInput').value;
+            const confirmPw = document.getElementById('devPassConfirmInput').value;
+            const err = document.getElementById('devModalError');
+
+            if (devModalAction === 'setup' || devModalAction === 'change') {
+                if (pw.length < 4) {
+                    err.textContent = 'Password must be at least 4 characters.';
+                    err.classList.remove('hidden');
+                    return;
+                }
+                if (pw !== confirmPw) {
+                    err.textContent = 'Passwords do not match.';
+                    err.classList.remove('hidden');
+                    return;
+                }
+                const record = await hashPasswordWithSalt(pw);
+                localStorage.setItem(DEV_PASS_HASH_KEY, JSON.stringify(record));
+                isDeveloperMode = true;
+                closeDevModal();
+                applyRoleModeUI();
+                logTerminal('[AUTH] Developer Mode password configured. Developer tools unlocked.', 'text-purple-400');
+            } else {
+                try {
+                    const stored = JSON.parse(localStorage.getItem(DEV_PASS_HASH_KEY) || '{}');
+                    const check = await hashPasswordWithSalt(pw, stored.salt);
+                    if (check.hash === stored.hash) {
+                        isDeveloperMode = true;
+                        closeDevModal();
+                        applyRoleModeUI();
+                        logTerminal('[AUTH] Developer Mode unlocked via password.', 'text-purple-400');
+                    } else {
+                        err.textContent = 'Incorrect Developer Mode password.';
+                        err.classList.remove('hidden');
+                    }
+                } catch (_) {
+                    err.textContent = 'Verification error. Try again.';
+                    err.classList.remove('hidden');
+                }
+            }
+        });
+
+        function lockDeveloperMode() {
+            isDeveloperMode = false;
+            applyRoleModeUI();
+        }
+
+        function resetDeveloperPassword() {
+            if (!confirm('Reset Developer Mode password? You will be prompted to create a new one next time you open Dev Mode.')) return;
+            localStorage.removeItem(DEV_PASS_HASH_KEY);
+            isDeveloperMode = false;
+            closeDevModal();
+            applyRoleModeUI();
+        }
+
+        // --- VAULT SAVE / BOOT ---
         async function saveVaultState() {
             if (activePin) {
                 const sealed = await encryptPayload(appState, activePin);
@@ -745,6 +1225,11 @@
         }
 
         async function bootVault() {
+            const savedKey = localStorage.getItem(GEMINI_KEY_STORAGE);
+            if (savedKey) {
+                document.getElementById('geminiApiKeyInput').value = savedKey;
+            }
+            applyRoleModeUI();
             const pinMeta = localStorage.getItem(PIN_META_KEY);
             const raw = localStorage.getItem(VAULT_STORAGE_KEY);
 
@@ -768,7 +1253,7 @@
             renderAll();
         }
 
-        // --- PIN LOCK & AUTO-LOCK ---
+        // --- VAULT PIN LOCK & AUTO-LOCK ---
         function showPinOverlay() {
             const overlay = document.getElementById('pinLockOverlay');
             overlay.classList.remove('hidden');
@@ -833,7 +1318,7 @@
             await saveVaultState();
             resetIdleTimer();
             closeSetPinModal();
-            logTerminal('AES-256-GCM PIN encryption enabled. Local storage sealed.', 'text-emerald-400');
+            logTerminal('AES-256-GCM Vault PIN encryption enabled. Local storage sealed.', 'text-emerald-400');
         });
 
         function handleHeaderPinClick() {
@@ -850,18 +1335,20 @@
                 return;
             }
             activePin = null;
+            isDeveloperMode = false;
+            applyRoleModeUI();
             appState = structuredClone(BLANK_STATE);
             renderAll();
             showPinOverlay();
         }
 
         async function disablePinEncryption() {
-            if (!confirm('Remove PIN encryption and store data unencrypted in this browser?')) return;
+            if (!confirm('Remove Vault PIN encryption and store data unencrypted in this browser?')) return;
             activePin = null;
             localStorage.removeItem(PIN_META_KEY);
             clearTimeout(idleTimer);
             await saveVaultState();
-            logTerminal('PIN encryption removed.', 'text-amber-400');
+            logTerminal('Vault PIN encryption removed.', 'text-amber-400');
         }
 
         function resetIdleTimer() {
@@ -905,13 +1392,14 @@
                 lockBtn.classList.add('hidden');
                 disableBtn.classList.add('hidden');
             }
+            applyRoleModeUI();
         }
 
         // --- PORTABLE ENCRYPTED BACKUP ---
         async function exportEncryptedVault() {
             const pass = document.getElementById('backupPassphrase').value.trim() || activePin;
             if (!pass) {
-                alert('Enter a backup password or set an active PIN first.');
+                alert('Enter a backup password or set an active Vault PIN first.');
                 return;
             }
             const envelope = await encryptPayload(appState, pass);
@@ -965,6 +1453,11 @@
 
         // --- NAVIGATION ---
         function switchTab(tabId) {
+            if (['botfarm', 'xai', 'testing'].includes(tabId) && !isDeveloperMode) {
+                handleModeSwitchClick();
+                return;
+            }
+            currentTab = tabId;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(el => {
                 el.classList.remove('bg-cyan-600/20', 'text-cyan-300', 'border', 'border-cyan-500/30');
@@ -1105,15 +1598,14 @@
             document.getElementById('dash-min-payments').textContent = fmtMoney(totalMinPay);
             document.getElementById('dash-total-outflow').textContent = fmtMoney(totalMinPay + totalBills + appState.extraMonthly);
 
-            // Render tables
             const debtsBody = document.getElementById('debtsTableBody');
             if (!appState.debts.length) {
                 debtsBody.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-500 text-xs">No credit or loan accounts added yet.</td></tr>';
             } else {
                 debtsBody.innerHTML = appState.debts.map(d => `
                     <tr>
-                        <td class="py-3 font-semibold text-white">${d.name}</td>
-                        <td class="py-3 text-slate-400 font-mono text-xs">${d.type}</td>
+                        <td class="py-3 font-semibold text-white">${escapeHtml(d.name)}</td>
+                        <td class="py-3 text-slate-400 font-mono text-xs">${escapeHtml(d.type)}</td>
                         <td class="py-3 font-bold text-cyan-300 sensitive-val">${fmtMoney(d.balance)}</td>
                         <td class="py-3 text-slate-400 sensitive-val">${d.limit ? fmtMoney(d.limit) : '--'}</td>
                         <td class="py-3 text-amber-400">${d.apr}%</td>
@@ -1129,8 +1621,8 @@
             } else {
                 billsBody.innerHTML = appState.bills.map(b => `
                     <tr>
-                        <td class="py-3 font-semibold text-white">${b.name}</td>
-                        <td class="py-3 text-slate-400 text-xs">${b.category}</td>
+                        <td class="py-3 font-semibold text-white">${escapeHtml(b.name)}</td>
+                        <td class="py-3 text-slate-400 text-xs">${escapeHtml(b.category)}</td>
                         <td class="py-3 font-bold text-emerald-300 sensitive-val">${fmtMoney(b.amount)}</td>
                         <td class="py-3 text-slate-300 font-mono">Day ${b.dueDay}</td>
                         <td class="py-3 text-right"><button onclick="removeBill(${b.id})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash"></i></button></td>
@@ -1314,6 +1806,7 @@
 
             function animate(now) {
                 requestAnimationFrame(animate);
+                if (!isDeveloperMode) return;
                 const dt = Math.min((now - window.cityState.lastTime) / 1000, 0.05);
                 window.cityState.lastTime = now;
 
@@ -1511,7 +2004,7 @@
             if (isEncrypted) {
                 logTerminal('[AUDIT PASS] localStorage contains only AES-256-GCM ciphertext. Zero plaintext leaks.', 'text-emerald-400');
             } else {
-                logTerminal('[AUDIT NOTICE] PIN lock not set yet. Tap "Set PIN Lock" in header to encrypt localStorage.', 'text-amber-400');
+                logTerminal('[AUDIT NOTICE] Vault PIN lock not set yet. Tap "Set PIN Lock" in header to encrypt localStorage.', 'text-amber-400');
             }
         }
 
@@ -1527,7 +2020,9 @@
             if (!confirm(msg)) return;
             localStorage.removeItem(VAULT_STORAGE_KEY);
             localStorage.removeItem(PIN_META_KEY);
+            localStorage.removeItem(DEV_PASS_HASH_KEY);
             activePin = null;
+            isDeveloperMode = false;
             clearTimeout(idleTimer);
             appState = structuredClone(BLANK_STATE);
             hidePinOverlay();
