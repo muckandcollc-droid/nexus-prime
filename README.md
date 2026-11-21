@@ -1,10 +1,12 @@
-# NEXUS-PRIME | Solo Encrypted Financial Command Center (All-in-One Release)
+# NEXUS-PRIME v12 | Unified Banking, Debt & Wealth Command Center
 
-A zero-knowledge, blank-slate personal bill and debt payoff PWA engineered for private/public GitHub Pages hosting and Android tablet installation.
+A zero-knowledge, blank-slate personal financial hub built for GitHub Pages and mobile/tablet installation.
 
-## Key Capabilities
-- **Zero Hardcoded Data**: Ships as a clean `$0.00` template in source control with no hardcoded credentials, account balances, or API keys.
-- **AES-256-GCM Local Vault Encryption**: Optional PIN lock derives a non-extractable key via `PBKDF2-SHA256` (310,000 iterations) with a fresh 96-bit IV on every write and 10-minute idle auto-lock.
-- **Password-Gated Developer Mode**: Boots cleanly into **User Mode** (`Dashboard`, `Bills & Credit`, `Statement OCR`, `Security & Backup`, plus **Export CSV**). Entering your salted `PBKDF2-SHA256` Developer Password unlocks **Gemini Copilot**, **AI Bot Farm** (Three.js 3D cyber-city), **Live xAI Console**, and **Test Operations**.
-- **Local Statement OCR & Quick CSV Export**: Scan statements locally via `Tesseract.js`, export `.csv` ledgers anytime, and back up/restore encrypted `.nexusvault` snapshots.
-- **PWA Ready**: Includes `192x192` and `512x512` PNG icons and `manifest.json` for Chrome home-screen installation on Android.
+## Modules Included
+- **Overview**: Total Bank Cash, Investments, Debt Principal, Net Worth, Quick Actions, and Dynamic Snowball/Avalanche Paydown Curve.
+- **Bank & Activity**: Checking/savings balances, interactive transaction ledger (deposits, bill payments, creditor payments that automatically reduce debt balances, investments), and Plaid backend proxy hooks.
+- **Bills & Creditors**: Manual entry, CSV/JSON/TXT file import, and Quick Export CSV.
+- **Negotiations**: Track APR reductions, hardship plans, debt validation requests, and lump-sum settlements with a built-in call/letter script generator.
+- **Credit Reports**: Tri-bureau score tracker (Equifax, Experian, TransUnion), live utilization, collections count, and inquiries.
+- **Investments**: Track ETFs, stocks, 401(k)/IRA, and crypto holdings feeding into Net Worth.
+- **Security & Backup**: AES-256-GCM local vault encryption (`PBKDF2-SHA256`), `.nexusvault` encrypted backup/restore, and Developer Mode (`gemini-3.8-flash` / `gemini-3.1-pro-preview`).

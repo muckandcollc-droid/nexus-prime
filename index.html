@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS-PRIME | Solo Encrypted Financial Command Center</title>
+    <title>NEXUS-PRIME v12 | Unified Banking, Debt & Wealth Command Center</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#030712">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -48,7 +48,7 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-cyan-500 selection:text-black user-mode">
 
-    <!-- PIN UNLOCK OVERLAY (Vault Encryption Lock) -->
+    <!-- PIN UNLOCK OVERLAY -->
     <div id="pinLockOverlay" class="fixed inset-0 z-[100] bg-[#030712]/95 backdrop-blur-xl hidden items-center justify-center p-4">
         <div class="glass-panel p-8 rounded-2xl max-w-sm w-full border border-cyan-500/40 text-center space-y-6">
             <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-600 to-emerald-500 flex items-center justify-center text-white text-2xl glow-cyan">
@@ -63,8 +63,7 @@
                     placeholder="••••"
                     class="w-full text-center tracking-[0.6em] text-2xl font-mono bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-cyan-300 focus:outline-none focus:border-cyan-500">
                 <p id="unlockErrorMsg" class="text-xs text-rose-400 hidden"></p>
-                <button type="submit" id="unlockSubmitBtn"
-                    class="w-full py-3 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white font-bold rounded-xl text-sm transition">
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white font-bold rounded-xl text-sm transition">
                     Decrypt &amp; Unlock
                 </button>
             </form>
@@ -84,7 +83,7 @@
                 <button onclick="closeSetPinModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <p class="text-xs text-slate-400">
-                Encrypts all bills, credit accounts, and balances locally using Web Crypto (<code class="text-cyan-300">PBKDF2-SHA256</code> + <code class="text-emerald-300">AES-256-GCM</code>). Zero plaintext touches browser storage.
+                Encrypts all bank accounts, transactions, bills, debts, negotiations, credit reports, and investments locally using Web Crypto (<code class="text-cyan-300">PBKDF2-SHA256</code> + <code class="text-emerald-300">AES-256-GCM</code>).
             </p>
             <form id="setPinForm" class="space-y-4">
                 <div>
@@ -118,7 +117,7 @@
                 <button onclick="closeDevModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <p id="devModalDesc" class="text-xs text-slate-400">
-                Enter your Developer Mode password to unlock Gemini Copilot, the 3D Cyber-City Bot Farm, Live xAI Console, and Test Operations Sandbox.
+                Enter your Developer Mode password to unlock Gemini Copilot, Live xAI Console, and Test Operations.
             </p>
             <form id="devModeForm" class="space-y-4">
                 <div>
@@ -151,49 +150,44 @@
     <header class="sticky top-0 z-40 glass-panel border-b border-cyan-900/40 px-4 lg:px-8 py-3 flex items-center justify-between gap-2">
         <div class="flex items-center space-x-3">
             <div class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-emerald-500 glow-cyan shrink-0">
-                <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+                <i class="fa-solid fa-building-columns text-white text-lg"></i>
                 <span class="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full"></span>
             </div>
             <div>
                 <div class="flex items-center space-x-2">
                     <h1 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 tracking-wider text-base lg:text-xl">NEXUS-PRIME</h1>
                     <span id="roleModeBadge" class="px-2 py-0.5 text-[10px] font-mono bg-emerald-950/90 text-emerald-300 border border-emerald-700 rounded">USER MODE</span>
-                    <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono bg-cyan-950/80 text-cyan-300 border border-cyan-800 rounded">ALL-IN-ONE</span>
+                    <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono bg-cyan-950/80 text-cyan-300 border border-cyan-800 rounded">v12 BANKING HUB</span>
                 </div>
-                <p class="text-[11px] text-slate-400 hidden sm:block">Zero-Knowledge Local Ledger • Gemini Copilot Locked to Developer Mode</p>
+                <p class="text-[11px] text-slate-400 hidden sm:block">Unified Banking, Transactions, Creditors, Negotiations, Credit &amp; Investments</p>
             </div>
         </div>
 
         <div class="flex items-center space-x-2">
-            <!-- Quick CSV Export Button -->
             <button onclick="exportVaultCSV()" title="Quick Export CSV"
                 class="px-3 py-2 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600/50 text-emerald-200 text-xs font-bold rounded-lg transition flex items-center space-x-1.5">
                 <i class="fa-solid fa-file-csv text-emerald-400"></i>
                 <span class="hidden md:inline">Export CSV</span>
             </button>
 
-            <!-- User <-> Developer Mode Switcher -->
             <button onclick="handleModeSwitchClick()" id="modeSwitchBtn" title="Switch Between User & Developer Mode"
                 class="px-3 py-2 bg-purple-950/80 hover:bg-purple-900/80 border border-purple-600/50 text-purple-200 text-xs font-bold rounded-lg transition flex items-center space-x-1.5">
                 <i class="fa-solid fa-code" id="modeSwitchIcon"></i>
                 <span id="modeSwitchLabel">Dev Mode</span>
             </button>
 
-            <!-- Privacy Blur Toggle -->
             <button onclick="togglePrivacyBlur()" id="privacyBlurBtn" title="Blur Dollar Figures"
                 class="px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition flex items-center space-x-1.5">
                 <i class="fa-solid fa-eye" id="privacyBlurIcon"></i>
                 <span class="hidden md:inline">Mask</span>
             </button>
 
-            <!-- Tablet Lite Mode Toggle -->
             <button onclick="toggleLiteMode()" id="liteModeBtn" title="Toggle Tablet Lite Mode"
                 class="px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition flex items-center space-x-1.5">
                 <i class="fa-solid fa-gauge-high text-cyan-400"></i>
                 <span class="hidden md:inline" id="liteModeLabel">Lite: OFF</span>
             </button>
 
-            <!-- Vault PIN / Lock Button -->
             <button onclick="handleHeaderPinClick()" id="headerPinBtn"
                 class="px-3.5 py-2 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white text-xs font-bold rounded-lg transition flex items-center space-x-1.5">
                 <i class="fa-solid fa-key" id="headerPinIcon"></i>
@@ -207,15 +201,26 @@
         <!-- Sidebar -->
         <aside class="w-full lg:w-64 glass-panel border-r border-slate-800 p-4 flex lg:flex-col justify-between shrink-0">
             <nav class="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-1.5 overflow-x-auto w-full pb-2 lg:pb-0">
-                <!-- Clean User Mode Tabs -->
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 whitespace-nowrap">
-                    <i class="fa-solid fa-chart-pie w-4"></i><span>Dashboard</span>
+                    <i class="fa-solid fa-chart-pie w-4"></i><span>Overview</span>
+                </button>
+                <button onclick="switchTab('banking')" id="nav-banking" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
+                    <i class="fa-solid fa-building-columns w-4"></i><span>Bank &amp; Activity</span>
                 </button>
                 <button onclick="switchTab('vault')" id="nav-vault" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
-                    <i class="fa-solid fa-file-invoice-dollar w-4"></i><span>Bills &amp; Credit</span>
+                    <i class="fa-solid fa-file-invoice-dollar w-4"></i><span>Bills &amp; Creditors</span>
+                </button>
+                <button onclick="switchTab('negotiations')" id="nav-negotiations" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
+                    <i class="fa-solid fa-handshake w-4"></i><span>Negotiations</span>
+                </button>
+                <button onclick="switchTab('credit')" id="nav-credit" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
+                    <i class="fa-solid fa-gauge-high w-4"></i><span>Credit Reports</span>
+                </button>
+                <button onclick="switchTab('investments')" id="nav-investments" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
+                    <i class="fa-solid fa-arrow-trend-up w-4"></i><span>Investments</span>
                 </button>
                 <button onclick="switchTab('ocr')" id="nav-ocr" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
-                    <i class="fa-solid fa-camera w-4"></i><span>Statement OCR</span>
+                    <i class="fa-solid fa-file-arrow-up w-4"></i><span>Statement OCR</span>
                 </button>
                 <button onclick="switchTab('security')" id="nav-security" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
                     <i class="fa-solid fa-shield-halved w-4"></i><span>Security &amp; Backup</span>
@@ -227,9 +232,6 @@
                 </div>
                 <button onclick="switchTab('gemini')" id="nav-gemini" class="dev-only nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
                     <i class="fa-solid fa-sparkles w-4 text-purple-400"></i><span>Gemini Copilot</span>
-                </button>
-                <button onclick="switchTab('botfarm')" id="nav-botfarm" class="dev-only nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
-                    <i class="fa-solid fa-city w-4 text-purple-400"></i><span>AI Bot Farm</span>
                 </button>
                 <button onclick="switchTab('xai')" id="nav-xai" class="dev-only nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
                     <i class="fa-solid fa-terminal w-4 text-purple-400"></i><span>Live xAI Console</span>
@@ -248,10 +250,6 @@
                     <span>Storage Crypto</span>
                     <span id="sidebar-crypto-status" class="text-amber-400 font-bold">UNENCRYPTED</span>
                 </div>
-                <div class="dev-only flex justify-between items-center text-slate-400 font-mono">
-                    <span>Bot Nodes</span>
-                    <span class="text-cyan-400 font-bold" id="sidebar-nodes">14/14</span>
-                </div>
                 <div class="flex justify-between items-center text-slate-400 font-mono">
                     <span>Auto-Lock</span>
                     <span class="text-slate-300" id="sidebar-autolock">OFF</span>
@@ -262,70 +260,66 @@
         <!-- Workspace Content -->
         <main class="flex-1 p-4 lg:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
 
-            <!-- TAB 1: DASHBOARD -->
+            <!-- TAB 1: OVERVIEW / BANKING DASHBOARD -->
             <section id="tab-dashboard" class="tab-content space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden flex flex-col justify-between glow-cyan">
-                        <div>
-                            <div class="w-11 h-11 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center mb-3 text-cyan-400">
-                                <i class="fa-solid fa-bullseye text-lg"></i>
-                            </div>
-                            <h3 id="dash-payoff-date" class="text-3xl font-extrabold text-white tracking-tight">--</h3>
-                            <p class="text-slate-400 text-xs mt-1">Projected Debt-Free Date</p>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                            <span id="dash-strategy-badge" class="text-emerald-400 font-bold">Snowball Engine Ready</span>
-                            <span id="dash-months-left" class="text-slate-400 font-mono">0 mos</span>
-                        </div>
+                <!-- Net Worth & Cash Row -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-panel p-5 rounded-2xl border-l-4 border-emerald-500">
+                        <span class="text-xs text-slate-400">Total Bank Cash</span>
+                        <h3 id="dash-total-cash" class="text-2xl font-extrabold text-emerald-400 mt-1 sensitive-val">$0.00</h3>
+                        <p class="text-[11px] text-slate-500 mt-1" id="dash-bank-count">0 linked bank accounts</p>
                     </div>
-
-                    <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
-                        <div class="flex justify-between items-center mb-3">
-                            <h4 class="font-bold text-white text-base">Portfolio Summary</h4>
-                            <span class="text-[11px] font-mono text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded">Local Only</span>
-                        </div>
-                        <div class="space-y-2.5 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-slate-400">Total Debt Principal</span>
-                                <span id="dash-total-debt" class="font-bold text-white sensitive-val">$0.00</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-400">Monthly Recurring Bills</span>
-                                <span id="dash-total-bills" class="font-semibold text-cyan-300 sensitive-val">$0.00</span>
-                            </div>
-                            <div class="flex justify-between pt-2 border-t border-slate-800">
-                                <span class="text-slate-300 font-medium">Credit Utilization</span>
-                                <span id="dash-utilization" class="font-bold text-emerald-400">0%</span>
-                            </div>
-                        </div>
+                    <div class="glass-panel p-5 rounded-2xl border-l-4 border-cyan-500">
+                        <span class="text-xs text-slate-400">Total Investments</span>
+                        <h3 id="dash-total-invest" class="text-2xl font-extrabold text-cyan-300 mt-1 sensitive-val">$0.00</h3>
+                        <p class="text-[11px] text-slate-500 mt-1" id="dash-invest-count">0 holdings tracked</p>
                     </div>
-
-                    <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center relative">
-                        <h4 class="absolute top-4 left-6 font-bold text-white text-xs">Debt Mix</h4>
-                        <div class="w-36 h-36 relative mt-4">
-                            <canvas id="debtDonutChart"></canvas>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                                <span class="text-[10px] text-slate-400">Accounts</span>
-                                <span id="dash-account-count" class="text-lg font-extrabold text-white">0</span>
-                            </div>
-                        </div>
+                    <div class="glass-panel p-5 rounded-2xl border-l-4 border-rose-500">
+                        <span class="text-xs text-slate-400">Total Debt Principal</span>
+                        <h3 id="dash-total-debt" class="text-2xl font-extrabold text-white mt-1 sensitive-val">$0.00</h3>
+                        <p class="text-[11px] text-slate-500 mt-1">Utilization: <span id="dash-utilization" class="text-emerald-400 font-bold">0%</span></p>
+                    </div>
+                    <div class="glass-panel p-5 rounded-2xl border-l-4 border-purple-500">
+                        <span class="text-xs text-slate-400">Net Worth</span>
+                        <h3 id="dash-net-worth" class="text-2xl font-extrabold text-purple-300 mt-1 sensitive-val">$0.00</h3>
+                        <p class="text-[11px] text-slate-500 mt-1">Debt-Free: <span id="dash-payoff-date" class="text-cyan-300 font-bold">--</span> (<span id="dash-months-left">0 mos</span>)</p>
                     </div>
                 </div>
 
-                <!-- Strategy & Monthly Surplus Controls -->
+                <!-- Quick Action Bar (Bank App Feel) -->
+                <div class="glass-panel p-4 rounded-2xl flex flex-wrap items-center justify-between gap-3">
+                    <div class="text-xs text-slate-300 font-semibold">Quick Actions:</div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="switchTab('banking')" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition">
+                            <i class="fa-solid fa-arrow-right-arrow-left mr-1.5"></i>Log Transaction / Pay
+                        </button>
+                        <button onclick="switchTab('vault')" class="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">
+                            <i class="fa-solid fa-plus mr-1.5"></i>Add Bill / Creditor
+                        </button>
+                        <button onclick="switchTab('negotiations')" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-xl transition">
+                            <i class="fa-solid fa-handshake mr-1.5"></i>Start Negotiation
+                        </button>
+                        <button onclick="switchTab('credit')" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition">
+                            <i class="fa-solid fa-gauge-high mr-1.5"></i>Update Credit Score
+                        </button>
+                        <button onclick="switchTab('investments')" class="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl transition">
+                            <i class="fa-solid fa-chart-line mr-1.5"></i>Add Investment
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Paydown Curve & Snowball Boost -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 glass-panel p-6 rounded-2xl">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                             <div>
-                                <h4 class="font-bold text-white text-base">Dynamic Paydown Curve</h4>
-                                <p class="text-xs text-slate-400">Supports unlimited debt accounts &amp; balances of any size</p>
+                                <h4 class="font-bold text-white text-base">Dynamic Debt Paydown Curve</h4>
+                                <p class="text-xs text-slate-400">Updates automatically when you log creditor payments or adjust extra boost</p>
                             </div>
-                            <div class="flex items-center space-x-2">
-                                <select id="strategySelect" onchange="updateStrategySettings()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-cyan-300 font-semibold">
-                                    <option value="snowball">Snowball (Smallest First)</option>
-                                    <option value="avalanche">Avalanche (Highest APR First)</option>
-                                </select>
-                            </div>
+                            <select id="strategySelect" onchange="updateStrategySettings()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-cyan-300 font-semibold">
+                                <option value="snowball">Snowball (Smallest First)</option>
+                                <option value="avalanche">Avalanche (Highest APR First)</option>
+                            </select>
                         </div>
                         <div class="h-60 relative">
                             <canvas id="debtPaydownChart"></canvas>
@@ -334,7 +328,7 @@
 
                     <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between space-y-4">
                         <div>
-                            <h4 class="font-bold text-white text-base">Monthly Snowball Boost</h4>
+                            <h4 class="font-bold text-white text-base">Monthly Cash Flow &amp; Boost</h4>
                             <p class="text-xs text-slate-400 mt-1">Extra monthly payment applied automatically to accelerate zero-debt date.</p>
                         </div>
                         <div class="space-y-3">
@@ -343,40 +337,179 @@
                                 <input type="number" id="extraMonthlyInput" min="0" step="10" value="0" onchange="updateStrategySettings()"
                                     class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-500">
                             </div>
-                            <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-xs space-y-1">
+                            <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-xs space-y-1.5">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">Recurring Monthly Bills:</span>
+                                    <span id="dash-total-bills" class="text-cyan-300 font-bold sensitive-val">$0.00</span>
+                                </div>
                                 <div class="flex justify-between">
                                     <span class="text-slate-400">Min. Debt Payments:</span>
                                     <span id="dash-min-payments" class="text-white font-bold sensitive-val">$0.00</span>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">Total Monthly Outflow:</span>
-                                    <span id="dash-total-outflow" class="text-cyan-300 font-bold sensitive-val">$0.00</span>
+                                <div class="flex justify-between pt-1 border-t border-slate-800">
+                                    <span class="text-slate-300">Total Monthly Outflow:</span>
+                                    <span id="dash-total-outflow" class="text-emerald-300 font-bold sensitive-val">$0.00</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="switchTab('vault')" class="flex-1 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">
-                                + Add Accounts
-                            </button>
-                            <button onclick="exportVaultCSV()" class="px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition" title="Quick Export CSV">
-                                <i class="fa-solid fa-file-csv mr-1"></i>CSV
-                            </button>
+                        <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
+                            <span id="dash-strategy-badge" class="text-emerald-400 font-bold">Snowball Active</span>
+                            <span class="text-slate-400">Accounts: <strong id="dash-account-count" class="text-white">0</strong></span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 2: BILLS & CREDIT VAULT -->
+            <!-- TAB 2: BANK ACCOUNTS & INTERACTIVE TRANSACTIONS -->
+            <section id="tab-banking" class="tab-content hidden space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-white"><i class="fa-solid fa-building-columns text-emerald-400 mr-2"></i>Bank Accounts &amp; Unified Transactions</h3>
+                        <p class="text-xs text-slate-400">Manage checking/savings balances, execute bill or creditor payments, and connect live Plaid bank feeds via your backend.</p>
+                    </div>
+                </div>
+
+                <!-- Plaid Backend Sync Bar -->
+                <div class="glass-panel p-5 rounded-2xl border border-cyan-500/30 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h4 class="text-sm font-bold text-white"><i class="fa-solid fa-link text-cyan-400 mr-1.5"></i>Live Bank Feed Sync (Plaid Backend Proxy)</h4>
+                            <p class="text-[11px] text-slate-400">Connects to your Node/Express backend so PLAID_SECRET never touches GitHub or browser storage.</p>
+                        </div>
+                        <span id="plaidStatusBadge" class="px-2.5 py-1 text-[10px] font-mono bg-slate-900 text-slate-300 border border-slate-700 rounded-lg">Standby</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <input type="text" id="plaidBackendUrl" value="http://localhost:5000" placeholder="Backend URL (e.g., http://localhost:5000)"
+                            class="flex-1 min-w-[200px] bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-cyan-200">
+                        <button onclick="launchPlaidLink()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">
+                            Link Bank (Plaid)
+                        </button>
+                        <button onclick="syncPlaidTransactions()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition">
+                            Sync Transactions
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add Bank Account + Log Interactive Transaction -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h4 class="text-base font-extrabold text-white">Add Bank / Cash Account</h4>
+                        <form id="addBankForm" class="space-y-3 text-sm">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Bank / Account Name</label>
+                                    <input type="text" id="bankName" required placeholder="e.g., Primary Checking"
+                                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Account Type</label>
+                                    <select id="bankType" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                                        <option value="Checking">Checking</option>
+                                        <option value="Savings">Savings</option>
+                                        <option value="Cash Reserve">Cash Reserve</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Current Balance ($)</label>
+                                <input type="number" id="bankBalance" step="0.01" required placeholder="0.00"
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                            </div>
+                            <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition">
+                                Add Bank Account
+                            </button>
+                        </form>
+                        <div id="bankAccountsList" class="space-y-2 pt-2 border-t border-slate-800"></div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h4 class="text-base font-extrabold text-white">Execute / Log Transaction</h4>
+                        <form id="addTxnForm" class="space-y-3 text-sm">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Transaction Type</label>
+                                    <select id="txnType" onchange="toggleTxnTarget()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                                        <option value="deposit">Deposit / Income (+)</option>
+                                        <option value="bill_payment">Pay Recurring Bill (-)</option>
+                                        <option value="creditor_payment">Pay Creditor / Debt (-)</option>
+                                        <option value="investment">Buy Investment (-)</option>
+                                        <option value="expense">General Expense (-)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Bank Account</label>
+                                    <select id="txnBankSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                                        <option value="">-- Select Bank --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="txnCreditorWrap" class="hidden">
+                                <label class="block text-xs text-slate-400 mb-1">Apply Payment Directly to Creditor</label>
+                                <select id="txnCreditorSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                                    <option value="">-- Select Creditor --</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs text-slate-400 mb-1">Description / Merchant</label>
+                                    <input type="text" id="txnDesc" required placeholder="e.g., Paycheck, Mortgage, Amex Payment"
+                                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Amount ($)</label>
+                                    <input type="number" id="txnAmount" min="0.01" step="0.01" required placeholder="0.00"
+                                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xs transition">
+                                Post Transaction &amp; Update Balances
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Unified Transaction Ledger -->
+                <div class="glass-panel p-6 rounded-2xl overflow-x-auto space-y-4">
+                    <div class="flex flex-wrap justify-between items-center gap-2">
+                        <h4 class="font-bold text-white text-base">Transaction Activity Ledger</h4>
+                        <input type="text" id="txnSearchInput" oninput="renderAll()" placeholder="Search transactions..."
+                            class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 font-mono text-xs">
+                                <th class="pb-2">DATE</th>
+                                <th class="pb-2">DESCRIPTION</th>
+                                <th class="pb-2">TYPE</th>
+                                <th class="pb-2">AMOUNT</th>
+                                <th class="pb-2 text-right">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="txnsTableBody" class="divide-y divide-slate-800/60">
+                            <tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">No transactions logged yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 3: BILLS & CREDITORS -->
             <section id="tab-vault" class="tab-content hidden space-y-6">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <h3 class="text-xl font-extrabold text-white">Bills &amp; Credit Ledger</h3>
-                        <p class="text-xs text-slate-400">All entries stay local on your device and export cleanly to CSV anytime.</p>
+                        <h3 class="text-xl font-extrabold text-white">Bills &amp; Creditors Ledger</h3>
+                        <p class="text-xs text-slate-400">Add accounts manually, import from CSV/JSON/TXT files, or export anytime.</p>
                     </div>
-                    <button onclick="exportVaultCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-2">
-                        <i class="fa-solid fa-file-csv"></i>
-                        <span>Quick Export CSV</span>
-                    </button>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <label class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-file-import"></i>
+                            <span>Import From File</span>
+                            <input type="file" id="vaultFileImport" accept=".csv,.json,.txt" class="hidden" onchange="importAccountsFromFile(event)">
+                        </label>
+                        <button onclick="exportVaultCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-2">
+                            <i class="fa-solid fa-file-csv"></i>
+                            <span>Quick Export CSV</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -386,8 +519,8 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">Creditor / Account Name</label>
-                                    <input type="text" id="debtName" required placeholder="e.g., Sapphire Card"
-                                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+                                    <input type="text" id="debtName" required placeholder="e.g., Capital One"
+                                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
                                 </div>
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">Account Type</label>
@@ -434,8 +567,8 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">Bill / Utility Name</label>
-                                    <input type="text" id="billName" required placeholder="e.g., Electric Utility"
-                                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                                    <input type="text" id="billName" required placeholder="e.g., Auto Insurance"
+                                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
                                 </div>
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">Category</label>
@@ -456,7 +589,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">Due Day of Month</label>
-                                    <input type="number" id="billDueDay" min="1" max="31" required placeholder="15"
+                                    <input type="number" id="billDueDay" min="1" max="31" required placeholder="1"
                                         class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
                                 </div>
                             </div>
@@ -507,27 +640,194 @@
                 </div>
             </section>
 
-            <!-- TAB 3: STATEMENT SNAPSHOT OCR -->
+            <!-- TAB 4: CREDITOR NEGOTIATIONS CENTER -->
+            <section id="tab-negotiations" class="tab-content hidden space-y-6">
+                <div class="glass-panel p-6 rounded-2xl space-y-5">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-white"><i class="fa-solid fa-handshake text-amber-400 mr-2"></i>Creditor Negotiation &amp; Settlement Center</h3>
+                        <p class="text-xs text-slate-400 mt-1">Track APR reduction requests, hardship plans, debt validation letters, and lump-sum settlement offers across your creditors.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <form id="addNegForm" class="space-y-3 text-sm">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Creditor / Collector</label>
+                                    <input type="text" id="negCreditor" required placeholder="e.g., Capital One / Holzman Law"
+                                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Negotiation Type</label>
+                                    <select id="negType" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                                        <option value="APR Reduction">APR Reduction / Hardship Plan</option>
+                                        <option value="Lump-Sum Settlement">Lump-Sum Settlement</option>
+                                        <option value="Debt Validation">Debt Validation Request (FDCPA)</option>
+                                        <option value="Pay-for-Delete">Pay-for-Delete Proposal</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Target Offer ($ or %)</label>
+                                    <input type="text" id="negTarget" required placeholder="e.g., 40% settlement or 9.99% APR"
+                                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Status</label>
+                                    <select id="negStatus" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                                        <option value="Planned">Planned</option>
+                                        <option value="Sent / Called">Sent / Called</option>
+                                        <option value="Counter-Offered">Counter-Offered</option>
+                                        <option value="Accepted (In Writing)">Accepted (In Writing)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="submit" class="flex-1 py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-xs transition">
+                                    Log Negotiation
+                                </button>
+                                <button type="button" onclick="generateNegotiationScript()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-xl text-xs transition">
+                                    Generate Script
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-cyan-300">Ready-to-Use Call / Letter Script</span>
+                                <button onclick="copyNegScript()" class="text-[11px] text-emerald-400 hover:underline">Copy Script</button>
+                            </div>
+                            <textarea id="negScriptBox" rows="7" readonly
+                                class="w-full bg-transparent text-xs font-mono text-slate-300 focus:outline-none">Select a creditor and negotiation type on the left, then click "Generate Script" to build a ready-to-use call or written offer template.</textarea>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-400 font-mono text-xs">
+                                    <th class="pb-2">CREDITOR</th>
+                                    <th class="pb-2">TYPE</th>
+                                    <th class="pb-2">TARGET OFFER</th>
+                                    <th class="pb-2">STATUS</th>
+                                    <th class="pb-2 text-right">REMOVE</th>
+                                </tr>
+                            </thead>
+                            <tbody id="negsTableBody" class="divide-y divide-slate-800/60">
+                                <tr><td colspan="5" class="py-5 text-center text-slate-500 text-xs">No active negotiations logged yet.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: CREDIT REPORTS & BUREAU TRACKER -->
+            <section id="tab-credit" class="tab-content hidden space-y-6">
+                <div class="glass-panel p-6 rounded-2xl space-y-5">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-white"><i class="fa-solid fa-gauge-high text-indigo-400 mr-2"></i>Tri-Bureau Credit Reports &amp; Monitoring</h3>
+                        <p class="text-xs text-slate-400 mt-1">Track your Equifax, Experian, and TransUnion scores, inquiries, and derogatory items locally. (Direct automated bureau APIs like CRS, Array, or Equifax require B2B/FCRA business credentials on a backend server.)</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-5 rounded-xl bg-slate-950 border border-cyan-500/30 space-y-2">
+                            <span class="text-xs font-mono text-cyan-400">EQUIFAX</span>
+                            <input type="number" id="scoreEquifax" min="300" max="850" placeholder="Score (300-850)" onchange="saveCreditScores()"
+                                class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-2xl font-extrabold text-white">
+                        </div>
+                        <div class="p-5 rounded-xl bg-slate-950 border border-emerald-500/30 space-y-2">
+                            <span class="text-xs font-mono text-emerald-400">EXPERIAN</span>
+                            <input type="number" id="scoreExperian" min="300" max="850" placeholder="Score (300-850)" onchange="saveCreditScores()"
+                                class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-2xl font-extrabold text-white">
+                        </div>
+                        <div class="p-5 rounded-xl bg-slate-950 border border-purple-500/30 space-y-2">
+                            <span class="text-xs font-mono text-purple-400">TRANSUNION</span>
+                            <input type="number" id="scoreTransUnion" min="300" max="850" placeholder="Score (300-850)" onchange="saveCreditScores()"
+                                class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-2xl font-extrabold text-white">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                        <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800">
+                            <span class="text-slate-400 block">Revolving Utilization (Live)</span>
+                            <span id="credit-util-live" class="text-xl font-extrabold text-cyan-300">0%</span>
+                        </div>
+                        <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800">
+                            <span class="text-slate-400 block">Open Collections (Live)</span>
+                            <span id="credit-coll-live" class="text-xl font-extrabold text-rose-400">0</span>
+                        </div>
+                        <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800">
+                            <span class="text-slate-400 block">Hard Inquiries (Manual)</span>
+                            <input type="number" id="creditInquiries" min="0" value="0" onchange="saveCreditScores()"
+                                class="mt-1 w-24 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-base font-bold text-white">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 6: INVESTMENTS & WEALTH -->
+            <section id="tab-investments" class="tab-content hidden space-y-6">
+                <div class="glass-panel p-6 rounded-2xl space-y-5">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-white"><i class="fa-solid fa-arrow-trend-up text-purple-400 mr-2"></i>Investments &amp; Wealth Portfolio</h3>
+                        <p class="text-xs text-slate-400 mt-1">Track brokerage accounts, ETFs, stocks, 401(k)/IRA, and crypto holdings. Automatically updates your Net Worth on the Overview tab.</p>
+                    </div>
+
+                    <form id="addInvestForm" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-sm">
+                        <input type="text" id="invName" required placeholder="Asset / Account (e.g., VOO, 401k)"
+                            class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                        <select id="invType" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                            <option value="ETF / Stock">ETF / Stock</option>
+                            <option value="401(k) / IRA">401(k) / IRA</option>
+                            <option value="Crypto">Crypto</option>
+                            <option value="High-Yield / CD">High-Yield / CD</option>
+                        </select>
+                        <input type="number" id="invValue" min="0" step="0.01" required placeholder="Current Value ($)"
+                            class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+                        <button type="submit" class="py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition">
+                            Add Holding
+                        </button>
+                    </form>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-400 font-mono text-xs">
+                                    <th class="pb-2">HOLDING</th>
+                                    <th class="pb-2">CATEGORY</th>
+                                    <th class="pb-2">VALUE</th>
+                                    <th class="pb-2 text-right">REMOVE</th>
+                                </tr>
+                            </thead>
+                            <tbody id="investTableBody" class="divide-y divide-slate-800/60">
+                                <tr><td colspan="4" class="py-5 text-center text-slate-500 text-xs">No investment holdings added yet.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 7: STATEMENT SNAPSHOT & FILE OCR -->
             <section id="tab-ocr" class="tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl space-y-5">
                     <div>
-                        <h3 class="text-xl font-extrabold text-white"><i class="fa-solid fa-camera text-cyan-400 mr-2"></i>Statement Snapshot &amp; OCR Scanner</h3>
-                        <p class="text-xs text-slate-400 mt-1">Runs 100% locally in your browser using Tesseract.js—your statement image never leaves your tablet.</p>
+                        <h3 class="text-xl font-extrabold text-white"><i class="fa-solid fa-file-arrow-up text-cyan-400 mr-2"></i>Statement Snapshot &amp; File Scanner</h3>
+                        <p class="text-xs text-slate-400 mt-1">Select a saved image, screenshot, TXT, or CSV file from your device. OCR runs 100% locally in your browser using Tesseract.js.</p>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="space-y-4">
                             <label class="block border-2 border-dashed border-slate-700 hover:border-cyan-500 rounded-2xl p-6 text-center cursor-pointer transition bg-slate-950/60">
                                 <i class="fa-solid fa-cloud-arrow-up text-3xl text-cyan-400 mb-2"></i>
-                                <span class="block text-sm font-bold text-white">Upload or Snap Statement Image</span>
-                                <span class="block text-xs text-slate-400 mt-1">PNG, JPG, WebP screenshot or camera photo</span>
-                                <input type="file" id="ocrFileInput" accept="image/*" capture="environment" class="hidden" onchange="handleOcrFile(event)">
+                                <span class="block text-sm font-bold text-white">Choose File From Device or Gallery</span>
+                                <span class="block text-xs text-slate-400 mt-1">PNG, JPG, WebP image, TXT, or CSV statement file</span>
+                                <input type="file" id="ocrFileInput" accept="image/*,.txt,.csv" class="hidden" onchange="handleOcrFile(event)">
                             </label>
 
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">Or Paste Statement Text Directly</label>
-                                <textarea id="ocrRawText" rows="5" placeholder="Paste statement snippet (e.g., Statement Balance: $1,420.50, Minimum Payment Due: $42.00, APR: 21.99%)..."
-                                    class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500"></textarea>
+                                <textarea id="ocrRawText" rows="5" placeholder="Paste statement snippet..."
+                                    class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-200"></textarea>
                             </div>
 
                             <button onclick="parseOcrText()" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">
@@ -563,10 +863,10 @@
                                 </div>
                                 <div class="flex gap-2 pt-2">
                                     <button onclick="saveParsedToVault('debt')" class="flex-1 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition">
-                                        Save as Credit / Debt
+                                        Save as Creditor
                                     </button>
                                     <button onclick="saveParsedToVault('bill')" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition">
-                                        Save as Monthly Bill
+                                        Save as Bill
                                     </button>
                                 </div>
                             </div>
@@ -575,7 +875,7 @@
                 </div>
             </section>
 
-            <!-- TAB 4: SECURITY & PORTABLE ENCRYPTED BACKUP -->
+            <!-- TAB 8: SECURITY & BACKUP -->
             <section id="tab-security" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="glass-panel p-6 rounded-2xl space-y-4">
@@ -598,36 +898,26 @@
                             </div>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <button onclick="openSetPinModal()" class="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">
-                                Set / Change Vault PIN
-                            </button>
-                            <button onclick="openChangeDevPassword()" class="px-4 py-2.5 bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold rounded-xl transition">
-                                Set / Change Dev Password
-                            </button>
-                            <button onclick="lockVaultNow()" id="secLockNowBtn" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition hidden">
-                                Lock Vault Now
-                            </button>
-                            <button onclick="disablePinEncryption()" id="secDisablePinBtn" class="px-4 py-2.5 bg-rose-950 border border-rose-800 hover:bg-rose-900 text-rose-300 text-xs font-bold rounded-xl transition hidden">
-                                Remove Vault PIN
-                            </button>
+                            <button onclick="openSetPinModal()" class="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">Set / Change Vault PIN</button>
+                            <button onclick="openChangeDevPassword()" class="px-4 py-2.5 bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold rounded-xl transition">Set / Change Dev Password</button>
+                            <button onclick="lockVaultNow()" id="secLockNowBtn" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition hidden">Lock Vault Now</button>
+                            <button onclick="disablePinEncryption()" id="secDisablePinBtn" class="px-4 py-2.5 bg-rose-950 border border-rose-800 hover:bg-rose-900 text-rose-300 text-xs font-bold rounded-xl transition hidden">Remove Vault PIN</button>
                         </div>
                     </div>
 
                     <div class="glass-panel p-6 rounded-2xl space-y-4">
                         <h3 class="text-lg font-extrabold text-white"><i class="fa-solid fa-file-shield text-emerald-400 mr-2"></i>Export CSV &amp; Encrypted <code class="text-emerald-300">.nexusvault</code></h3>
                         <p class="text-xs text-slate-400">
-                            Download a spreadsheet-ready CSV report anytime or export an AES-256-GCM encrypted <code class="text-emerald-300">.nexusvault</code> backup (both ignored by Git via <code class="text-cyan-300">.gitignore</code>).
+                            Save your full banking, debt, negotiation, credit, and investment state to an encrypted <code class="text-emerald-300">.nexusvault</code> file anytime so you can wipe or reinstall safely.
                         </p>
                         <div class="space-y-3 text-xs">
                             <button onclick="exportVaultCSV()" class="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl transition">
                                 <i class="fa-solid fa-file-csv mr-1.5"></i>Quick Export Ledger CSV (.csv)
                             </button>
                             <input type="password" id="backupPassphrase" placeholder="Backup password (or uses your active PIN)"
-                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500">
+                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white">
                             <div class="flex gap-2">
-                                <button onclick="exportEncryptedVault()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition">
-                                    Export .nexusvault
-                                </button>
+                                <button onclick="exportEncryptedVault()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition">Export .nexusvault</button>
                                 <label class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-center cursor-pointer transition">
                                     Import .nexusvault
                                     <input type="file" accept=".nexusvault,.json" class="hidden" onchange="importEncryptedVault(event)">
@@ -638,22 +928,22 @@
                 </div>
             </section>
 
-            <!-- DEV-ONLY TAB 5: DIRECT GEMINI COPILOT (DEVELOPER MODE ONLY) -->
+            <!-- DEV-ONLY TAB 9: DIRECT GEMINI COPILOT -->
             <section id="tab-gemini" class="dev-only tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl flex flex-col h-[640px] border border-purple-500/30 space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
                         <div>
                             <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-sparkles text-purple-400"></i>
-                                <span>Direct Gemini Dev &amp; Syndicate Copilot</span>
+                                <span>Direct Gemini Financial Copilot</span>
                                 <span class="px-2 py-0.5 text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-700 rounded">DEV ONLY</span>
                             </h3>
-                            <p class="text-xs text-slate-400">Locked behind Developer Mode password. API key stays local in your browser storage, never in GitHub code.</p>
+                            <p class="text-xs text-slate-400">API key stays local in your browser storage, never in GitHub code.</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
-                            <select id="geminiModelSelect" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-purple-200">
-                                <option value="gemini-2.5-flash" selected>gemini-2.5-flash</option>
-                                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                            <select id="geminiModelSelect" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-cyan-200">
+                                <option value="gemini-3.8-flash" selected>gemini-3.8-flash</option>
+                                <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview</option>
                             </select>
                             <button onclick="attachLiveVaultContextToInput()" class="px-3 py-1.5 bg-emerald-950 hover:bg-emerald-900 border border-emerald-700 text-emerald-300 rounded-lg text-xs font-semibold transition">
                                 Attach Vault Snapshot
@@ -664,145 +954,76 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-2 bg-slate-950/90 p-3 rounded-xl border border-slate-800 text-xs">
                         <input type="password" id="geminiApiKeyInput" onchange="saveGeminiKeyPref()"
                             placeholder="Paste Gemini API Key (AIza...) — saved locally only"
-                            class="md:col-span-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 font-mono text-purple-200 focus:outline-none focus:border-purple-500">
+                            class="md:col-span-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 font-mono text-cyan-200">
                         <label class="flex items-center gap-2 px-2 text-slate-300 cursor-pointer">
-                            <input type="checkbox" id="includeVaultContextCheck" checked class="accent-purple-500 rounded">
-                            <span>Share live totals with Gemini</span>
+                            <input type="checkbox" id="includeVaultContextCheck" checked class="accent-cyan-500 rounded">
+                            <span>Share live accounts with Gemini</span>
                         </label>
                     </div>
 
                     <div id="geminiChatFeed" class="flex-1 overflow-y-auto bg-slate-950/70 border border-slate-800/90 rounded-xl p-4 space-y-3 text-xs sm:text-sm">
                         <div class="p-3.5 rounded-xl bg-slate-900/90 border border-purple-500/20 text-slate-200">
-                            <span class="text-purple-400 font-mono text-xs font-bold block mb-1">GEMINI DEV COPILOT</span>
-                            Listen up, boss—Developer Mode is unlocked and the direct Gemini wire is hot. Paste your Gemini API key above, attach your vault telemetry, and ask me anything about payoff equations, APR arbitrage, or app upgrades—no middle-manning required.
+                            <span class="text-purple-400 font-mono text-xs font-bold block mb-1">GEMINI COPILOT</span>
+                            Ready. Paste your Gemini API key above and ask about payoff priorities, creditor negotiations, or cash flow.
                         </div>
                     </div>
 
                     <form id="geminiChatForm" class="flex gap-2">
-                        <input type="text" id="geminiPromptInput" required
-                            placeholder="Ask Gemini in Developer Mode..."
-                            class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500">
-                        <button type="submit" id="geminiSendBtn"
-                            class="px-5 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold rounded-xl text-xs sm:text-sm transition">
+                        <input type="text" id="geminiPromptInput" required placeholder="Ask Gemini in Developer Mode..."
+                            class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white">
+                        <button type="submit" id="geminiSendBtn" class="px-5 py-3 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white font-bold rounded-xl text-xs sm:text-sm transition">
                             Ask Gemini
                         </button>
                     </form>
                 </div>
             </section>
 
-            <!-- DEV-ONLY TAB 6: ANIMATED 3D CYBER-CITY BOT FARM -->
-            <section id="tab-botfarm" class="dev-only tab-content hidden space-y-6">
-                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h3 class="text-xl font-extrabold text-white">Animated 3D Cyber-City Bot Farm</h3>
-                                <span class="px-2 py-0.5 text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-700 rounded">DEV ONLY</span>
-                            </div>
-                            <p class="text-slate-400 text-xs">Live WebGL skyline with grid traffic pulses, breathing towers, and ascending data packets.</p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="spawnBotNode()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xs transition">
-                                <i class="fa-solid fa-plus mr-1"></i> Spawn Node
-                            </button>
-                            <button onclick="toggleCityView()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition">
-                                <i class="fa-solid fa-rotate mr-1"></i> Reset Camera
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="city-canvas-container" class="w-full h-[430px] rounded-xl overflow-hidden relative border border-slate-800 bg-slate-950">
-                        <div class="absolute bottom-4 left-4 z-10 glass-panel px-3 py-2 rounded-lg text-xs font-mono text-cyan-300">
-                            Active Towers: <span id="city-tower-count" class="text-emerald-400 font-bold">14</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- DEV-ONLY TAB 7: LIVE xAI GROK CONSOLE -->
+            <!-- DEV-ONLY TAB 10: LIVE xAI GROK CONSOLE -->
             <section id="tab-xai" class="dev-only tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
                         <div>
-                            <div class="flex items-center space-x-2">
-                                <h3 class="text-lg font-extrabold text-cyan-300">LIVE xAI GROK CONSOLE</h3>
-                                <span class="px-2 py-0.5 text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-700 rounded">DEV ONLY</span>
-                            </div>
-                            <p class="text-xs text-slate-400">Streams via your backend proxy (<code class="text-emerald-400">XAI_API_KEY</code> stays off GitHub &amp; browser storage)</p>
+                            <h3 class="text-lg font-extrabold text-cyan-300">LIVE xAI GROK CONSOLE</h3>
+                            <p class="text-xs text-slate-400">Streams via your backend proxy (<code class="text-emerald-400">XAI_API_KEY</code> stays on server)</p>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="injectVaultTelemetryPrompt()" class="px-3 py-1.5 bg-emerald-950 border border-emerald-700 text-emerald-300 rounded-lg text-xs font-semibold hover:bg-emerald-900">
-                                Inject Vault Totals
-                            </button>
-                            <select id="xai-model" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-cyan-200">
-                                <option value="grok-4.7" selected>grok-4.7</option>
-                                <option value="grok-4.20">grok-4.20</option>
-                            </select>
-                        </div>
+                        <select id="xai-model" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-cyan-200">
+                            <option value="grok-4.7" selected>grok-4.7</option>
+                            <option value="grok-4.20">grok-4.20</option>
+                        </select>
                     </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <input id="xai-endpoint" type="text" value="http://localhost:5000/api/xai/stream"
-                            placeholder="Backend proxy URL"
-                            class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-300">
-                        <input id="xai-system" type="text" value="Sharp, street-smart, mathematically precise debt strategist."
-                            placeholder="System instructions"
-                            class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300">
-                    </div>
-
-                    <div id="xai-output" class="bg-slate-950 border border-slate-800 rounded-xl p-4 min-h-[200px] max-h-80 overflow-y-auto text-xs sm:text-sm font-mono whitespace-pre-wrap text-emerald-200">Ready for live xAI dispatch...</div>
-
+                    <input id="xai-endpoint" type="text" value="http://localhost:5000/api/xai/stream" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-300">
+                    <div id="xai-output" class="bg-slate-950 border border-slate-800 rounded-xl p-4 min-h-[200px] max-h-80 overflow-y-auto text-xs font-mono whitespace-pre-wrap text-emerald-200">Ready for live xAI dispatch...</div>
                     <form id="xai-form" class="flex gap-2">
-                        <input id="xai-prompt" type="text" required placeholder="Ask Grok to optimize your payoff schedule..."
-                            class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
-                        <button type="submit" id="xai-send"
-                            class="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs sm:text-sm font-bold rounded-xl transition">Stream</button>
+                        <input id="xai-prompt" type="text" required placeholder="Ask Grok..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white">
+                        <button type="submit" id="xai-send" class="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">Stream</button>
                     </form>
                 </div>
             </section>
 
-            <!-- DEV-ONLY TAB 8: TEST OPERATIONS -->
+            <!-- DEV-ONLY TAB 11: TEST OPERATIONS -->
             <section id="tab-testing" class="dev-only tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                         <div>
-                            <div class="flex items-center space-x-2">
-                                <h3 class="text-xl font-extrabold text-white">Operations Sandbox &amp; Clean Slate Controls</h3>
-                                <span class="px-2 py-0.5 text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-700 rounded">DEV ONLY</span>
-                            </div>
-                            <p class="text-slate-400 text-xs">Test local calculations, export CSV, or reset the app to a brand-new blank state.</p>
+                            <h3 class="text-xl font-extrabold text-white">Operations Sandbox &amp; Clean Slate Controls</h3>
+                            <p class="text-slate-400 text-xs">Audit storage encryption or reset the app to a brand-new blank state.</p>
                         </div>
-                        <button onclick="lockDeveloperMode()" class="px-3 py-1.5 bg-emerald-950 border border-emerald-700 text-emerald-300 rounded-lg text-xs font-bold hover:bg-emerald-900">
-                            Return to User Mode
+                        <button onclick="lockDeveloperMode()" class="px-3 py-1.5 bg-emerald-950 border border-emerald-700 text-emerald-300 rounded-lg text-xs font-bold hover:bg-emerald-900">Return to User Mode</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onclick="runSecurityAudit()" class="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500 text-left">
+                            <h5 class="text-white font-bold text-sm">Run Storage Audit</h5>
+                            <p class="text-xs text-slate-400 mt-1">Verify AES-256-GCM encryption in localStorage.</p>
+                        </button>
+                        <button onclick="runMathCheck()" class="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500 text-left">
+                            <h5 class="text-white font-bold text-sm">Run Math Check</h5>
+                            <p class="text-xs text-slate-400 mt-1">Verify Snowball/Avalanche payoff timeline.</p>
+                        </button>
+                        <button onclick="resetToBrandNewApp(false)" class="p-4 rounded-xl bg-rose-950/40 border border-rose-500/40 hover:border-rose-400 text-left">
+                            <h5 class="text-rose-300 font-bold text-sm">Reset to Brand New</h5>
+                            <p class="text-xs text-slate-400 mt-1">Wipe local storage back to a clean $0.00 state.</p>
                         </button>
                     </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="p-5 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between space-y-4">
-                            <div>
-                                <h5 class="text-white font-bold text-sm">Verify Encryption &amp; Storage</h5>
-                                <p class="text-xs text-slate-400 mt-1">Inspects localStorage to verify zero plaintext account leaks when PIN lock is active.</p>
-                            </div>
-                            <button onclick="runSecurityAudit()" class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-lg transition">Run Storage Audit</button>
-                        </div>
-
-                        <div class="p-5 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between space-y-4">
-                            <div>
-                                <h5 class="text-white font-bold text-sm">Simulate Paydown Math</h5>
-                                <p class="text-xs text-slate-400 mt-1">Runs a live Snowball vs. Avalanche check across your current vault accounts.</p>
-                            </div>
-                            <button onclick="runMathCheck()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition">Run Math Check</button>
-                        </div>
-
-                        <div class="p-5 rounded-xl bg-slate-900/90 border border-rose-500/40 flex flex-col justify-between space-y-4">
-                            <div>
-                                <h5 class="text-white font-bold text-sm">Reset to Brand New</h5>
-                                <p class="text-xs text-slate-400 mt-1">Wipes all local storage, PIN keys, and Dev password back to a clean $0.00 first-run app.</p>
-                            </div>
-                            <button onclick="resetToBrandNewApp(false)" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-lg transition">Reset to Brand New</button>
-                        </div>
-                    </div>
-
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 h-44 overflow-y-auto space-y-1" id="test-terminal">
                         <div class="text-cyan-400">[SYSTEM] Developer Sandbox ready.</div>
                     </div>
@@ -820,11 +1041,16 @@
         const IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 
         const BLANK_STATE = {
-            version: 1,
+            version: 2,
             strategy: 'snowball',
             extraMonthly: 0,
+            banks: [],
+            transactions: [],
             debts: [],
-            bills: []
+            bills: [],
+            negotiations: [],
+            credit: { equifax: '', experian: '', transunion: '', inquiries: 0 },
+            investments: []
         };
 
         let appState = structuredClone(BLANK_STATE);
@@ -833,382 +1059,49 @@
         let devModalAction = 'unlock';
         let currentTab = 'dashboard';
         let idleTimer = null;
-        let donutChart = null;
         let paydownChart = null;
 
-        function bufToB64(buf) {
-            return btoa(String.fromCharCode(...new Uint8Array(buf)));
-        }
-        function b64ToBuf(b64) {
-            return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-        }
+        function bufToB64(buf) { return btoa(String.fromCharCode(...new Uint8Array(buf))); }
+        function b64ToBuf(b64) { return Uint8Array.from(atob(b64), c => c.charCodeAt(0)); }
+        function escapeHtml(s) { return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function fmtMoney(n) { return '$' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
         async function hashPasswordWithSalt(password, saltB64) {
             const salt = saltB64 ? b64ToBuf(saltB64) : crypto.getRandomValues(new Uint8Array(16));
-            const enc = new TextEncoder();
-            const baseKey = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
-            const bits = await crypto.subtle.deriveBits(
-                { name: 'PBKDF2', salt, iterations: 210000, hash: 'SHA-256' },
-                baseKey,
-                256
-            );
+            const baseKey = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+            const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 210000, hash: 'SHA-256' }, baseKey, 256);
             return { salt: bufToB64(salt), hash: bufToB64(bits) };
         }
 
         async function deriveAesKey(pin, saltBytes) {
-            const enc = new TextEncoder();
-            const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveKey']);
-            return crypto.subtle.deriveKey(
-                { name: 'PBKDF2', salt: saltBytes, iterations: 310000, hash: 'SHA-256' },
-                keyMaterial,
-                { name: 'AES-GCM', length: 256 },
-                false,
-                ['encrypt', 'decrypt']
-            );
+            const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveKey']);
+            return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: saltBytes, iterations: 310000, hash: 'SHA-256' }, keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
         }
 
         async function encryptPayload(obj, pin) {
             const salt = crypto.getRandomValues(new Uint8Array(16));
             const iv = crypto.getRandomValues(new Uint8Array(12));
             const key = await deriveAesKey(pin, salt);
-            const encoded = new TextEncoder().encode(JSON.stringify(obj));
-            const cipherBuf = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
-            return {
-                encrypted: true,
-                alg: 'AES-256-GCM',
-                kdf: 'PBKDF2-SHA256-310000',
-                salt: bufToB64(salt),
-                iv: bufToB64(iv),
-                ciphertext: bufToB64(cipherBuf)
-            };
+            const cipherBuf = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(obj)));
+            return { encrypted: true, alg: 'AES-256-GCM', kdf: 'PBKDF2-SHA256-310000', salt: bufToB64(salt), iv: bufToB64(iv), ciphertext: bufToB64(cipherBuf) };
         }
 
         async function decryptPayload(envelope, pin) {
-            const salt = b64ToBuf(envelope.salt);
-            const iv = b64ToBuf(envelope.iv);
-            const ciphertext = b64ToBuf(envelope.ciphertext);
-            const key = await deriveAesKey(pin, salt);
-            const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+            const key = await deriveAesKey(pin, b64ToBuf(envelope.salt));
+            const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64ToBuf(envelope.iv) }, key, b64ToBuf(envelope.ciphertext));
             return JSON.parse(new TextDecoder().decode(plainBuf));
         }
 
-        function csvEscape(val) {
-            const str = String(val ?? '');
-            return '"' + str.replace(/"/g, '""') + '"';
-        }
-
-        function exportVaultCSV() {
-            const rows = [
-                ['RecordType', 'Name', 'CategoryOrType', 'BalanceOrAmount', 'CreditLimit', 'APR_Percent', 'MinPayment', 'DueDay', 'Strategy', 'ExtraMonthly']
-            ];
-
-            appState.debts.forEach(d => {
-                rows.push([
-                    'Debt',
-                    d.name,
-                    d.type,
-                    Number(d.balance || 0).toFixed(2),
-                    Number(d.limit || 0).toFixed(2),
-                    Number(d.apr || 0).toFixed(2),
-                    Number(d.minPay || 0).toFixed(2),
-                    '',
-                    appState.strategy,
-                    Number(appState.extraMonthly || 0).toFixed(2)
-                ]);
-            });
-
-            appState.bills.forEach(b => {
-                rows.push([
-                    'Bill',
-                    b.name,
-                    b.category,
-                    Number(b.amount || 0).toFixed(2),
-                    '',
-                    '',
-                    '',
-                    b.dueDay || '',
-                    appState.strategy,
-                    Number(appState.extraMonthly || 0).toFixed(2)
-                ]);
-            });
-
-            if (rows.length === 1) {
-                rows.push(['Summary', 'Empty Vault', 'Blank Slate', '0.00', '0.00', '0.00', '0.00', '', appState.strategy, Number(appState.extraMonthly || 0).toFixed(2)]);
-            }
-
-            const csvContent = rows.map(r => r.map(csvEscape).join(',')).join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `nexus-prime-ledger-${new Date().toISOString().slice(0, 10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            logTerminal('Exported quick CSV ledger snapshot.', 'text-emerald-400');
-        }
-
-        function saveGeminiKeyPref() {
-            const k = document.getElementById('geminiApiKeyInput').value.trim();
-            if (k) {
-                localStorage.setItem(GEMINI_KEY_STORAGE, k);
-            } else {
-                localStorage.removeItem(GEMINI_KEY_STORAGE);
-            }
-        }
-
-        function attachLiveVaultContextToInput() {
-            const totalDebt = appState.debts.reduce((s, d) => s + d.balance, 0);
-            const totalBills = appState.bills.reduce((s, b) => s + b.amount, 0);
-            const sim = simulatePayoffSchedule();
-            document.getElementById('geminiPromptInput').value =
-                `Review my ledger: ${appState.debts.length} debt accounts (${fmtMoney(totalDebt)}), ${appState.bills.length} recurring bills (${fmtMoney(totalBills)}/mo), extra monthly payment ${fmtMoney(appState.extraMonthly)}, strategy ${appState.strategy}, projected payoff ${sim.payoffLabel} (${sim.months} mos). What should my next move be?`;
-            document.getElementById('geminiPromptInput').focus();
-        }
-
-        function appendGeminiBubble(sender, text, isUser = false) {
-            const feed = document.getElementById('geminiChatFeed');
-            const div = document.createElement('div');
-            div.className = isUser
-                ? 'p-3.5 rounded-xl bg-purple-950/50 border border-purple-700/40 text-purple-100 ml-6'
-                : 'p-3.5 rounded-xl bg-slate-900/95 border border-slate-800 text-slate-200 mr-6 whitespace-pre-wrap';
-            const labelColor = isUser ? 'text-purple-300' : 'text-emerald-400';
-            div.innerHTML = `<span class="${labelColor} font-mono text-xs font-bold block mb-1">${sender}</span>${escapeHtml(text)}`;
-            feed.appendChild(div);
-            feed.scrollTop = feed.scrollHeight;
-            return div;
-        }
-
-        function escapeHtml(s) {
-            return String(s)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        }
-
-        document.getElementById('geminiChatForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!isDeveloperMode) {
-                handleModeSwitchClick();
-                return;
-            }
-            const promptInput = document.getElementById('geminiPromptInput');
-            const sendBtn = document.getElementById('geminiSendBtn');
-            const apiKey = document.getElementById('geminiApiKeyInput').value.trim() || localStorage.getItem(GEMINI_KEY_STORAGE) || '';
-            const model = document.getElementById('geminiModelSelect').value;
-            const shareVault = document.getElementById('includeVaultContextCheck').checked;
-            const userPrompt = promptInput.value.trim();
-            if (!userPrompt) return;
-
-            if (!apiKey) {
-                appendGeminiBubble('GEMINI DEV COPILOT', 'Please paste your Gemini API key in the key bar above first so Developer Mode can call Gemini directly.');
-                return;
-            }
-
-            appendGeminiBubble('YOU', userPrompt, true);
-            promptInput.value = '';
-            sendBtn.disabled = true;
-            sendBtn.textContent = 'Thinking...';
-
-            const thinkingBubble = appendGeminiBubble('GEMINI DEV COPILOT', 'Crunching relativistic payoff matrices...');
-
-            let finalPrompt = userPrompt;
-            if (shareVault) {
-                const totalDebt = appState.debts.reduce((s, d) => s + d.balance, 0);
-                const totalBills = appState.bills.reduce((s, b) => s + b.amount, 0);
-                const sim = simulatePayoffSchedule();
-                finalPrompt =
-                    `Vault Context (Developer Mode): ` +
-                    `Debts=${appState.debts.length} accounts totaling ${fmtMoney(totalDebt)}; ` +
-                    `Monthly Bills=${fmtMoney(totalBills)}; Strategy=${appState.strategy}; ` +
-                    `Extra Monthly=${fmtMoney(appState.extraMonthly)}; Projected Payoff=${sim.payoffLabel} (${sim.months} mos).\n\nDeveloper Query: ${userPrompt}`;
-            }
-
-            try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-                const res = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        systemInstruction: {
-                            parts: [{ text: 'You are Gemini inside NEXUS-PRIME Developer Mode: speak with razor-sharp street-smart syndicate swagger (capisce?) while delivering mathematical and relativistic precision sharper than Albert Einstein. Keep answers concise, tactical, and grounded in the exact ledger telemetry.' }]
-                        },
-                        contents: [{ parts: [{ text: finalPrompt }] }]
-                    })
-                });
-                const data = await res.json();
-                if (!res.ok) {
-                    throw new Error(data.error?.message || `HTTP ${res.status}`);
-                }
-                const replyText =
-                    data.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('\n')
-                    || 'No text returned.';
-                thinkingBubble.innerHTML = `<span class="text-emerald-400 font-mono text-xs font-bold block mb-1">GEMINI DEV COPILOT (${model})</span>${escapeHtml(replyText)}`;
-            } catch (err) {
-                thinkingBubble.innerHTML = `<span class="text-rose-400 font-mono text-xs font-bold block mb-1">GEMINI ERROR</span>${escapeHtml(err.message)}`;
-            } finally {
-                sendBtn.disabled = false;
-                sendBtn.textContent = 'Ask Gemini';
-            }
-        });
-
-        function applyRoleModeUI() {
-            const badge = document.getElementById('roleModeBadge');
-            const switchBtn = document.getElementById('modeSwitchBtn');
-            const switchIcon = document.getElementById('modeSwitchIcon');
-            const switchLabel = document.getElementById('modeSwitchLabel');
-            const sideRole = document.getElementById('sidebar-role-status');
-            const secDevStatus = document.getElementById('sec-devpass-status');
-            const hasDevPass = Boolean(localStorage.getItem(DEV_PASS_HASH_KEY));
-
-            if (secDevStatus) {
-                secDevStatus.textContent = hasDevPass ? 'Configured (SHA-256 Salted)' : 'Not Configured Yet';
-                secDevStatus.className = hasDevPass ? 'font-bold text-purple-400' : 'font-bold text-slate-300';
-            }
-
-            if (isDeveloperMode) {
-                document.body.classList.remove('user-mode');
-                document.body.classList.add('dev-mode');
-                badge.textContent = 'DEV MODE';
-                badge.className = 'px-2 py-0.5 text-[10px] font-mono bg-purple-950/90 text-purple-300 border border-purple-600 rounded';
-                switchBtn.className = 'px-3 py-2 bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-600/60 text-emerald-200 text-xs font-bold rounded-lg transition flex items-center space-x-1.5';
-                switchIcon.className = 'fa-solid fa-user-shield';
-                switchLabel.textContent = 'User Mode';
-                if (sideRole) {
-                    sideRole.textContent = 'DEVELOPER';
-                    sideRole.className = 'text-purple-400 font-bold';
-                }
-            } else {
-                document.body.classList.add('user-mode');
-                document.body.classList.remove('dev-mode');
-                badge.textContent = 'USER MODE';
-                badge.className = 'px-2 py-0.5 text-[10px] font-mono bg-emerald-950/90 text-emerald-300 border border-emerald-700 rounded';
-                switchBtn.className = 'px-3 py-2 bg-purple-950/80 hover:bg-purple-900/80 border border-purple-600/50 text-purple-200 text-xs font-bold rounded-lg transition flex items-center space-x-1.5';
-                switchIcon.className = 'fa-solid fa-code';
-                switchLabel.textContent = 'Dev Mode';
-                if (sideRole) {
-                    sideRole.textContent = 'USER';
-                    sideRole.className = 'text-emerald-400 font-bold';
-                }
-                if (['gemini', 'botfarm', 'xai', 'testing'].includes(currentTab)) {
-                    switchTab('dashboard');
-                }
-            }
-        }
-
-        function handleModeSwitchClick() {
-            if (isDeveloperMode) {
-                lockDeveloperMode();
-                return;
-            }
-            const stored = localStorage.getItem(DEV_PASS_HASH_KEY);
-            if (!stored) {
-                openDevModal('setup');
-            } else {
-                openDevModal('unlock');
-            }
-        }
-
-        function openChangeDevPassword() {
-            openDevModal('change');
-        }
-
-        function openDevModal(action) {
-            devModalAction = action;
-            const modal = document.getElementById('devModeModal');
-            const title = document.getElementById('devModalTitle');
-            const desc = document.getElementById('devModalDesc');
-            const passLabel = document.getElementById('devPassLabel');
-            const confirmWrap = document.getElementById('devConfirmWrap');
-            const submitBtn = document.getElementById('devModalSubmitBtn');
-            const resetBtn = document.getElementById('resetDevPassBtn');
-            const err = document.getElementById('devModalError');
-
-            document.getElementById('devPassInput').value = '';
-            document.getElementById('devPassConfirmInput').value = '';
-            err.classList.add('hidden');
-
-            if (action === 'setup' || action === 'change') {
-                title.innerHTML = '<i class="fa-solid fa-key text-purple-400 mr-2"></i>' +
-                    (action === 'setup' ? 'Create Developer Mode Password' : 'Change Developer Mode Password');
-                desc.textContent = 'Set a password required whenever switching from clean User Mode into Developer Mode (Gemini Copilot, Bot Farm, xAI & Sandbox).';
-                passLabel.textContent = 'New Developer Password (min 4 characters)';
-                confirmWrap.classList.remove('hidden');
-                submitBtn.textContent = 'Save & Enter Dev Mode';
-                resetBtn.classList.add('hidden');
-            } else {
-                title.innerHTML = '<i class="fa-solid fa-terminal text-purple-400 mr-2"></i>Unlock Developer Mode';
-                desc.textContent = 'Enter your Developer Mode password to reveal Gemini Copilot, the 3D Bot Farm, Live xAI Console, and Test Operations.';
-                passLabel.textContent = 'Developer Password';
-                confirmWrap.classList.add('hidden');
-                submitBtn.textContent = 'Unlock Dev Mode';
-                resetBtn.classList.remove('hidden');
-            }
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            setTimeout(() => document.getElementById('devPassInput').focus(), 50);
-        }
-
-        function closeDevModal() {
-            const modal = document.getElementById('devModeModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        document.getElementById('devModeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const pw = document.getElementById('devPassInput').value;
-            const confirmPw = document.getElementById('devPassConfirmInput').value;
-            const err = document.getElementById('devModalError');
-
-            if (devModalAction === 'setup' || devModalAction === 'change') {
-                if (pw.length < 4) {
-                    err.textContent = 'Password must be at least 4 characters.';
-                    err.classList.remove('hidden');
-                    return;
-                }
-                if (pw !== confirmPw) {
-                    err.textContent = 'Passwords do not match.';
-                    err.classList.remove('hidden');
-                    return;
-                }
-                const record = await hashPasswordWithSalt(pw);
-                localStorage.setItem(DEV_PASS_HASH_KEY, JSON.stringify(record));
-                isDeveloperMode = true;
-                closeDevModal();
-                applyRoleModeUI();
-                logTerminal('[AUTH] Developer Mode password configured. Gemini Copilot & Developer tools unlocked.', 'text-purple-400');
-            } else {
-                try {
-                    const stored = JSON.parse(localStorage.getItem(DEV_PASS_HASH_KEY) || '{}');
-                    const check = await hashPasswordWithSalt(pw, stored.salt);
-                    if (check.hash === stored.hash) {
-                        isDeveloperMode = true;
-                        closeDevModal();
-                        applyRoleModeUI();
-                        logTerminal('[AUTH] Developer Mode unlocked via password.', 'text-purple-400');
-                    } else {
-                        err.textContent = 'Incorrect Developer Mode password.';
-                        err.classList.remove('hidden');
-                    }
-                } catch (_) {
-                    err.textContent = 'Verification error. Try again.';
-                    err.classList.remove('hidden');
-                }
-            }
-        });
-
-        function lockDeveloperMode() {
-            isDeveloperMode = false;
-            applyRoleModeUI();
-        }
-
-        function resetDeveloperPassword() {
-            if (!confirm('Reset Developer Mode password? You will be prompted to create a new one next time you open Dev Mode.')) return;
-            localStorage.removeItem(DEV_PASS_HASH_KEY);
-            isDeveloperMode = false;
-            closeDevModal();
-            applyRoleModeUI();
+        function hydrateState(rawObj) {
+            const merged = { ...structuredClone(BLANK_STATE), ...(rawObj || {}) };
+            if (!Array.isArray(merged.banks)) merged.banks = [];
+            if (!Array.isArray(merged.transactions)) merged.transactions = [];
+            if (!Array.isArray(merged.debts)) merged.debts = [];
+            if (!Array.isArray(merged.bills)) merged.bills = [];
+            if (!Array.isArray(merged.negotiations)) merged.negotiations = [];
+            if (!Array.isArray(merged.investments)) merged.investments = [];
+            if (!merged.credit) merged.credit = { equifax: '', experian: '', transunion: '', inquiries: 0 };
+            return merged;
         }
 
         async function saveVaultState() {
@@ -1224,248 +1117,206 @@
 
         async function bootVault() {
             const savedKey = localStorage.getItem(GEMINI_KEY_STORAGE);
-            if (savedKey) {
-                document.getElementById('geminiApiKeyInput').value = savedKey;
-            }
+            if (savedKey) document.getElementById('geminiApiKeyInput').value = savedKey;
             applyRoleModeUI();
             const pinMeta = localStorage.getItem(PIN_META_KEY);
             const raw = localStorage.getItem(VAULT_STORAGE_KEY);
-
             if (pinMeta && raw) {
                 showPinOverlay();
                 updateSecurityBadges();
                 return;
             }
-
             if (raw) {
                 try {
                     const parsed = JSON.parse(raw);
-                    if (parsed && !parsed.encrypted && parsed.data) {
-                        appState = { ...structuredClone(BLANK_STATE), ...parsed.data };
-                    }
-                } catch (_) {
-                    appState = structuredClone(BLANK_STATE);
-                }
+                    if (parsed && !parsed.encrypted && parsed.data) appState = hydrateState(parsed.data);
+                } catch (_) { appState = structuredClone(BLANK_STATE); }
             }
             updateSecurityBadges();
             renderAll();
         }
 
-        function showPinOverlay() {
-            const overlay = document.getElementById('pinLockOverlay');
-            overlay.classList.remove('hidden');
-            overlay.classList.add('flex');
-            document.getElementById('unlockPinInput').value = '';
-            document.getElementById('unlockErrorMsg').classList.add('hidden');
-        }
-
-        function hidePinOverlay() {
-            const overlay = document.getElementById('pinLockOverlay');
-            overlay.classList.add('hidden');
-            overlay.classList.remove('flex');
-        }
-
-        document.getElementById('unlockForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const pin = document.getElementById('unlockPinInput').value.trim();
-            const errEl = document.getElementById('unlockErrorMsg');
+        // --- PLAID BACKEND HOOKS ---
+        async function launchPlaidLink() {
+            const base = document.getElementById('plaidBackendUrl').value.trim().replace(/\/$/, '');
+            const badge = document.getElementById('plaidStatusBadge');
+            badge.textContent = 'Connecting...';
             try {
-                const raw = JSON.parse(localStorage.getItem(VAULT_STORAGE_KEY) || '{}');
-                const decrypted = await decryptPayload(raw, pin);
-                appState = { ...structuredClone(BLANK_STATE), ...decrypted };
-                activePin = pin;
-                hidePinOverlay();
-                resetIdleTimer();
-                updateSecurityBadges();
-                renderAll();
-            } catch (_) {
-                errEl.textContent = 'Incorrect PIN. Decryption rejected.';
-                errEl.classList.remove('hidden');
+                const res = await fetch(`${base}/api/create_link_token`, { method: 'POST' });
+                const data = await res.json();
+                if (!data.link_token) throw new Error(data.error || 'No link_token returned');
+                const handler = Plaid.create({
+                    token: data.link_token,
+                    onSuccess: async (public_token) => {
+                        await fetch(`${base}/api/exchange_public_token`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ public_token })
+                        });
+                        badge.textContent = 'Linked';
+                        await syncPlaidTransactions();
+                    },
+                    onExit: () => { badge.textContent = 'Closed'; }
+                });
+                handler.open();
+            } catch (err) {
+                badge.textContent = 'Backend Offline';
+                alert('Plaid Link requires your backend server running at ' + base + '.\nError: ' + err.message);
             }
-        });
-
-        function openSetPinModal() {
-            const m = document.getElementById('setPinModal');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
-            document.getElementById('newPinInput').value = '';
-            document.getElementById('confirmPinInput').value = '';
-            document.getElementById('setPinError').classList.add('hidden');
         }
 
-        function closeSetPinModal() {
-            const m = document.getElementById('setPinModal');
-            m.classList.add('hidden');
-            m.classList.remove('flex');
+        async function syncPlaidTransactions() {
+            const base = document.getElementById('plaidBackendUrl').value.trim().replace(/\/$/, '');
+            const badge = document.getElementById('plaidStatusBadge');
+            badge.textContent = 'Syncing...';
+            try {
+                const res = await fetch(`${base}/api/get_transactions`);
+                const data = await res.json();
+                const items = data.transactions || data.added || [];
+                items.forEach((t, i) => {
+                    appState.transactions.unshift({
+                        id: Date.now() + i,
+                        date: t.date || new Date().toISOString().slice(0, 10),
+                        desc: t.name || t.merchant_name || 'Plaid Transaction',
+                        type: (t.amount < 0) ? 'deposit' : 'expense',
+                        amount: Math.abs(Number(t.amount || 0))
+                    });
+                });
+                await saveVaultState();
+                badge.textContent = `Synced (${items.length})`;
+            } catch (err) {
+                badge.textContent = 'Sync Error';
+                alert('Could not reach Plaid backend at ' + base + '.\n' + err.message);
+            }
         }
 
-        document.getElementById('setPinForm').addEventListener('submit', async (e) => {
+        // --- BANKING & INTERACTIVE TRANSACTIONS ---
+        document.getElementById('addBankForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const p1 = document.getElementById('newPinInput').value.trim();
-            const p2 = document.getElementById('confirmPinInput').value.trim();
-            const err = document.getElementById('setPinError');
-
-            if (p1 !== p2) {
-                err.textContent = 'PINs do not match.';
-                err.classList.remove('hidden');
-                return;
-            }
-            activePin = p1;
-            localStorage.setItem(PIN_META_KEY, JSON.stringify({ enabled: true, updatedAt: new Date().toISOString() }));
+            appState.banks.push({
+                id: Date.now(),
+                name: document.getElementById('bankName').value.trim(),
+                type: document.getElementById('bankType').value,
+                balance: parseFloat(document.getElementById('bankBalance').value) || 0
+            });
+            e.target.reset();
             await saveVaultState();
-            resetIdleTimer();
-            closeSetPinModal();
-            logTerminal('AES-256-GCM Vault PIN encryption enabled. Local storage sealed.', 'text-emerald-400');
         });
 
-        function handleHeaderPinClick() {
-            if (activePin) {
-                lockVaultNow();
-            } else {
-                openSetPinModal();
-            }
-        }
-
-        function lockVaultNow() {
-            if (!localStorage.getItem(PIN_META_KEY)) {
-                openSetPinModal();
-                return;
-            }
-            activePin = null;
-            isDeveloperMode = false;
-            applyRoleModeUI();
-            appState = structuredClone(BLANK_STATE);
-            renderAll();
-            showPinOverlay();
-        }
-
-        async function disablePinEncryption() {
-            if (!confirm('Remove Vault PIN encryption and store data unencrypted in this browser?')) return;
-            activePin = null;
-            localStorage.removeItem(PIN_META_KEY);
-            clearTimeout(idleTimer);
+        async function removeBank(id) {
+            appState.banks = appState.banks.filter(b => b.id !== id);
             await saveVaultState();
-            logTerminal('Vault PIN encryption removed.', 'text-amber-400');
         }
 
-        function resetIdleTimer() {
-            clearTimeout(idleTimer);
-            if (activePin) {
-                idleTimer = setTimeout(() => lockVaultNow(), IDLE_TIMEOUT_MS);
+        function toggleTxnTarget() {
+            const t = document.getElementById('txnType').value;
+            document.getElementById('txnCreditorWrap').classList.toggle('hidden', t !== 'creditor_payment');
+        }
+
+        document.getElementById('addTxnForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const type = document.getElementById('txnType').value;
+            const bankId = Number(document.getElementById('txnBankSelect').value);
+            const credId = Number(document.getElementById('txnCreditorSelect').value);
+            const desc = document.getElementById('txnDesc').value.trim();
+            const amount = parseFloat(document.getElementById('txnAmount').value) || 0;
+            if (amount <= 0) return;
+
+            const bank = appState.banks.find(b => b.id === bankId);
+            if (bank) {
+                bank.balance += (type === 'deposit') ? amount : -amount;
             }
-        }
-        ['click', 'keydown', 'touchstart'].forEach(evt =>
-            window.addEventListener(evt, () => { if (activePin) resetIdleTimer(); }, { passive: true })
-        );
-
-        function updateSecurityBadges() {
-            const hasPin = Boolean(localStorage.getItem(PIN_META_KEY));
-            const headerLabel = document.getElementById('headerPinLabel');
-            const headerIcon = document.getElementById('headerPinIcon');
-            const sideStatus = document.getElementById('sidebar-crypto-status');
-            const sideAuto = document.getElementById('sidebar-autolock');
-            const secStatus = document.getElementById('sec-panel-status');
-            const lockBtn = document.getElementById('secLockNowBtn');
-            const disableBtn = document.getElementById('secDisablePinBtn');
-
-            if (hasPin) {
-                headerLabel.textContent = 'Lock Vault';
-                headerIcon.className = 'fa-solid fa-lock';
-                sideStatus.textContent = 'AES-256-GCM';
-                sideStatus.className = 'text-emerald-400 font-bold';
-                sideAuto.textContent = '10 MIN';
-                secStatus.textContent = 'Active (AES-256-GCM Encrypted)';
-                secStatus.className = 'font-bold text-emerald-400';
-                lockBtn.classList.remove('hidden');
-                disableBtn.classList.remove('hidden');
-            } else {
-                headerLabel.textContent = 'Set PIN Lock';
-                headerIcon.className = 'fa-solid fa-key';
-                sideStatus.textContent = 'UNENCRYPTED';
-                sideStatus.className = 'text-amber-400 font-bold';
-                sideAuto.textContent = 'OFF';
-                secStatus.textContent = 'Not Set (Opens Immediately)';
-                secStatus.className = 'font-bold text-amber-400';
-                lockBtn.classList.add('hidden');
-                disableBtn.classList.add('hidden');
+            if (type === 'creditor_payment' && credId) {
+                const debt = appState.debts.find(d => d.id === credId);
+                if (debt) debt.balance = Math.max(0, debt.balance - amount);
             }
-            applyRoleModeUI();
-        }
 
-        async function exportEncryptedVault() {
-            const pass = document.getElementById('backupPassphrase').value.trim() || activePin;
-            if (!pass) {
-                alert('Enter a backup password or set an active Vault PIN first.');
-                return;
-            }
-            const envelope = await encryptPayload(appState, pass);
-            const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `nexus-vault-${new Date().toISOString().slice(0, 10)}.nexusvault`;
-            a.click();
-            URL.revokeObjectURL(url);
-            logTerminal('Exported AES-256-GCM .nexusvault backup file.', 'text-emerald-400');
-        }
-
-        function importEncryptedVault(event) {
-            const file = event.target.files?.[0];
-            if (!file) return;
-            const pass = document.getElementById('backupPassphrase').value.trim() || activePin;
-            if (!pass) {
-                alert('Enter the backup password in the field above before selecting the file.');
-                event.target.value = '';
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const envelope = JSON.parse(e.target.result);
-                    const restored = await decryptPayload(envelope, pass);
-                    appState = { ...structuredClone(BLANK_STATE), ...restored };
-                    await saveVaultState();
-                    logTerminal('Imported and decrypted .nexusvault backup successfully.', 'text-cyan-400');
-                } catch (_) {
-                    alert('Failed to decrypt backup. Check your password.');
-                }
-                event.target.value = '';
-            };
-            reader.readAsText(file);
-        }
-
-        function togglePrivacyBlur() {
-            document.body.classList.toggle('privacy-blur');
-            const blurred = document.body.classList.contains('privacy-blur');
-            document.getElementById('privacyBlurIcon').className = blurred ? 'fa-solid fa-eye-slash text-amber-400' : 'fa-solid fa-eye';
-        }
-
-        function toggleLiteMode() {
-            document.body.classList.toggle('lite-mode');
-            const isLite = document.body.classList.contains('lite-mode');
-            document.getElementById('liteModeLabel').textContent = isLite ? 'Lite: ON' : 'Lite: OFF';
-        }
-
-        function switchTab(tabId) {
-            if (['gemini', 'botfarm', 'xai', 'testing'].includes(tabId) && !isDeveloperMode) {
-                handleModeSwitchClick();
-                return;
-            }
-            currentTab = tabId;
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('bg-cyan-600/20', 'text-cyan-300', 'border', 'border-cyan-500/30');
-                el.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/50');
+            appState.transactions.unshift({
+                id: Date.now(),
+                date: new Date().toISOString().slice(0, 10),
+                desc,
+                type,
+                amount
             });
-            document.getElementById('tab-' + tabId)?.classList.remove('hidden');
-            const btn = document.getElementById('nav-' + tabId);
-            if (btn) {
-                btn.classList.add('bg-cyan-600/20', 'text-cyan-300', 'border', 'border-cyan-500/30');
-                btn.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/50');
-            }
-            if (tabId === 'botfarm') initThreeCity();
+            e.target.reset();
+            toggleTxnTarget();
+            await saveVaultState();
+        });
+
+        async function removeTxn(id) {
+            appState.transactions = appState.transactions.filter(t => t.id !== id);
+            await saveVaultState();
         }
 
+        // --- NEGOTIATIONS ---
+        document.getElementById('addNegForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            appState.negotiations.unshift({
+                id: Date.now(),
+                creditor: document.getElementById('negCreditor').value.trim(),
+                type: document.getElementById('negType').value,
+                target: document.getElementById('negTarget').value.trim(),
+                status: document.getElementById('negStatus').value
+            });
+            e.target.reset();
+            await saveVaultState();
+        });
+
+        async function removeNeg(id) {
+            appState.negotiations = appState.negotiations.filter(n => n.id !== id);
+            await saveVaultState();
+        }
+
+        function generateNegotiationScript() {
+            const cred = document.getElementById('negCreditor').value.trim() || '[Creditor Name]';
+            const type = document.getElementById('negType').value;
+            const target = document.getElementById('negTarget').value.trim() || '[Target Offer]';
+            let script = '';
+            if (type === 'APR Reduction') {
+                script = `Hello, I am calling regarding my ${cred} account. I want to stay current and pay down my balance, but the current APR is making it difficult. Can you review my account for a lower APR or a fixed-rate hardship plan around ${target}?`;
+            } else if (type === 'Debt Validation') {
+                script = `Re: Written Debt Validation Request (${cred})\n\nPursuant to the Fair Debt Collection Practices Act (15 U.S.C. 1692g), please provide written verification of this alleged debt, including the original creditor, itemized balance calculation, and proof of your authority to collect.`;
+            } else {
+                script = `Hello ${cred}, I am prepared to resolve this account with a ${type.toLowerCase()} of ${target}. I can submit payment once I receive written confirmation of the agreed settlement terms and reporting status.`;
+            }
+            document.getElementById('negScriptBox').value = script;
+        }
+
+        function copyNegScript() {
+            navigator.clipboard?.writeText(document.getElementById('negScriptBox').value);
+            alert('Script copied to clipboard.');
+        }
+
+        // --- CREDIT SCORES ---
+        async function saveCreditScores() {
+            appState.credit = {
+                equifax: document.getElementById('scoreEquifax').value,
+                experian: document.getElementById('scoreExperian').value,
+                transunion: document.getElementById('scoreTransUnion').value,
+                inquiries: parseInt(document.getElementById('creditInquiries').value, 10) || 0
+            };
+            await saveVaultState();
+        }
+
+        // --- INVESTMENTS ---
+        document.getElementById('addInvestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            appState.investments.push({
+                id: Date.now(),
+                name: document.getElementById('invName').value.trim(),
+                type: document.getElementById('invType').value,
+                value: parseFloat(document.getElementById('invValue').value) || 0
+            });
+            e.target.reset();
+            await saveVaultState();
+        });
+
+        async function removeInvest(id) {
+            appState.investments = appState.investments.filter(i => i.id !== id);
+            await saveVaultState();
+        }
+
+        // --- DEBTS & BILLS ---
         document.getElementById('addDebtForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             appState.debts.push({
@@ -1494,212 +1345,237 @@
             await saveVaultState();
         });
 
-        async function removeDebt(id) {
-            appState.debts = appState.debts.filter(d => d.id !== id);
-            await saveVaultState();
-        }
-
-        async function removeBill(id) {
-            appState.bills = appState.bills.filter(b => b.id !== id);
-            await saveVaultState();
-        }
-
+        async function removeDebt(id) { appState.debts = appState.debts.filter(d => d.id !== id); await saveVaultState(); }
+        async function removeBill(id) { appState.bills = appState.bills.filter(b => b.id !== id); await saveVaultState(); }
         async function updateStrategySettings() {
             appState.strategy = document.getElementById('strategySelect').value;
             appState.extraMonthly = Math.max(0, parseFloat(document.getElementById('extraMonthlyInput').value) || 0);
             await saveVaultState();
         }
 
+        // --- FILE IMPORT & CSV EXPORT ---
+        function parseCsvLine(line) {
+            const out = []; let cur = '', inQ = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+                else if (ch === '"') inQ = !inQ;
+                else if (ch === ',' && !inQ) { out.push(cur.trim()); cur = ''; }
+                else cur += ch;
+            }
+            out.push(cur.trim());
+            return out;
+        }
+
+        function importAccountsFromFile(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const content = String(e.target.result || '').trim();
+                let addedDebts = 0, addedBills = 0;
+                try {
+                    if (file.name.toLowerCase().endsWith('.json')) {
+                        const parsed = JSON.parse(content);
+                        if (Array.isArray(parsed.debts)) { parsed.debts.forEach((d, i) => { appState.debts.push({ id: Date.now() + i, ...d }); addedDebts++; }); }
+                        if (Array.isArray(parsed.bills)) { parsed.bills.forEach((b, i) => { appState.bills.push({ id: Date.now() + 1000 + i, ...b }); addedBills++; }); }
+                    } else {
+                        const lines = content.split(/\r?\n/).filter(l => l.trim());
+                        if (lines.length < 2) throw new Error('File needs a header row and at least one data row.');
+                        const headers = parseCsvLine(lines[0]).map(h => h.toLowerCase());
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = parseCsvLine(lines[i]);
+                            const get = (keys) => { const idx = headers.findIndex(h => keys.some(k => h.includes(k))); return idx >= 0 ? (cols[idx] || '') : ''; };
+                            const recordType = get(['recordtype', 'record']).toLowerCase();
+                            const name = get(['name', 'creditor', 'account', 'bill']);
+                            if (!name || name.toLowerCase() === 'empty vault') continue;
+                            const amount = parseFloat(get(['balance', 'amount']).replace(/[$,]/g, '')) || 0;
+                            if (recordType === 'bill') {
+                                appState.bills.push({ id: Date.now() + i, name, category: get(['category']) || 'Utilities', amount, dueDay: parseInt(get(['due']), 10) || 1 });
+                                addedBills++;
+                            } else {
+                                appState.debts.push({ id: Date.now() + i, name, type: get(['type', 'category']) || 'credit_card', balance: amount, limit: parseFloat(get(['limit']).replace(/[$,]/g, '')) || 0, apr: parseFloat(get(['apr', 'rate']).replace(/[%]/g, '')) || 0, minPay: parseFloat(get(['min']).replace(/[$,]/g, '')) || 0 });
+                                addedDebts++;
+                            }
+                        }
+                    }
+                    await saveVaultState();
+                    alert(`Imported ${addedDebts} creditor(s) and ${addedBills} bill(s) from ${file.name}.`);
+                } catch (err) { alert('Import failed: ' + err.message); }
+                finally { event.target.value = ''; }
+            };
+            reader.readAsText(file);
+        }
+
+        function csvEscape(val) { return '"' + String(val ?? '').replace(/"/g, '""') + '"'; }
+        function exportVaultCSV() {
+            const rows = [['RecordType', 'Name', 'CategoryOrType', 'BalanceOrAmount', 'CreditLimit', 'APR_Percent', 'MinPayment', 'DueDay']];
+            appState.banks.forEach(b => rows.push(['Bank', b.name, b.type, Number(b.balance).toFixed(2), '', '', '', '']));
+            appState.debts.forEach(d => rows.push(['Debt', d.name, d.type, Number(d.balance).toFixed(2), Number(d.limit || 0).toFixed(2), Number(d.apr || 0).toFixed(2), Number(d.minPay || 0).toFixed(2), '']));
+            appState.bills.forEach(b => rows.push(['Bill', b.name, b.category, Number(b.amount).toFixed(2), '', '', '', b.dueDay || '']));
+            appState.investments.forEach(i => rows.push(['Investment', i.name, i.type, Number(i.value).toFixed(2), '', '', '', '']));
+            const blob = new Blob([rows.map(r => r.map(csvEscape).join(',')).join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nexus-prime-ledger-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // --- PAYDOWN SIMULATION ---
         function simulatePayoffSchedule() {
             if (!appState.debts.length) return { months: 0, curve: [0], labels: ['Today'], payoffLabel: '--' };
-
             const items = appState.debts.map(d => ({ ...d, bal: d.balance })).filter(d => d.bal > 0);
             if (!items.length) return { months: 0, curve: [0], labels: ['Today'], payoffLabel: 'Paid Off' };
-
             items.sort((a, b) => appState.strategy === 'avalanche' ? b.apr - a.apr : a.bal - b.bal);
-
             let months = 0;
-            const maxMonths = 360;
             const curve = [items.reduce((s, d) => s + d.bal, 0)];
             const labels = ['Today'];
             const now = new Date();
-
-            while (months < maxMonths && items.some(d => d.bal > 0.01)) {
+            while (months < 360 && items.some(d => d.bal > 0.01)) {
                 months++;
-                let freedSnowball = appState.extraMonthly;
-
+                let freed = appState.extraMonthly;
                 for (const d of items) {
-                    if (d.bal <= 0) {
-                        freedSnowball += d.minPay;
-                        continue;
-                    }
-                    const interest = d.bal * (d.apr / 100 / 12);
-                    d.bal += interest;
+                    if (d.bal <= 0) { freed += d.minPay; continue; }
+                    d.bal += d.bal * (d.apr / 100 / 12);
                     const pay = Math.min(d.bal, d.minPay);
                     d.bal -= pay;
-                    if (d.minPay > pay) freedSnowball += (d.minPay - pay);
+                    if (d.minPay > pay) freed += (d.minPay - pay);
                 }
-
                 for (const d of items) {
-                    if (d.bal > 0 && freedSnowball > 0) {
-                        const extra = Math.min(d.bal, freedSnowball);
+                    if (d.bal > 0 && freed > 0) {
+                        const extra = Math.min(d.bal, freed);
                         d.bal -= extra;
-                        freedSnowball -= extra;
+                        freed -= extra;
                     }
                 }
-
-                const remaining = items.reduce((s, d) => s + d.bal, 0);
-                if (months % 3 === 0 || remaining <= 0.01) {
+                const rem = items.reduce((s, d) => s + d.bal, 0);
+                if (months % 3 === 0 || rem <= 0.01) {
                     const future = new Date(now.getFullYear(), now.getMonth() + months, 1);
                     labels.push(future.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
-                    curve.push(Math.max(0, Math.round(remaining)));
+                    curve.push(Math.max(0, Math.round(rem)));
                 }
             }
-
             const target = new Date(now.getFullYear(), now.getMonth() + months, 1);
-            const payoffLabel = target.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-            return { months, curve, labels, payoffLabel };
+            return { months, curve, labels, payoffLabel: target.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) };
         }
 
-        function fmtMoney(n) {
-            return '$' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
+        // --- RENDER ALL ---
         function renderAll() {
-            document.getElementById('strategySelect').value = appState.strategy;
-            document.getElementById('extraMonthlyInput').value = appState.extraMonthly;
-
+            const totalCash = appState.banks.reduce((s, b) => s + b.balance, 0);
+            const totalInvest = appState.investments.reduce((s, i) => s + i.value, 0);
             const totalDebt = appState.debts.reduce((s, d) => s + d.balance, 0);
             const totalBills = appState.bills.reduce((s, b) => s + b.amount, 0);
             const totalMinPay = appState.debts.reduce((s, d) => s + d.minPay, 0);
+            const netWorth = totalCash + totalInvest - totalDebt;
 
-            const revolving = appState.debts.filter(d => d.type === 'credit_card' && d.limit > 0);
-            const revBal = revolving.reduce((s, d) => s + d.balance, 0);
-            const revLim = revolving.reduce((s, d) => s + d.limit, 0);
-            const util = revLim > 0 ? Math.round((revBal / revLim) * 100) : 0;
-
+            const rev = appState.debts.filter(d => d.type === 'credit_card' && d.limit > 0);
+            const util = rev.reduce((s, d) => s + d.limit, 0) > 0 ? Math.round((rev.reduce((s, d) => s + d.balance, 0) / rev.reduce((s, d) => s + d.limit, 0)) * 100) : 0;
             const sim = simulatePayoffSchedule();
 
+            document.getElementById('strategySelect').value = appState.strategy;
+            document.getElementById('extraMonthlyInput').value = appState.extraMonthly;
+            document.getElementById('dash-total-cash').textContent = fmtMoney(totalCash);
+            document.getElementById('dash-bank-count').textContent = `${appState.banks.length} linked bank account(s)`;
+            document.getElementById('dash-total-invest').textContent = fmtMoney(totalInvest);
+            document.getElementById('dash-invest-count').textContent = `${appState.investments.length} holding(s) tracked`;
             document.getElementById('dash-total-debt').textContent = fmtMoney(totalDebt);
-            document.getElementById('dash-total-bills').textContent = fmtMoney(totalBills);
+            document.getElementById('dash-net-worth').textContent = fmtMoney(netWorth);
             document.getElementById('dash-utilization').textContent = util + '%';
-            document.getElementById('dash-account-count').textContent = appState.debts.length;
             document.getElementById('dash-payoff-date').textContent = sim.payoffLabel;
             document.getElementById('dash-months-left').textContent = sim.months + ' mos';
-            document.getElementById('dash-strategy-badge').textContent =
-                appState.strategy === 'avalanche' ? 'Avalanche Active' : 'Snowball Active';
+            document.getElementById('dash-total-bills').textContent = fmtMoney(totalBills);
             document.getElementById('dash-min-payments').textContent = fmtMoney(totalMinPay);
             document.getElementById('dash-total-outflow').textContent = fmtMoney(totalMinPay + totalBills + appState.extraMonthly);
+            document.getElementById('dash-account-count').textContent = appState.debts.length;
+            document.getElementById('dash-strategy-badge').textContent = appState.strategy === 'avalanche' ? 'Avalanche Active' : 'Snowball Active';
 
-            const debtsBody = document.getElementById('debtsTableBody');
-            if (!appState.debts.length) {
-                debtsBody.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-500 text-xs">No credit or loan accounts added yet.</td></tr>';
-            } else {
-                debtsBody.innerHTML = appState.debts.map(d => `
-                    <tr>
-                        <td class="py-3 font-semibold text-white">${escapeHtml(d.name)}</td>
-                        <td class="py-3 text-slate-400 font-mono text-xs">${escapeHtml(d.type)}</td>
-                        <td class="py-3 font-bold text-cyan-300 sensitive-val">${fmtMoney(d.balance)}</td>
-                        <td class="py-3 text-slate-400 sensitive-val">${d.limit ? fmtMoney(d.limit) : '--'}</td>
-                        <td class="py-3 text-amber-400">${d.apr}%</td>
-                        <td class="py-3 text-white sensitive-val">${fmtMoney(d.minPay)}</td>
-                        <td class="py-3 text-right"><button onclick="removeDebt(${d.id})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>
-                `).join('');
-            }
+            // Bank accounts & selects
+            document.getElementById('bankAccountsList').innerHTML = appState.banks.length
+                ? appState.banks.map(b => `<div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs"><div><span class="font-bold text-white">${escapeHtml(b.name)}</span> <span class="text-slate-400">(${escapeHtml(b.type)})</span></div><div class="flex items-center gap-3"><span class="font-bold text-emerald-400 sensitive-val">${fmtMoney(b.balance)}</span><button onclick="removeBank(${b.id})" class="text-rose-400"><i class="fa-solid fa-trash"></i></button></div></div>`).join('')
+                : '<p class="text-xs text-slate-500">No bank accounts added yet.</p>';
 
-            const billsBody = document.getElementById('billsTableBody');
-            if (!appState.bills.length) {
-                billsBody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">No recurring bills added yet.</td></tr>';
-            } else {
-                billsBody.innerHTML = appState.bills.map(b => `
-                    <tr>
-                        <td class="py-3 font-semibold text-white">${escapeHtml(b.name)}</td>
-                        <td class="py-3 text-slate-400 text-xs">${escapeHtml(b.category)}</td>
-                        <td class="py-3 font-bold text-emerald-300 sensitive-val">${fmtMoney(b.amount)}</td>
-                        <td class="py-3 text-slate-300 font-mono">Day ${b.dueDay}</td>
-                        <td class="py-3 text-right"><button onclick="removeBill(${b.id})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>
-                `).join('');
-            }
+            const bankSel = document.getElementById('txnBankSelect');
+            bankSel.innerHTML = '<option value="">-- Select Bank --</option>' + appState.banks.map(b => `<option value="${b.id}">${escapeHtml(b.name)} (${fmtMoney(b.balance)})</option>`).join('');
+            const credSel = document.getElementById('txnCreditorSelect');
+            credSel.innerHTML = '<option value="">-- Select Creditor --</option>' + appState.debts.map(d => `<option value="${d.id}">${escapeHtml(d.name)} (${fmtMoney(d.balance)})</option>`).join('');
 
-            renderCharts(sim);
-        }
+            // Transactions
+            const q = (document.getElementById('txnSearchInput')?.value || '').toLowerCase();
+            const filteredTxns = appState.transactions.filter(t => !q || t.desc.toLowerCase().includes(q) || t.type.toLowerCase().includes(q));
+            document.getElementById('txnsTableBody').innerHTML = filteredTxns.length
+                ? filteredTxns.map(t => `<tr><td class="py-2.5 text-slate-400 font-mono text-xs">${escapeHtml(t.date)}</td><td class="py-2.5 font-semibold text-white">${escapeHtml(t.desc)}</td><td class="py-2.5 text-xs text-cyan-300 font-mono">${escapeHtml(t.type)}</td><td class="py-2.5 font-bold ${t.type === 'deposit' ? 'text-emerald-400' : 'text-rose-300'} sensitive-val">${t.type === 'deposit' ? '+' : '-'}${fmtMoney(t.amount)}</td><td class="py-2.5 text-right"><button onclick="removeTxn(${t.id})" class="text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('')
+                : '<tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">No transactions logged yet.</td></tr>';
 
-        function renderCharts(sim) {
-            const donutCtx = document.getElementById('debtDonutChart')?.getContext('2d');
-            if (donutCtx) {
-                if (donutChart) donutChart.destroy();
-                const hasData = appState.debts.length > 0;
-                donutChart = new Chart(donutCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: hasData ? appState.debts.map(d => d.name) : ['Empty'],
-                        datasets: [{
-                            data: hasData ? appState.debts.map(d => d.balance) : [1],
-                            backgroundColor: hasData ? ['#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#38bdf8'] : ['#1e293b'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '75%' }
-                });
-            }
+            // Debts & Bills
+            document.getElementById('debtsTableBody').innerHTML = appState.debts.length
+                ? appState.debts.map(d => `<tr><td class="py-3 font-semibold text-white">${escapeHtml(d.name)}</td><td class="py-3 text-slate-400 font-mono text-xs">${escapeHtml(d.type)}</td><td class="py-3 font-bold text-cyan-300 sensitive-val">${fmtMoney(d.balance)}</td><td class="py-3 text-slate-400 sensitive-val">${d.limit ? fmtMoney(d.limit) : '--'}</td><td class="py-3 text-amber-400">${d.apr}%</td><td class="py-3 text-white sensitive-val">${fmtMoney(d.minPay)}</td><td class="py-3 text-right"><button onclick="removeDebt(${d.id})" class="text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('')
+                : '<tr><td colspan="7" class="py-6 text-center text-slate-500 text-xs">No credit or loan accounts added yet.</td></tr>';
 
+            document.getElementById('billsTableBody').innerHTML = appState.bills.length
+                ? appState.bills.map(b => `<tr><td class="py-3 font-semibold text-white">${escapeHtml(b.name)}</td><td class="py-3 text-slate-400 text-xs">${escapeHtml(b.category)}</td><td class="py-3 font-bold text-emerald-300 sensitive-val">${fmtMoney(b.amount)}</td><td class="py-3 text-slate-300 font-mono">Day ${b.dueDay}</td><td class="py-3 text-right"><button onclick="removeBill(${b.id})" class="text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('')
+                : '<tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">No recurring bills added yet.</td></tr>';
+
+            // Negotiations
+            document.getElementById('negsTableBody').innerHTML = appState.negotiations.length
+                ? appState.negotiations.map(n => `<tr><td class="py-3 font-semibold text-white">${escapeHtml(n.creditor)}</td><td class="py-3 text-amber-300 text-xs">${escapeHtml(n.type)}</td><td class="py-3 text-cyan-300 text-xs">${escapeHtml(n.target)}</td><td class="py-3 text-emerald-400 text-xs font-mono">${escapeHtml(n.status)}</td><td class="py-3 text-right"><button onclick="removeNeg(${n.id})" class="text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('')
+                : '<tr><td colspan="5" class="py-5 text-center text-slate-500 text-xs">No active negotiations logged yet.</td></tr>';
+
+            // Credit
+            document.getElementById('scoreEquifax').value = appState.credit.equifax || '';
+            document.getElementById('scoreExperian').value = appState.credit.experian || '';
+            document.getElementById('scoreTransUnion').value = appState.credit.transunion || '';
+            document.getElementById('creditInquiries').value = appState.credit.inquiries || 0;
+            document.getElementById('credit-util-live').textContent = util + '%';
+            document.getElementById('credit-coll-live').textContent = appState.debts.filter(d => d.type === 'collection').length;
+
+            // Investments
+            document.getElementById('investTableBody').innerHTML = appState.investments.length
+                ? appState.investments.map(i => `<tr><td class="py-3 font-semibold text-white">${escapeHtml(i.name)}</td><td class="py-3 text-slate-400 text-xs">${escapeHtml(i.type)}</td><td class="py-3 font-bold text-purple-300 sensitive-val">${fmtMoney(i.value)}</td><td class="py-3 text-right"><button onclick="removeInvest(${i.id})" class="text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button></td></tr>`).join('')
+                : '<tr><td colspan="4" class="py-5 text-center text-slate-500 text-xs">No investment holdings added yet.</td></tr>';
+
+            // Chart
             const lineCtx = document.getElementById('debtPaydownChart')?.getContext('2d');
             if (lineCtx) {
                 if (paydownChart) paydownChart.destroy();
                 paydownChart = new Chart(lineCtx, {
                     type: 'line',
-                    data: {
-                        labels: sim.labels,
-                        datasets: [{
-                            label: 'Remaining Principal',
-                            data: sim.curve,
-                            borderColor: '#06b6d4',
-                            backgroundColor: 'rgba(6, 182, 212, 0.12)',
-                            fill: true,
-                            tension: 0.35
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
-                        }
-                    }
+                    data: { labels: sim.labels, datasets: [{ label: 'Remaining Principal', data: sim.curve, borderColor: '#06b6d4', backgroundColor: 'rgba(6, 182, 212, 0.12)', fill: true, tension: 0.35 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } } } }
                 });
             }
         }
 
+        // --- OCR ---
         async function handleOcrFile(event) {
             const file = event.target.files?.[0];
             if (!file) return;
             const status = document.getElementById('ocrStatusMsg');
+            if (file.name.toLowerCase().endsWith('.txt') || file.name.toLowerCase().endsWith('.csv')) {
+                const reader = new FileReader();
+                reader.onload = (e) => { document.getElementById('ocrRawText').value = String(e.target.result || ''); status.textContent = `Loaded ${file.name}.`; parseOcrText(); };
+                reader.readAsText(file);
+                event.target.value = '';
+                return;
+            }
             status.textContent = 'Scanning image locally via Tesseract OCR...';
             try {
                 const { data: { text } } = await Tesseract.recognize(file, 'eng');
                 document.getElementById('ocrRawText').value = text;
-                status.textContent = 'OCR scan complete. Review extracted values on the right.';
+                status.textContent = 'OCR complete.';
                 parseOcrText();
-            } catch (err) {
-                status.textContent = 'OCR error: ' + err.message;
-            }
+            } catch (err) { status.textContent = 'OCR error: ' + err.message; }
+            finally { event.target.value = ''; }
         }
 
         function parseOcrText() {
             const text = document.getElementById('ocrRawText').value || '';
             const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-            if (lines.length && !document.getElementById('parsedName').value) {
-                document.getElementById('parsedName').value = lines[0].slice(0, 36);
-            }
-            const balMatch = text.match(/(?:balance|total due|amount due|new balance)[^\d$]*\$?\s*([\d,]+\.\d{2})/i)
-                || text.match(/\$\s*([\d,]+\.\d{2})/);
+            if (lines.length && !document.getElementById('parsedName').value) document.getElementById('parsedName').value = lines[0].slice(0, 36);
+            const balMatch = text.match(/(?:balance|total due|amount due|new balance)[^\d$]*\$?\s*([\d,]+\.\d{2})/i) || text.match(/\$\s*([\d,]+\.\d{2})/);
             const minMatch = text.match(/(?:minimum|min\.?\s*payment)[^\d$]*\$?\s*([\d,]+\.\d{2})/i);
             const aprMatch = text.match(/(\d{1,2}\.\d{1,2})\s*%/);
-
             if (balMatch) document.getElementById('parsedBalance').value = balMatch[1].replace(/,/g, '');
             if (minMatch) document.getElementById('parsedMinPay').value = minMatch[1].replace(/,/g, '');
             if (aprMatch) document.getElementById('parsedApr').value = aprMatch[1];
@@ -1710,319 +1586,213 @@
             const balance = parseFloat(document.getElementById('parsedBalance').value) || 0;
             const minPay = parseFloat(document.getElementById('parsedMinPay').value) || 0;
             const apr = parseFloat(document.getElementById('parsedApr').value) || 0;
-
-            if (target === 'debt') {
-                appState.debts.push({ id: Date.now(), name, type: 'credit_card', balance, limit: 0, apr, minPay });
-            } else {
-                appState.bills.push({ id: Date.now(), name, category: 'Utilities', amount: balance || minPay, dueDay: 15 });
-            }
+            if (target === 'debt') appState.debts.push({ id: Date.now(), name, type: 'credit_card', balance, limit: 0, apr, minPay });
+            else appState.bills.push({ id: Date.now(), name, category: 'Utilities', amount: balance || minPay, dueDay: 15 });
             await saveVaultState();
             switchTab('vault');
         }
 
-        window.cityState = {
-            initialized: false,
-            scene: null,
-            camera: null,
-            renderer: null,
-            container: null,
-            buildings: [],
-            beacons: [],
-            traffic: [],
-            dataSparks: [],
-            angle: 0,
-            lastTime: performance.now()
-        };
-
-        function initThreeCity() {
-            const container = document.getElementById('city-canvas-container');
-            if (!container) return;
-            if (window.cityState.initialized) {
-                handleCityResize();
-                return;
-            }
-            const isLite = document.body.classList.contains('lite-mode');
-            const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x030712, 0.025);
-
-            const camera = new THREE.PerspectiveCamera(60, Math.max(container.clientWidth, 1) / Math.max(container.clientHeight, 1), 0.1, 1000);
-            camera.position.set(0, 28, 46);
-            camera.lookAt(0, 5, 0);
-
-            const renderer = new THREE.WebGLRenderer({ antialias: !isLite, alpha: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isLite ? 1 : 2));
-            container.appendChild(renderer.domElement);
-
-            const grid = new THREE.GridHelper(110, 44, 0x06b6d4, 0x1e293b);
-            grid.position.y = -0.1;
-            scene.add(grid);
-
-            scene.add(new THREE.AmbientLight(0xffffff, 0.65));
-            const cyanLight = new THREE.PointLight(0x06b6d4, 2.4, 120);
-            cyanLight.position.set(0, 24, 0);
-            scene.add(cyanLight);
-
-            window.cityState.scene = scene;
-            window.cityState.camera = camera;
-            window.cityState.renderer = renderer;
-            window.cityState.container = container;
-
-            for (let x = -6; x <= 6; x += 3) {
-                for (let z = -6; z <= 6; z += 3) {
-                    if (Math.random() > 0.15) {
-                        addTowerToCity(x * 2.6, z * 2.6, 5 + Math.random() * 16);
-                    }
-                }
-            }
-
-            const laneGeo = new THREE.BoxGeometry(1.6, 0.35, 0.45);
-            for (let i = 0; i < 24; i++) {
-                const alongX = i % 2 === 0;
-                const car = new THREE.Mesh(laneGeo, new THREE.MeshBasicMaterial({ color: i % 3 === 0 ? 0xfbbf24 : 0x38bdf8 }));
-                if (!alongX) car.rotation.y = Math.PI / 2;
-                const laneCoord = ((i % 7) - 3) * 5.2;
-                const startPos = -45 + Math.random() * 90;
-                car.position.set(alongX ? startPos : laneCoord, 0.25, alongX ? laneCoord : startPos);
-                scene.add(car);
-                window.cityState.traffic.push({ mesh: car, alongX, dir: Math.random() > 0.5 ? 1 : -1, speed: 12 + Math.random() * 14 });
-            }
-
-            for (let i = 0; i < 28; i++) {
-                addSparkToCity((Math.random() - 0.5) * 36, Math.random() * 22, (Math.random() - 0.5) * 36, i % 2 === 0 ? 0x34d399 : 0x22d3ee);
-            }
-
-            window.cityState.initialized = true;
-            updateCityCount();
-
-            function animate(now) {
-                requestAnimationFrame(animate);
-                if (!isDeveloperMode) return;
-                const dt = Math.min((now - window.cityState.lastTime) / 1000, 0.05);
-                window.cityState.lastTime = now;
-
-                const botTab = document.getElementById('tab-botfarm');
-                if (!botTab || botTab.classList.contains('hidden')) return;
-
-                window.cityState.angle += dt * 0.22;
-                const ang = window.cityState.angle;
-                camera.position.x = Math.sin(ang) * 46;
-                camera.position.z = Math.cos(ang) * 46;
-                camera.position.y = 26 + Math.sin(ang * 1.5) * 4;
-                camera.lookAt(0, 5, 0);
-
-                window.cityState.buildings.forEach((b) => {
-                    const wave = Math.sin(now * 0.002 * b.speed + b.phase);
-                    const h = Math.max(2, b.baseHeight + wave * 1.4);
-                    b.mesh.scale.y = h;
-                    b.mesh.position.y = h / 2;
-                    b.mesh.material.emissiveIntensity = 0.35 + (wave + 1) * 0.25;
-                });
-
-                window.cityState.beacons.forEach((bk) => {
-                    const wave = Math.sin(now * 0.004 + bk.phase);
-                    bk.mesh.position.y = bk.baseHeight + 0.9 + wave * 0.6;
-                });
-
-                window.cityState.traffic.forEach((t) => {
-                    if (t.alongX) {
-                        t.mesh.position.x += t.dir * t.speed * dt;
-                        if (t.mesh.position.x > 48) t.mesh.position.x = -48;
-                        if (t.mesh.position.x < -48) t.mesh.position.x = 48;
-                    } else {
-                        t.mesh.position.z += t.dir * t.speed * dt;
-                        if (t.mesh.position.z > 48) t.mesh.position.z = -48;
-                        if (t.mesh.position.z < -48) t.mesh.position.z = 48;
-                    }
-                });
-
-                window.cityState.dataSparks.forEach((s) => {
-                    s.mesh.position.y += s.velY * dt;
-                    s.mesh.rotation.y += s.rotSpeed * dt;
-                    if (s.mesh.position.y > 26) s.mesh.position.y = 0.4;
-                });
-
-                renderer.render(scene, camera);
-            }
-
-            requestAnimationFrame(animate);
-            window.addEventListener('resize', handleCityResize);
+        // --- GEMINI COPILOT ---
+        function saveGeminiKeyPref() {
+            const k = document.getElementById('geminiApiKeyInput').value.trim();
+            if (k) localStorage.setItem(GEMINI_KEY_STORAGE, k); else localStorage.removeItem(GEMINI_KEY_STORAGE);
         }
 
-        function addTowerToCity(xPos, zPos, baseHeight) {
-            const { scene, buildings, beacons } = window.cityState;
-            if (!scene) return;
-            const isCyan = Math.random() > 0.45;
-            const tower = new THREE.Mesh(
-                new THREE.BoxGeometry(1, 1, 1),
-                new THREE.MeshStandardMaterial({
-                    color: isCyan ? 0x06b6d4 : 0x10b981,
-                    emissive: isCyan ? 0x0284c7 : 0x059669,
-                    emissiveIntensity: 0.45,
-                    roughness: 0.25,
-                    metalness: 0.85
-                })
-            );
-            tower.scale.set(2.1, baseHeight, 2.1);
-            tower.position.set(xPos, baseHeight / 2, zPos);
-            scene.add(tower);
-
-            const beacon = new THREE.Mesh(
-                new THREE.SphereGeometry(0.35, 10, 10),
-                new THREE.MeshBasicMaterial({ color: isCyan ? 0x67e8f9 : 0x6ee7b7 })
-            );
-            beacon.position.set(xPos, baseHeight + 0.8, zPos);
-            scene.add(beacon);
-
-            buildings.push({ mesh: tower, baseHeight, phase: Math.random() * Math.PI * 2, speed: 0.8 + Math.random() * 1.2 });
-            beacons.push({ mesh: beacon, baseHeight, phase: Math.random() * Math.PI * 2 });
-        }
-
-        function addSparkToCity(x, y, z, colorHex) {
-            const { scene, dataSparks } = window.cityState;
-            if (!scene) return;
-            const spark = new THREE.Mesh(new THREE.OctahedronGeometry(0.32, 0), new THREE.MeshBasicMaterial({ color: colorHex }));
-            spark.position.set(x, y, z);
-            scene.add(spark);
-            dataSparks.push({ mesh: spark, velY: 2.5 + Math.random() * 4.5, rotSpeed: 1.5 + Math.random() * 3 });
-        }
-
-        function updateCityCount() {
-            const c = window.cityState.buildings.length;
-            const el = document.getElementById('city-tower-count');
-            const side = document.getElementById('sidebar-nodes');
-            if (el) el.textContent = c;
-            if (side) side.textContent = `${c}/${c}`;
-        }
-
-        function handleCityResize() {
-            const { container, camera, renderer } = window.cityState;
-            if (!container || !camera || !renderer || !container.clientWidth) return;
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        }
-
-        function spawnBotNode() {
-            if (!window.cityState.initialized) initThreeCity();
-            const rx = (Math.random() - 0.5) * 34;
-            const rz = (Math.random() - 0.5) * 34;
-            addTowerToCity(rx, rz, 8 + Math.random() * 14);
-            addSparkToCity(rx, 1.5, rz, 0x38bdf8);
-            updateCityCount();
-        }
-
-        function toggleCityView() {
-            if (!window.cityState.camera) return;
-            window.cityState.angle = 0;
-            window.cityState.camera.position.set(0, 28, 46);
-            window.cityState.camera.lookAt(0, 5, 0);
-        }
-
-        function injectVaultTelemetryPrompt() {
+        function attachLiveVaultContextToInput() {
+            const totalCash = appState.banks.reduce((s, b) => s + b.balance, 0);
             const totalDebt = appState.debts.reduce((s, d) => s + d.balance, 0);
-            const totalBills = appState.bills.reduce((s, b) => s + b.amount, 0);
-            document.getElementById('xai-prompt').value =
-                `Analyze my payoff plan: ${appState.debts.length} debt accounts totaling ${fmtMoney(totalDebt)}, monthly bills ${fmtMoney(totalBills)}, extra monthly snowball ${fmtMoney(appState.extraMonthly)} using ${appState.strategy}.`;
+            const totalInvest = appState.investments.reduce((s, i) => s + i.value, 0);
+            document.getElementById('geminiPromptInput').value = `Review my bank cash (${fmtMoney(totalCash)}), investments (${fmtMoney(totalInvest)}), and ${appState.debts.length} debts (${fmtMoney(totalDebt)}). What should I prioritize first?`;
+            document.getElementById('geminiPromptInput').focus();
         }
 
-        document.getElementById('xai-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const promptEl = document.getElementById('xai-prompt');
-            const outEl = document.getElementById('xai-output');
-            const sendBtn = document.getElementById('xai-send');
-            const prompt = promptEl.value.trim();
-            if (!prompt) return;
+        function appendGeminiBubble(sender, text, isUser = false) {
+            const feed = document.getElementById('geminiChatFeed');
+            const div = document.createElement('div');
+            div.className = isUser ? 'p-3.5 rounded-xl bg-purple-950/50 border border-purple-700/40 text-purple-100 ml-6' : 'p-3.5 rounded-xl bg-slate-900/95 border border-slate-800 text-slate-200 mr-6 whitespace-pre-wrap';
+            div.innerHTML = `<span class="${isUser ? 'text-purple-300' : 'text-emerald-400'} font-mono text-xs font-bold block mb-1">${sender}</span>${escapeHtml(text)}`;
+            feed.appendChild(div);
+            feed.scrollTop = feed.scrollHeight;
+            return div;
+        }
 
-            outEl.textContent = `> ${prompt}\n\n`;
+        document.getElementById('geminiChatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const promptInput = document.getElementById('geminiPromptInput');
+            const sendBtn = document.getElementById('geminiSendBtn');
+            const apiKey = document.getElementById('geminiApiKeyInput').value.trim() || localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+            const model = document.getElementById('geminiModelSelect').value;
+            const userPrompt = promptInput.value.trim();
+            if (!userPrompt) return;
+            if (!apiKey) { appendGeminiBubble('GEMINI COPILOT', 'Please paste your Gemini API key above first.'); return; }
+
+            appendGeminiBubble('YOU', userPrompt, true);
+            promptInput.value = '';
             sendBtn.disabled = true;
-            sendBtn.textContent = 'Streaming...';
-            promptEl.value = '';
+            sendBtn.textContent = 'Thinking...';
+            const bubble = appendGeminiBubble('GEMINI COPILOT', 'Analyzing...');
+
+            let finalPrompt = userPrompt;
+            if (document.getElementById('includeVaultContextCheck').checked) {
+                finalPrompt = `Vault JSON Summary: ${JSON.stringify({ banks: appState.banks, debts: appState.debts, bills: appState.bills, negotiations: appState.negotiations, credit: appState.credit, investments: appState.investments })}\n\nQuestion: ${userPrompt}`;
+            }
 
             try {
-                const res = await fetch(document.getElementById('xai-endpoint').value.trim(), {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
                     body: JSON.stringify({
-                        prompt,
-                        model: document.getElementById('xai-model').value,
-                        systemPrompt: document.getElementById('xai-system').value
+                        systemInstruction: { parts: [{ text: 'You are Gemini inside NEXUS-PRIME, a clear, direct, mathematically accurate personal banking, debt negotiation, credit, and wealth assistant.' }] },
+                        contents: [{ parts: [{ text: finalPrompt }] }]
                     })
                 });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const reader = res.body.getReader();
-                const decoder = new TextDecoder();
-                let buffer = '';
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split('\n');
-                    buffer = lines.pop() || '';
-                    for (const line of lines) {
-                        const trimmed = line.trim();
-                        if (!trimmed.startsWith('data:')) continue;
-                        const payload = trimmed.slice(5).trim();
-                        if (payload === '[DONE]') continue;
-                        try {
-                            const parsed = JSON.parse(payload);
-                            outEl.textContent += parsed.choices?.[0]?.delta?.content || '';
-                            outEl.scrollTop = outEl.scrollHeight;
-                        } catch (_) {}
-                    }
-                }
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+                const reply = data.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('\n') || 'No response.';
+                bubble.innerHTML = `<span class="text-emerald-400 font-mono text-xs font-bold block mb-1">GEMINI COPILOT (${model})</span>${escapeHtml(reply)}`;
             } catch (err) {
-                outEl.textContent += `[RELAY INFO] ${err.message} — Start your local Node proxy (node server.js) with XAI_API_KEY in .env to stream live responses.`;
+                bubble.innerHTML = `<span class="text-rose-400 font-mono text-xs font-bold block mb-1">GEMINI ERROR</span>${escapeHtml(err.message)}`;
             } finally {
                 sendBtn.disabled = false;
-                sendBtn.textContent = 'Stream';
+                sendBtn.textContent = 'Ask Gemini';
             }
         });
 
-        function logTerminal(msg, colorClass = 'text-cyan-400') {
-            const term = document.getElementById('test-terminal');
-            if (!term) return;
-            const time = new Date().toLocaleTimeString();
-            term.innerHTML += `<div class="${colorClass}">[${time}] ${msg}</div>`;
-            term.scrollTop = term.scrollHeight;
+        // --- SECURITY, PIN, DEV MODE & NAVIGATION ---
+        function switchTab(tabId) {
+            if (['gemini', 'xai', 'testing'].includes(tabId) && !isDeveloperMode) { handleModeSwitchClick(); return; }
+            currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-cyan-600/20', 'text-cyan-300', 'border', 'border-cyan-500/30');
+                el.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/50');
+            });
+            document.getElementById('tab-' + tabId)?.classList.remove('hidden');
+            const btn = document.getElementById('nav-' + tabId);
+            if (btn) { btn.classList.add('bg-cyan-600/20', 'text-cyan-300', 'border', 'border-cyan-500/30'); btn.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-slate-800/50'); }
         }
 
-        function runSecurityAudit() {
-            const raw = localStorage.getItem(VAULT_STORAGE_KEY) || '';
-            const isEncrypted = raw.includes('"encrypted":true');
-            if (isEncrypted) {
-                logTerminal('[AUDIT PASS] localStorage contains only AES-256-GCM ciphertext. Zero plaintext leaks.', 'text-emerald-400');
+        function applyRoleModeUI() {
+            const badge = document.getElementById('roleModeBadge');
+            const switchLabel = document.getElementById('modeSwitchLabel');
+            const sideRole = document.getElementById('sidebar-role-status');
+            if (isDeveloperMode) {
+                document.body.classList.remove('user-mode');
+                badge.textContent = 'DEV MODE';
+                switchLabel.textContent = 'User Mode';
+                if (sideRole) sideRole.textContent = 'DEVELOPER';
             } else {
-                logTerminal('[AUDIT NOTICE] Vault PIN lock not set yet. Tap "Set PIN Lock" in header to encrypt localStorage.', 'text-amber-400');
+                document.body.classList.add('user-mode');
+                badge.textContent = 'USER MODE';
+                switchLabel.textContent = 'Dev Mode';
+                if (sideRole) sideRole.textContent = 'USER';
+                if (['gemini', 'xai', 'testing'].includes(currentTab)) switchTab('dashboard');
             }
         }
 
-        function runMathCheck() {
-            const sim = simulatePayoffSchedule();
-            logTerminal(`[MATH CHECK] ${appState.debts.length} accounts simulated -> Debt-free target: ${sim.payoffLabel} (${sim.months} months).`, 'text-cyan-400');
+        function handleModeSwitchClick() {
+            if (isDeveloperMode) { lockDeveloperMode(); return; }
+            openDevModal(localStorage.getItem(DEV_PASS_HASH_KEY) ? 'unlock' : 'setup');
         }
-
-        function resetToBrandNewApp(fromLockScreen = false) {
-            const msg = fromLockScreen
-                ? 'Wipe encrypted vault and PIN to start fresh?'
-                : 'Reset everything back to a brand-new $0.00 blank slate?';
-            if (!confirm(msg)) return;
-            localStorage.removeItem(VAULT_STORAGE_KEY);
-            localStorage.removeItem(PIN_META_KEY);
-            localStorage.removeItem(DEV_PASS_HASH_KEY);
-            activePin = null;
-            isDeveloperMode = false;
-            clearTimeout(idleTimer);
-            appState = structuredClone(BLANK_STATE);
-            hidePinOverlay();
-            updateSecurityBadges();
-            renderAll();
-            logTerminal('[RESET] All local data wiped. App restored to brand-new $0.00 state.', 'text-rose-400');
+        function openChangeDevPassword() { openDevModal('change'); }
+        function openDevModal(action) {
+            devModalAction = action;
+            const m = document.getElementById('devModeModal');
+            document.getElementById('devConfirmWrap').classList.toggle('hidden', action === 'unlock');
+            document.getElementById('resetDevPassBtn').classList.toggle('hidden', action !== 'unlock');
+            document.getElementById('devModalError').classList.add('hidden');
+            document.getElementById('devPassInput').value = '';
+            document.getElementById('devPassConfirmInput').value = '';
+            m.classList.remove('hidden'); m.classList.add('flex');
         }
+        function closeDevModal() { document.getElementById('devModeModal').classList.add('hidden'); document.getElementById('devModeModal').classList.remove('flex'); }
+        function lockDeveloperMode() { isDeveloperMode = false; applyRoleModeUI(); }
+        function resetDeveloperPassword() { if (!confirm('Reset Developer Mode password?')) return; localStorage.removeItem(DEV_PASS_HASH_KEY); isDeveloperMode = false; closeDevModal(); applyRoleModeUI(); }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            bootVault();
+        document.getElementById('devModeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pw = document.getElementById('devPassInput').value;
+            const c = document.getElementById('devPassConfirmInput').value;
+            const err = document.getElementById('devModalError');
+            if (devModalAction !== 'unlock') {
+                if (pw.length < 4 || pw !== c) { err.textContent = 'Passwords must match (min 4 chars).'; err.classList.remove('hidden'); return; }
+                localStorage.setItem(DEV_PASS_HASH_KEY, JSON.stringify(await hashPasswordWithSalt(pw)));
+                isDeveloperMode = true; closeDevModal(); applyRoleModeUI();
+            } else {
+                const stored = JSON.parse(localStorage.getItem(DEV_PASS_HASH_KEY) || '{}');
+                const check = await hashPasswordWithSalt(pw, stored.salt);
+                if (check.hash === stored.hash) { isDeveloperMode = true; closeDevModal(); applyRoleModeUI(); }
+                else { err.textContent = 'Incorrect password.'; err.classList.remove('hidden'); }
+            }
         });
+
+        function showPinOverlay() { document.getElementById('pinLockOverlay').classList.remove('hidden'); document.getElementById('pinLockOverlay').classList.add('flex'); }
+        function hidePinOverlay() { document.getElementById('pinLockOverlay').classList.add('hidden'); document.getElementById('pinLockOverlay').classList.remove('flex'); }
+        function openSetPinModal() { document.getElementById('setPinModal').classList.remove('hidden'); document.getElementById('setPinModal').classList.add('flex'); }
+        function closeSetPinModal() { document.getElementById('setPinModal').classList.add('hidden'); document.getElementById('setPinModal').classList.remove('flex'); }
+        function handleHeaderPinClick() { activePin ? lockVaultNow() : openSetPinModal(); }
+        function lockVaultNow() { if (!localStorage.getItem(PIN_META_KEY)) { openSetPinModal(); return; } activePin = null; isDeveloperMode = false; applyRoleModeUI(); appState = structuredClone(BLANK_STATE); renderAll(); showPinOverlay(); }
+        async function disablePinEncryption() { if (!confirm('Remove Vault PIN?')) return; activePin = null; localStorage.removeItem(PIN_META_KEY); clearTimeout(idleTimer); await saveVaultState(); }
+
+        document.getElementById('unlockForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const pin = document.getElementById('unlockPinInput').value.trim();
+                const raw = JSON.parse(localStorage.getItem(VAULT_STORAGE_KEY) || '{}');
+                appState = hydrateState(await decryptPayload(raw, pin));
+                activePin = pin; hidePinOverlay(); updateSecurityBadges(); renderAll();
+            } catch (_) { document.getElementById('unlockErrorMsg').textContent = 'Incorrect PIN.'; document.getElementById('unlockErrorMsg').classList.remove('hidden'); }
+        });
+
+        document.getElementById('setPinForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const p1 = document.getElementById('newPinInput').value.trim(), p2 = document.getElementById('confirmPinInput').value.trim();
+            if (p1 !== p2) { document.getElementById('setPinError').textContent = 'PINs do not match.'; document.getElementById('setPinError').classList.remove('hidden'); return; }
+            activePin = p1; localStorage.setItem(PIN_META_KEY, JSON.stringify({ enabled: true })); await saveVaultState(); closeSetPinModal();
+        });
+
+        function updateSecurityBadges() {
+            const hasPin = Boolean(localStorage.getItem(PIN_META_KEY));
+            document.getElementById('headerPinLabel').textContent = hasPin ? 'Lock Vault' : 'Set PIN Lock';
+            document.getElementById('sidebar-crypto-status').textContent = hasPin ? 'AES-256-GCM' : 'UNENCRYPTED';
+            document.getElementById('sidebar-autolock').textContent = hasPin ? '10 MIN' : 'OFF';
+            document.getElementById('sec-panel-status').textContent = hasPin ? 'Active (AES-256-GCM)' : 'Not Set';
+            document.getElementById('secLockNowBtn').classList.toggle('hidden', !hasPin);
+            document.getElementById('secDisablePinBtn').classList.toggle('hidden', !hasPin);
+        }
+
+        async function exportEncryptedVault() {
+            const pass = document.getElementById('backupPassphrase').value.trim() || activePin;
+            if (!pass) { alert('Enter a backup password or set a PIN first.'); return; }
+            const blob = new Blob([JSON.stringify(await encryptPayload(appState, pass), null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `nexus-vault-${new Date().toISOString().slice(0, 10)}.nexusvault`; a.click(); URL.revokeObjectURL(url);
+        }
+
+        function importEncryptedVault(event) {
+            const file = event.target.files?.[0]; if (!file) return;
+            const pass = document.getElementById('backupPassphrase').value.trim() || activePin;
+            if (!pass) { alert('Enter your backup password first.'); event.target.value = ''; return; }
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try { appState = hydrateState(await decryptPayload(JSON.parse(e.target.result), pass)); await saveVaultState(); alert('Vault restored successfully.'); }
+                catch (_) { alert('Decryption failed. Check your password.'); }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function togglePrivacyBlur() { document.body.classList.toggle('privacy-blur'); }
+        function toggleLiteMode() { document.body.classList.toggle('lite-mode'); document.getElementById('liteModeLabel').textContent = document.body.classList.contains('lite-mode') ? 'Lite: ON' : 'Lite: OFF'; }
+        function logTerminal(msg) { const t = document.getElementById('test-terminal'); if (t) { t.innerHTML += `<div>${escapeHtml(msg)}</div>`; t.scrollTop = t.scrollHeight; } }
+        function runSecurityAudit() { logTerminal((localStorage.getItem(VAULT_STORAGE_KEY) || '').includes('"encrypted":true') ? '[PASS] AES-256-GCM active.' : '[NOTICE] Vault PIN not set.'); }
+        function runMathCheck() { const s = simulatePayoffSchedule(); logTerminal(`[MATH] ${appState.debts.length} debts -> ${s.payoffLabel} (${s.months} mos)`); }
+        function resetToBrandNewApp(fromLock) {
+            if (!confirm('Wipe all local data and reset to $0.00?')) return;
+            localStorage.removeItem(VAULT_STORAGE_KEY); localStorage.removeItem(PIN_META_KEY); localStorage.removeItem(DEV_PASS_HASH_KEY);
+            activePin = null; isDeveloperMode = false; appState = structuredClone(BLANK_STATE); hidePinOverlay(); updateSecurityBadges(); renderAll();
+        }
+
+        window.addEventListener('DOMContentLoaded', bootVault);
     </script>
 </body>
 </html>

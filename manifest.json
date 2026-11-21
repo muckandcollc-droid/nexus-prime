@@ -1,23 +1,13 @@
 {
-  "name": "NEXUS-PRIME Solo Financial Vault",
+  "name": "NEXUS-PRIME Unified Financial Hub",
   "short_name": "NEXUS-PRIME",
-  "description": "Zero-knowledge encrypted personal debt & bill command center",
+  "description": "Zero-knowledge encrypted personal banking, debt, negotiation, credit, and investment hub",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#030712",
   "theme_color": "#030712",
   "icons": [
-    {
-      "src": "./icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }

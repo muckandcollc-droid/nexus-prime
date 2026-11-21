@@ -1,13 +1,8 @@
-# Block encrypted vault exports, CSV ledgers & local backups
 *.nexusvault
 *.csv
 *backup*.json
-
-# Block environment variables & API keys
 .env
 .env.*
-
-# Block OS & Node clutter
 .DS_Store
 Thumbs.db
 node_modules/
