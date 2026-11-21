@@ -118,7 +118,7 @@
                 <button onclick="closeDevModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <p id="devModalDesc" class="text-xs text-slate-400">
-                Enter your Developer Mode password to unlock the 3D Cyber-City Bot Farm, Live xAI/Gemini Console, and Test Operations Sandbox.
+                Enter your Developer Mode password to unlock Gemini Copilot, the 3D Cyber-City Bot Farm, Live xAI Console, and Test Operations Sandbox.
             </p>
             <form id="devModeForm" class="space-y-4">
                 <div>
@@ -158,8 +158,9 @@
                 <div class="flex items-center space-x-2">
                     <h1 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 tracking-wider text-base lg:text-xl">NEXUS-PRIME</h1>
                     <span id="roleModeBadge" class="px-2 py-0.5 text-[10px] font-mono bg-emerald-950/90 text-emerald-300 border border-emerald-700 rounded">USER MODE</span>
+                    <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono bg-cyan-950/80 text-cyan-300 border border-cyan-800 rounded">ALL-IN-ONE</span>
                 </div>
-                <p class="text-[11px] text-slate-400 hidden sm:block">Zero-Knowledge Local Ledger • Direct Gemini Copilot in Both Modes</p>
+                <p class="text-[11px] text-slate-400 hidden sm:block">Zero-Knowledge Local Ledger • Gemini Copilot Locked to Developer Mode</p>
             </div>
         </div>
 
@@ -206,7 +207,7 @@
         <!-- Sidebar -->
         <aside class="w-full lg:w-64 glass-panel border-r border-slate-800 p-4 flex lg:flex-col justify-between shrink-0">
             <nav class="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-1.5 overflow-x-auto w-full pb-2 lg:pb-0">
-                <!-- Clean User Mode Tabs (Includes Direct Gemini Assistant) -->
+                <!-- Clean User Mode Tabs -->
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 whitespace-nowrap">
                     <i class="fa-solid fa-chart-pie w-4"></i><span>Dashboard</span>
                 </button>
@@ -216,9 +217,6 @@
                 <button onclick="switchTab('ocr')" id="nav-ocr" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
                     <i class="fa-solid fa-camera w-4"></i><span>Statement OCR</span>
                 </button>
-                <button onclick="switchTab('gemini')" id="nav-gemini" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
-                    <i class="fa-solid fa-sparkles w-4 text-cyan-400"></i><span>Gemini Copilot</span>
-                </button>
                 <button onclick="switchTab('security')" id="nav-security" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
                     <i class="fa-solid fa-shield-halved w-4"></i><span>Security &amp; Backup</span>
                 </button>
@@ -227,6 +225,9 @@
                 <div class="dev-only hidden lg:block pt-3 pb-1 px-2 text-[10px] font-mono uppercase tracking-wider text-purple-400">
                     Developer Tools
                 </div>
+                <button onclick="switchTab('gemini')" id="nav-gemini" class="dev-only nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
+                    <i class="fa-solid fa-sparkles w-4 text-purple-400"></i><span>Gemini Copilot</span>
+                </button>
                 <button onclick="switchTab('botfarm')" id="nav-botfarm" class="dev-only nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
                     <i class="fa-solid fa-city w-4 text-purple-400"></i><span>AI Bot Farm</span>
                 </button>
@@ -317,7 +318,7 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                             <div>
                                 <h4 class="font-bold text-white text-base">Dynamic Paydown Curve</h4>
-                                <p class="text-xs text-slate-400">Supports unlimited debt accounts &amp; balances above $45,000</p>
+                                <p class="text-xs text-slate-400">Supports unlimited debt accounts &amp; balances of any size</p>
                             </div>
                             <div class="flex items-center space-x-2">
                                 <select id="strategySelect" onchange="updateStrategySettings()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-cyan-300 font-semibold">
@@ -574,61 +575,7 @@
                 </div>
             </section>
 
-            <!-- TAB 4: DIRECT GEMINI COPILOT (AVAILABLE IN BOTH USER & DEV MODES) -->
-            <section id="tab-gemini" class="tab-content hidden space-y-6">
-                <div class="glass-panel p-6 rounded-2xl flex flex-col h-[640px] border border-cyan-500/30 space-y-4">
-                    <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
-                        <div>
-                            <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-sparkles text-cyan-400"></i>
-                                <span>Direct Gemini Financial Copilot</span>
-                            </h3>
-                            <p class="text-xs text-slate-400">Talk directly to Gemini inside your app—no middle-manning required. API key stays local in your browser session/storage, never in GitHub code.</p>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <select id="geminiModelSelect" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-cyan-200">
-                                <option value="gemini-2.5-flash" selected>gemini-2.5-flash</option>
-                                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
-                            </select>
-                            <button onclick="attachLiveVaultContextToInput()" class="px-3 py-1.5 bg-emerald-950 hover:bg-emerald-900 border border-emerald-700 text-emerald-300 rounded-lg text-xs font-semibold transition">
-                                Attach Vault Snapshot
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Local Gemini Key Bar (Never stored in source code or pushed to Git) -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 bg-slate-950/90 p-3 rounded-xl border border-slate-800 text-xs">
-                        <input type="password" id="geminiApiKeyInput" onchange="saveGeminiKeyPref()"
-                            placeholder="Paste Gemini API Key (AIza...) — saved locally only"
-                            class="md:col-span-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 font-mono text-cyan-200 focus:outline-none focus:border-cyan-500">
-                        <label class="flex items-center gap-2 px-2 text-slate-300 cursor-pointer">
-                            <input type="checkbox" id="includeVaultContextCheck" checked class="accent-cyan-500 rounded">
-                            <span>Share live totals with Gemini</span>
-                        </label>
-                    </div>
-
-                    <!-- Chat Feed -->
-                    <div id="geminiChatFeed" class="flex-1 overflow-y-auto bg-slate-950/70 border border-slate-800/90 rounded-xl p-4 space-y-3 text-xs sm:text-sm">
-                        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-cyan-500/20 text-slate-200">
-                            <span class="text-cyan-400 font-mono text-xs font-bold block mb-1">GEMINI COPILOT</span>
-                            Direct link ready. Paste your Gemini API key above, add your debts or bills, and ask me how to cut interest, optimize Snowball vs. Avalanche, or plan your payoff timeline—straight from inside your app.
-                        </div>
-                    </div>
-
-                    <!-- Prompt Input -->
-                    <form id="geminiChatForm" class="flex gap-2">
-                        <input type="text" id="geminiPromptInput" required
-                            placeholder="Ask Gemini about your payoff math, APR priorities, or monthly budget..."
-                            class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500">
-                        <button type="submit" id="geminiSendBtn"
-                            class="px-5 py-3 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white font-bold rounded-xl text-xs sm:text-sm transition">
-                            Ask Gemini
-                        </button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- TAB 5: SECURITY & PORTABLE ENCRYPTED BACKUP -->
+            <!-- TAB 4: SECURITY & PORTABLE ENCRYPTED BACKUP -->
             <section id="tab-security" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="glass-panel p-6 rounded-2xl space-y-4">
@@ -688,6 +635,58 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <!-- DEV-ONLY TAB 5: DIRECT GEMINI COPILOT (DEVELOPER MODE ONLY) -->
+            <section id="tab-gemini" class="dev-only tab-content hidden space-y-6">
+                <div class="glass-panel p-6 rounded-2xl flex flex-col h-[640px] border border-purple-500/30 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                        <div>
+                            <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-sparkles text-purple-400"></i>
+                                <span>Direct Gemini Dev &amp; Syndicate Copilot</span>
+                                <span class="px-2 py-0.5 text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-700 rounded">DEV ONLY</span>
+                            </h3>
+                            <p class="text-xs text-slate-400">Locked behind Developer Mode password. API key stays local in your browser storage, never in GitHub code.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <select id="geminiModelSelect" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-purple-200">
+                                <option value="gemini-2.5-flash" selected>gemini-2.5-flash</option>
+                                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                            </select>
+                            <button onclick="attachLiveVaultContextToInput()" class="px-3 py-1.5 bg-emerald-950 hover:bg-emerald-900 border border-emerald-700 text-emerald-300 rounded-lg text-xs font-semibold transition">
+                                Attach Vault Snapshot
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 bg-slate-950/90 p-3 rounded-xl border border-slate-800 text-xs">
+                        <input type="password" id="geminiApiKeyInput" onchange="saveGeminiKeyPref()"
+                            placeholder="Paste Gemini API Key (AIza...) — saved locally only"
+                            class="md:col-span-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 font-mono text-purple-200 focus:outline-none focus:border-purple-500">
+                        <label class="flex items-center gap-2 px-2 text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="includeVaultContextCheck" checked class="accent-purple-500 rounded">
+                            <span>Share live totals with Gemini</span>
+                        </label>
+                    </div>
+
+                    <div id="geminiChatFeed" class="flex-1 overflow-y-auto bg-slate-950/70 border border-slate-800/90 rounded-xl p-4 space-y-3 text-xs sm:text-sm">
+                        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-purple-500/20 text-slate-200">
+                            <span class="text-purple-400 font-mono text-xs font-bold block mb-1">GEMINI DEV COPILOT</span>
+                            Listen up, boss—Developer Mode is unlocked and the direct Gemini wire is hot. Paste your Gemini API key above, attach your vault telemetry, and ask me anything about payoff equations, APR arbitrage, or app upgrades—no middle-manning required.
+                        </div>
+                    </div>
+
+                    <form id="geminiChatForm" class="flex gap-2">
+                        <input type="text" id="geminiPromptInput" required
+                            placeholder="Ask Gemini in Developer Mode..."
+                            class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500">
+                        <button type="submit" id="geminiSendBtn"
+                            class="px-5 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold rounded-xl text-xs sm:text-sm transition">
+                            Ask Gemini
+                        </button>
+                    </form>
                 </div>
             </section>
 
@@ -837,7 +836,6 @@
         let donutChart = null;
         let paydownChart = null;
 
-        // --- WEB CRYPTO UTILITIES ---
         function bufToB64(buf) {
             return btoa(String.fromCharCode(...new Uint8Array(buf)));
         }
@@ -894,7 +892,6 @@
             return JSON.parse(new TextDecoder().decode(plainBuf));
         }
 
-        // --- QUICK EXPORT CSV ---
         function csvEscape(val) {
             const str = String(val ?? '');
             return '"' + str.replace(/"/g, '""') + '"';
@@ -950,7 +947,6 @@
             logTerminal('Exported quick CSV ledger snapshot.', 'text-emerald-400');
         }
 
-        // --- DIRECT GEMINI COPILOT (IN BOTH USER & DEV MODES) ---
         function saveGeminiKeyPref() {
             const k = document.getElementById('geminiApiKeyInput').value.trim();
             if (k) {
@@ -973,9 +969,9 @@
             const feed = document.getElementById('geminiChatFeed');
             const div = document.createElement('div');
             div.className = isUser
-                ? 'p-3.5 rounded-xl bg-cyan-950/50 border border-cyan-700/40 text-cyan-100 ml-6'
+                ? 'p-3.5 rounded-xl bg-purple-950/50 border border-purple-700/40 text-purple-100 ml-6'
                 : 'p-3.5 rounded-xl bg-slate-900/95 border border-slate-800 text-slate-200 mr-6 whitespace-pre-wrap';
-            const labelColor = isUser ? 'text-cyan-300' : 'text-emerald-400';
+            const labelColor = isUser ? 'text-purple-300' : 'text-emerald-400';
             div.innerHTML = `<span class="${labelColor} font-mono text-xs font-bold block mb-1">${sender}</span>${escapeHtml(text)}`;
             feed.appendChild(div);
             feed.scrollTop = feed.scrollHeight;
@@ -991,6 +987,10 @@
 
         document.getElementById('geminiChatForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!isDeveloperMode) {
+                handleModeSwitchClick();
+                return;
+            }
             const promptInput = document.getElementById('geminiPromptInput');
             const sendBtn = document.getElementById('geminiSendBtn');
             const apiKey = document.getElementById('geminiApiKeyInput').value.trim() || localStorage.getItem(GEMINI_KEY_STORAGE) || '';
@@ -1000,7 +1000,7 @@
             if (!userPrompt) return;
 
             if (!apiKey) {
-                appendGeminiBubble('GEMINI COPILOT', 'Please paste your Gemini API key in the key bar above first so the app can call Gemini directly without middle-manning.');
+                appendGeminiBubble('GEMINI DEV COPILOT', 'Please paste your Gemini API key in the key bar above first so Developer Mode can call Gemini directly.');
                 return;
             }
 
@@ -1009,7 +1009,7 @@
             sendBtn.disabled = true;
             sendBtn.textContent = 'Thinking...';
 
-            const thinkingBubble = appendGeminiBubble('GEMINI COPILOT', 'Analyzing...');
+            const thinkingBubble = appendGeminiBubble('GEMINI DEV COPILOT', 'Crunching relativistic payoff matrices...');
 
             let finalPrompt = userPrompt;
             if (shareVault) {
@@ -1017,10 +1017,10 @@
                 const totalBills = appState.bills.reduce((s, b) => s + b.amount, 0);
                 const sim = simulatePayoffSchedule();
                 finalPrompt =
-                    `Vault Context (Mode: ${isDeveloperMode ? 'Developer' : 'User'}): ` +
+                    `Vault Context (Developer Mode): ` +
                     `Debts=${appState.debts.length} accounts totaling ${fmtMoney(totalDebt)}; ` +
                     `Monthly Bills=${fmtMoney(totalBills)}; Strategy=${appState.strategy}; ` +
-                    `Extra Monthly=${fmtMoney(appState.extraMonthly)}; Projected Payoff=${sim.payoffLabel} (${sim.months} mos).\n\nUser Question: ${userPrompt}`;
+                    `Extra Monthly=${fmtMoney(appState.extraMonthly)}; Projected Payoff=${sim.payoffLabel} (${sim.months} mos).\n\nDeveloper Query: ${userPrompt}`;
             }
 
             try {
@@ -1030,7 +1030,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         systemInstruction: {
-                            parts: [{ text: 'You are Gemini inside NEXUS-PRIME, a sharp, clear, mathematically accurate personal debt and bill payoff copilot. Keep answers concise, actionable, and grounded in the user numbers.' }]
+                            parts: [{ text: 'You are Gemini inside NEXUS-PRIME Developer Mode: speak with razor-sharp street-smart syndicate swagger (capisce?) while delivering mathematical and relativistic precision sharper than Albert Einstein. Keep answers concise, tactical, and grounded in the exact ledger telemetry.' }]
                         },
                         contents: [{ parts: [{ text: finalPrompt }] }]
                     })
@@ -1042,7 +1042,7 @@
                 const replyText =
                     data.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('\n')
                     || 'No text returned.';
-                thinkingBubble.innerHTML = `<span class="text-emerald-400 font-mono text-xs font-bold block mb-1">GEMINI COPILOT (${model})</span>${escapeHtml(replyText)}`;
+                thinkingBubble.innerHTML = `<span class="text-emerald-400 font-mono text-xs font-bold block mb-1">GEMINI DEV COPILOT (${model})</span>${escapeHtml(replyText)}`;
             } catch (err) {
                 thinkingBubble.innerHTML = `<span class="text-rose-400 font-mono text-xs font-bold block mb-1">GEMINI ERROR</span>${escapeHtml(err.message)}`;
             } finally {
@@ -1051,7 +1051,6 @@
             }
         });
 
-        // --- USER <-> DEVELOPER MODE SWITCHER ---
         function applyRoleModeUI() {
             const badge = document.getElementById('roleModeBadge');
             const switchBtn = document.getElementById('modeSwitchBtn');
@@ -1090,7 +1089,7 @@
                     sideRole.textContent = 'USER';
                     sideRole.className = 'text-emerald-400 font-bold';
                 }
-                if (['botfarm', 'xai', 'testing'].includes(currentTab)) {
+                if (['gemini', 'botfarm', 'xai', 'testing'].includes(currentTab)) {
                     switchTab('dashboard');
                 }
             }
@@ -1131,14 +1130,14 @@
             if (action === 'setup' || action === 'change') {
                 title.innerHTML = '<i class="fa-solid fa-key text-purple-400 mr-2"></i>' +
                     (action === 'setup' ? 'Create Developer Mode Password' : 'Change Developer Mode Password');
-                desc.textContent = 'Set a password required whenever switching from clean User Mode into Developer Mode.';
+                desc.textContent = 'Set a password required whenever switching from clean User Mode into Developer Mode (Gemini Copilot, Bot Farm, xAI & Sandbox).';
                 passLabel.textContent = 'New Developer Password (min 4 characters)';
                 confirmWrap.classList.remove('hidden');
                 submitBtn.textContent = 'Save & Enter Dev Mode';
                 resetBtn.classList.add('hidden');
             } else {
                 title.innerHTML = '<i class="fa-solid fa-terminal text-purple-400 mr-2"></i>Unlock Developer Mode';
-                desc.textContent = 'Enter your Developer Mode password to reveal the 3D Bot Farm, Live xAI Console, and Test Operations.';
+                desc.textContent = 'Enter your Developer Mode password to reveal Gemini Copilot, the 3D Bot Farm, Live xAI Console, and Test Operations.';
                 passLabel.textContent = 'Developer Password';
                 confirmWrap.classList.add('hidden');
                 submitBtn.textContent = 'Unlock Dev Mode';
@@ -1178,7 +1177,7 @@
                 isDeveloperMode = true;
                 closeDevModal();
                 applyRoleModeUI();
-                logTerminal('[AUTH] Developer Mode password configured. Developer tools unlocked.', 'text-purple-400');
+                logTerminal('[AUTH] Developer Mode password configured. Gemini Copilot & Developer tools unlocked.', 'text-purple-400');
             } else {
                 try {
                     const stored = JSON.parse(localStorage.getItem(DEV_PASS_HASH_KEY) || '{}');
@@ -1212,7 +1211,6 @@
             applyRoleModeUI();
         }
 
-        // --- VAULT SAVE / BOOT ---
         async function saveVaultState() {
             if (activePin) {
                 const sealed = await encryptPayload(appState, activePin);
@@ -1253,7 +1251,6 @@
             renderAll();
         }
 
-        // --- VAULT PIN LOCK & AUTO-LOCK ---
         function showPinOverlay() {
             const overlay = document.getElementById('pinLockOverlay');
             overlay.classList.remove('hidden');
@@ -1395,7 +1392,6 @@
             applyRoleModeUI();
         }
 
-        // --- PORTABLE ENCRYPTED BACKUP ---
         async function exportEncryptedVault() {
             const pass = document.getElementById('backupPassphrase').value.trim() || activePin;
             if (!pass) {
@@ -1438,7 +1434,6 @@
             reader.readAsText(file);
         }
 
-        // --- PRIVACY & LITE MODE ---
         function togglePrivacyBlur() {
             document.body.classList.toggle('privacy-blur');
             const blurred = document.body.classList.contains('privacy-blur');
@@ -1451,9 +1446,8 @@
             document.getElementById('liteModeLabel').textContent = isLite ? 'Lite: ON' : 'Lite: OFF';
         }
 
-        // --- NAVIGATION ---
         function switchTab(tabId) {
-            if (['botfarm', 'xai', 'testing'].includes(tabId) && !isDeveloperMode) {
+            if (['gemini', 'botfarm', 'xai', 'testing'].includes(tabId) && !isDeveloperMode) {
                 handleModeSwitchClick();
                 return;
             }
@@ -1472,7 +1466,6 @@
             if (tabId === 'botfarm') initThreeCity();
         }
 
-        // --- DATA ENTRY & PAYDOWN ENGINE ---
         document.getElementById('addDebtForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             appState.debts.push({
@@ -1681,7 +1674,6 @@
             }
         }
 
-        // --- STATEMENT SNAPSHOT OCR ---
         async function handleOcrFile(event) {
             const file = event.target.files?.[0];
             if (!file) return;
@@ -1728,7 +1720,6 @@
             switchTab('vault');
         }
 
-        // --- ANIMATED 3D CYBER-CITY BOT FARM ---
         window.cityState = {
             initialized: false,
             scene: null,
@@ -1928,7 +1919,6 @@
             window.cityState.camera.lookAt(0, 5, 0);
         }
 
-        // --- LIVE xAI CONSOLE ---
         function injectVaultTelemetryPrompt() {
             const totalDebt = appState.debts.reduce((s, d) => s + d.balance, 0);
             const totalBills = appState.bills.reduce((s, b) => s + b.amount, 0);
@@ -1989,7 +1979,6 @@
             }
         });
 
-        // --- TEST OPERATIONS & RESET ---
         function logTerminal(msg, colorClass = 'text-cyan-400') {
             const term = document.getElementById('test-terminal');
             if (!term) return;
