@@ -1,0 +1,12 @@
+# Block encrypted vault exports & local financial snapshots
+*.nexusvault
+*backup*.json
+
+# Block environment variables & API keys
+.env
+.env.*
+
+# Block OS & Node clutter
+.DS_Store
+Thumbs.db
+node_modules/

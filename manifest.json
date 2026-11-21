@@ -1,0 +1,10 @@
+{
+  "name": "NEXUS-PRIME Solo Financial Vault",
+  "short_name": "NEXUS-PRIME",
+  "description": "Zero-knowledge encrypted personal debt & bill command center",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#030712",
+  "icons": []
+}
