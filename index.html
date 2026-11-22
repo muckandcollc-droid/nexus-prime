@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS-PRIME | Encrypted Financial Command Center</title>
+    <title>NEXUS-PRIME | Solo Encrypted Financial Command Center</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#030712">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -70,8 +70,8 @@
                 </button>
             </form>
             <div class="pt-2 border-t border-slate-800/80">
-                <button onclick="resetToActualBaseline(true)" class="text-[11px] text-slate-500 hover:text-rose-400 transition">
-                    Forgot PIN? Wipe &amp; Reload Baseline Ledger
+                <button onclick="resetToBrandNewApp(true)" class="text-[11px] text-slate-500 hover:text-rose-400 transition">
+                    Forgot PIN? Wipe &amp; Start Fresh Slate
                 </button>
             </div>
         </div>
@@ -160,7 +160,7 @@
                     <h1 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 tracking-wider text-base lg:text-xl">NEXUS-PRIME</h1>
                     <span id="roleModeBadge" class="px-2 py-0.5 text-[10px] font-mono bg-emerald-950/90 text-emerald-300 border border-emerald-700 rounded">USER MODE</span>
                 </div>
-                <p class="text-[11px] text-slate-400 hidden sm:block">Zero-Knowledge Local Ledger • Active Debt &amp; Assistance Command</p>
+                <p class="text-[11px] text-slate-400 hidden sm:block">Zero-Knowledge Local Ledger • Plaid Sync &amp; Category Totals</p>
             </div>
         </div>
 
@@ -205,9 +205,6 @@
                 </button>
                 <button onclick="switchTab('vault')" id="nav-vault" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
                     <i class="fa-solid fa-file-invoice-dollar w-4"></i><span>Bills &amp; Credit</span>
-                </button>
-                <button onclick="switchTab('assistance')" id="nav-assistance" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
-                    <i class="fa-solid fa-hand-holding-dollar w-4 text-emerald-400"></i><span>Relief &amp; Aid</span>
                 </button>
                 <button onclick="switchTab('ocr')" id="nav-ocr" class="nav-btn flex-1 lg:flex-none flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs lg:text-sm font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/50 whitespace-nowrap">
                     <i class="fa-solid fa-camera w-4"></i><span>Statement OCR</span>
@@ -267,7 +264,7 @@
                             <p class="text-slate-400 text-xs mt-1">Projected Debt-Free Date</p>
                         </div>
                         <div class="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                            <span id="dash-strategy-badge" class="text-emerald-400 font-bold">Avalanche Engine Active</span>
+                            <span id="dash-strategy-badge" class="text-emerald-400 font-bold">Snowball Engine Ready</span>
                             <span id="dash-months-left" class="text-slate-400 font-mono">0 mos</span>
                         </div>
                     </div>
@@ -275,20 +272,20 @@
                     <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
                         <div class="flex justify-between items-center mb-3">
                             <h4 class="font-bold text-white text-base">Portfolio Summary</h4>
-                            <span class="text-[11px] font-mono text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded">10 Accounts</span>
+                            <span class="text-[11px] font-mono text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded">Local Vault</span>
                         </div>
                         <div class="space-y-2.5 text-sm">
                             <div class="flex justify-between">
                                 <span class="text-slate-400">Total Debt Principal</span>
-                                <span id="dash-total-debt" class="font-bold text-white sensitive-val">$44,149.02</span>
+                                <span id="dash-total-debt" class="font-bold text-white sensitive-val">$0.00</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-slate-400">Monthly Recurring Bills</span>
-                                <span id="dash-total-bills" class="font-semibold text-cyan-300 sensitive-val">$2,134.66</span>
+                                <span id="dash-total-bills" class="font-semibold text-cyan-300 sensitive-val">$0.00</span>
                             </div>
                             <div class="flex justify-between pt-2 border-t border-slate-800">
                                 <span class="text-slate-300 font-medium">Credit Utilization</span>
-                                <span id="dash-utilization" class="font-bold text-amber-400">86%</span>
+                                <span id="dash-utilization" class="font-bold text-emerald-400">0%</span>
                             </div>
                         </div>
                     </div>
@@ -299,24 +296,10 @@
                             <canvas id="debtDonutChart"></canvas>
                             <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
                                 <span class="text-[10px] text-slate-400">Accounts</span>
-                                <span id="dash-account-count" class="text-lg font-extrabold text-white">10</span>
+                                <span id="dash-account-count" class="text-lg font-extrabold text-white">0</span>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Alert Banner for Missing Progressive Amount & 0% APR / $0 Min Pay Checks -->
-                <div class="p-4 rounded-2xl bg-amber-950/50 border border-amber-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                    <div class="space-y-1">
-                        <p class="font-bold text-amber-300"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>2 Quick Ledger Verifications Needed</p>
-                        <p class="text-slate-300">
-                            1) <strong>Progressive auto insurance</strong> amount was covered by the Android volume/toast popup in your screenshot—edit its monthly amount in <strong>Bills &amp; Credit</strong>.
-                            2) Confirm whether <strong>Chase 9190</strong> and <strong>Mastercard mgmt</strong> are on 0% promo APRs, and confirm <strong>Amex #61007</strong> ($2,437.46 @ 29.99% APR) minimum payment.
-                        </p>
-                    </div>
-                    <button onclick="switchTab('vault')" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl shrink-0">
-                        Review Ledger
-                    </button>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -324,11 +307,11 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                             <div>
                                 <h4 class="font-bold text-white text-base">Dynamic Paydown Curve</h4>
-                                <p class="text-xs text-slate-400">Avalanche targets 29.99% Amex #61007 &rarr; 28.65% Capital One &rarr; 26.65% Capital One #6626 first</p>
+                                <p class="text-xs text-slate-400">Calculates directly from your entered or synced debt balances</p>
                             </div>
                             <select id="strategySelect" onchange="updateStrategySettings()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-cyan-300 font-semibold">
-                                <option value="avalanche" selected>Avalanche (Highest APR First)</option>
                                 <option value="snowball">Snowball (Smallest First)</option>
+                                <option value="avalanche">Avalanche (Highest APR First)</option>
                             </select>
                         </div>
                         <div class="h-60 relative">
@@ -344,32 +327,32 @@
                         <div class="space-y-3">
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">Extra Monthly Payment ($)</label>
-                                <input type="number" id="extraMonthlyInput" min="0" step="10" value="150" onchange="updateStrategySettings()"
+                                <input type="number" id="extraMonthlyInput" min="0" step="10" value="0" onchange="updateStrategySettings()"
                                     class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-cyan-500">
                             </div>
                             <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-xs space-y-1">
                                 <div class="flex justify-between">
                                     <span class="text-slate-400">Min. Debt Payments:</span>
-                                    <span id="dash-min-payments" class="text-white font-bold sensitive-val">$754.00</span>
+                                    <span id="dash-min-payments" class="text-white font-bold sensitive-val">$0.00</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-slate-400">Total Monthly Outflow:</span>
-                                    <span id="dash-total-outflow" class="text-cyan-300 font-bold sensitive-val">$3,038.66</span>
+                                    <span id="dash-total-outflow" class="text-cyan-300 font-bold sensitive-val">$0.00</span>
                                 </div>
                             </div>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="switchTab('assistance')" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition">
-                                Relief &amp; Hardship Aid
+                            <button onclick="switchTab('vault')" class="flex-1 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition">
+                                + Add Accounts
                             </button>
-                            <button onclick="exportVaultCSV()" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 text-xs font-bold rounded-xl transition" title="Quick Export CSV">
+                            <button onclick="exportVaultCSV()" class="px-3.5 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition" title="Quick Export CSV">
                                 <i class="fa-solid fa-file-csv mr-1"></i>CSV
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Backend Bank Feed Sync (Plaid) -->
+                <!-- Backend Bank Feed Sync (Plaid) + Category Filter & Summary -->
                 <div class="glass-panel p-6 rounded-2xl border border-cyan-500/25 space-y-4">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-4">
                         <div>
@@ -378,7 +361,7 @@
                                 <span>Backend Bank Feed Sync (Plaid)</span>
                             </h4>
                             <p class="text-xs text-slate-400 mt-1">
-                                Sync transactions via your backend (<code class="text-cyan-300">/api/create_link_token</code>, <code class="text-cyan-300">/api/exchange_public_token</code>, <code class="text-cyan-300">/api/get_transactions</code>).
+                                Sync transactions via your backend (<code class="text-cyan-300">/api/create_link_token</code>, <code class="text-cyan-300">/api/exchange_public_token</code>, <code class="text-cyan-300">/api/get_transactions</code>), filter by category, and convert items into bills or extra snowball boost.
                             </p>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
@@ -398,29 +381,18 @@
                         Status: Ready. Start your backend server with PLAID_CLIENT_ID and PLAID_SECRET in .env to link an account.
                     </div>
 
-                    <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 bg-slate-950/70 border border-slate-800/80 rounded-xl px-4 py-3 text-xs">
-                        <div class="flex flex-wrap items-center gap-4">
-                            <div class="flex items-center gap-2">
-                                <label for="txnCategoryFilter" class="text-slate-400 font-mono">Category Filter:</label>
-                                <select id="txnCategoryFilter" onchange="renderAll()"
-                                    class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-cyan-200">
-                                    <option value="ALL">All Categories</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-4 font-mono">
-                                <span class="text-slate-400">Matching Items: <strong id="txnSummaryCount" class="text-white">0</strong></span>
-                                <span class="text-slate-400">Filtered Total: <strong id="txnSummaryTotal" class="text-emerald-300 sensitive-val">$0.00</strong></span>
-                            </div>
+                    <!-- Category Filter & Summary Bar -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950/70 border border-slate-800/80 rounded-xl px-4 py-3 text-xs">
+                        <div class="flex items-center gap-2">
+                            <label for="txnCategoryFilter" class="text-slate-400 font-mono">Category Filter:</label>
+                            <select id="txnCategoryFilter" onchange="renderAll()"
+                                class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-cyan-200">
+                                <option value="ALL">All Categories</option>
+                            </select>
                         </div>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <button onclick="applyFilteredTotalToExtraSnowball()"
-                                class="px-3 py-1.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-700 text-cyan-300 rounded-lg text-xs font-semibold transition">
-                                Apply Filtered Total to Boost
-                            </button>
-                            <button onclick="applyFilteredTotalAsBill()"
-                                class="px-3 py-1.5 bg-emerald-950 hover:bg-emerald-900 border border-emerald-700 text-emerald-300 rounded-lg text-xs font-semibold transition">
-                                Save Filtered Total as Bill
-                            </button>
+                        <div class="flex flex-wrap items-center gap-4 font-mono">
+                            <span class="text-slate-400">Matching Items: <strong id="txnSummaryCount" class="text-white">0</strong></span>
+                            <span class="text-slate-400">Category Total: <strong id="txnSummaryTotal" class="text-emerald-300 sensitive-val">$0.00</strong></span>
                         </div>
                     </div>
 
@@ -443,42 +415,37 @@
                 </div>
             </section>
 
-            <!-- TAB 2: BILLS & CREDIT VAULT (PRE-LOADED WITH YOUR ACTUAL ACCOUNTS) -->
+            <!-- TAB 2: BILLS & CREDIT VAULT -->
             <section id="tab-vault" class="tab-content hidden space-y-6">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <h3 class="text-xl font-extrabold text-white">Active Bills &amp; Credit Ledger</h3>
-                        <p class="text-xs text-slate-400">Loaded with your 10 credit/collection accounts ($44,149.02) and recurring bills. Click any row amount to edit inline.</p>
+                        <h3 class="text-xl font-extrabold text-white">Bills &amp; Credit Ledger</h3>
+                        <p class="text-xs text-slate-400">All entries stay local on your device and export cleanly to CSV anytime.</p>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="resetToActualBaseline(false)" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 text-xs font-bold rounded-xl transition">
-                            Reload Baseline Snapshot
-                        </button>
-                        <button onclick="exportVaultCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-2">
-                            <i class="fa-solid fa-file-csv"></i>
-                            <span>Quick Export CSV</span>
-                        </button>
-                    </div>
+                    <button onclick="exportVaultCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>Quick Export CSV</span>
+                    </button>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="glass-panel p-6 rounded-2xl space-y-4">
-                        <h3 class="text-lg font-extrabold text-white"><i class="fa-solid fa-credit-card text-cyan-400 mr-2"></i>Add Credit / Loan / Collection</h3>
+                        <h3 class="text-lg font-extrabold text-white"><i class="fa-solid fa-credit-card text-cyan-400 mr-2"></i>Add Credit / Loan Account</h3>
                         <form id="addDebtForm" class="space-y-3 text-sm">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">Creditor / Account Name</label>
-                                    <input type="text" id="debtName" required placeholder="e.g., Capital One"
+                                    <input type="text" id="debtName" required placeholder="e.g., Sapphire Card"
                                         class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
                                 </div>
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">Account Type</label>
                                     <select id="debtType" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
                                         <option value="credit_card">Credit Card (Revolving)</option>
-                                        <option value="collection">Collection / Legal</option>
                                         <option value="personal_loan">Personal Loan</option>
                                         <option value="auto_loan">Auto Loan</option>
                                         <option value="student_loan">Student Loan</option>
+                                        <option value="collection">Collection / Other</option>
                                     </select>
                                 </div>
                             </div>
@@ -516,15 +483,15 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">Bill / Utility Name</label>
-                                    <input type="text" id="billName" required placeholder="e.g., Progressive auto insurance"
+                                    <input type="text" id="billName" required placeholder="e.g., Electric Utility"
                                         class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
                                 </div>
                                 <div>
                                     <label class="block text-xs text-slate-400 mb-1">Category</label>
                                     <select id="billCategory" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
-                                        <option value="Housing">Housing / Mortgage</option>
-                                        <option value="Insurance">Insurance</option>
+                                        <option value="Housing">Housing / Rent</option>
                                         <option value="Utilities">Utilities</option>
+                                        <option value="Insurance">Insurance</option>
                                         <option value="Telecom">Phone / Internet</option>
                                         <option value="Subscription">Subscription / Other</option>
                                     </select>
@@ -550,7 +517,7 @@
                 </div>
 
                 <div class="glass-panel p-6 rounded-2xl overflow-x-auto space-y-4">
-                    <h4 class="font-bold text-white text-base">Active Credit &amp; Loan Accounts ($44,149.02 Total)</h4>
+                    <h4 class="font-bold text-white text-base">Active Credit &amp; Loan Accounts</h4>
                     <table class="w-full text-left text-xs sm:text-sm">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 font-mono text-xs">
@@ -560,10 +527,12 @@
                                 <th class="pb-2">LIMIT</th>
                                 <th class="pb-2">APR</th>
                                 <th class="pb-2">MIN PAY</th>
-                                <th class="pb-2 text-right">ACTIONS</th>
+                                <th class="pb-2 text-right">REMOVE</th>
                             </tr>
                         </thead>
-                        <tbody id="debtsTableBody" class="divide-y divide-slate-800/60"></tbody>
+                        <tbody id="debtsTableBody" class="divide-y divide-slate-800/60">
+                            <tr><td colspan="7" class="py-6 text-center text-slate-500 text-xs">No credit or loan accounts added yet.</td></tr>
+                        </tbody>
                     </table>
                 </div>
 
@@ -576,85 +545,17 @@
                                 <th class="pb-2">CATEGORY</th>
                                 <th class="pb-2">AMOUNT</th>
                                 <th class="pb-2">DUE DAY</th>
-                                <th class="pb-2 text-right">ACTIONS</th>
+                                <th class="pb-2 text-right">REMOVE</th>
                             </tr>
                         </thead>
-                        <tbody id="billsTableBody" class="divide-y divide-slate-800/60"></tbody>
+                        <tbody id="billsTableBody" class="divide-y divide-slate-800/60">
+                            <tr><td colspan="5" class="py-6 text-center text-slate-500 text-xs">No recurring bills added yet.</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- TAB 3: TAILORED FINANCIAL RELIEF & ASSISTANCE RESOURCES -->
-            <section id="tab-assistance" class="tab-content hidden space-y-6">
-                <div class="glass-panel p-6 rounded-2xl border border-emerald-500/30 space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
-                        <div>
-                            <h3 class="text-xl font-extrabold text-white"><i class="fa-solid fa-hand-holding-dollar text-emerald-400 mr-2"></i>Tailored Relief &amp; Financial Assistance Roadmap</h3>
-                            <p class="text-xs text-slate-400 mt-1">Matched directly to your 4 debt categories: high-APR cards ($23,268.63), legal/trust collections ($20,291.45), medical collection ($588.94), and mortgage ($2,134.66/mo).</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs sm:text-sm">
-                        <!-- Card 1: NFCC Nonprofit Credit Counseling -->
-                        <div class="p-5 rounded-xl bg-slate-950/90 border border-cyan-500/30 space-y-2.5">
-                            <div class="flex items-center justify-between">
-                                <span class="px-2 py-0.5 text-[10px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-700 rounded">CREDIT CARDS ($23,268.63 • UP TO 29.99% APR)</span>
-                            </div>
-                            <h4 class="font-bold text-white text-base">1. NFCC Nonprofit Credit Counseling &amp; Debt Management Plan</h4>
-                            <p class="text-slate-300 text-xs leading-relaxed">
-                                Your <strong>Amex #61007 (29.99%)</strong>, <strong>Capital One (28.65% &amp; 26.65%)</strong>, and <strong>Amex Skymiles (24%)</strong> carry steep interest drag. An NFCC-accredited nonprofit counselor offers a free initial budget review and can negotiate reduced card APRs (~6%–10%) through a Debt Management Plan (DMP) or check eligibility for Debt Reduction Options (DROs).
-                            </p>
-                            <div class="pt-1 text-xs font-mono text-cyan-300">
-                                Contact: <a href="https://www.nfcc.org" target="_blank" rel="noopener" class="underline hover:text-white">nfcc.org</a> • 1-800-388-2227
-                            </div>
-                        </div>
-
-                        <!-- Card 2: Issuer Hardship Programs -->
-                        <div class="p-5 rounded-xl bg-slate-950/90 border border-purple-500/30 space-y-2.5">
-                            <div class="flex items-center justify-between">
-                                <span class="px-2 py-0.5 text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-700 rounded">DIRECT CREDITOR RELIEF</span>
-                            </div>
-                            <h4 class="font-bold text-white text-base">2. Direct Amex, Capital One &amp; Chase Hardship Programs</h4>
-                            <p class="text-slate-300 text-xs leading-relaxed">
-                                Before paying third-party settlement firms, call the hardship department on the back of your <strong>Amex</strong>, <strong>Capital One</strong>, and <strong>Chase</strong> cards directly. In-house financial relief programs frequently lower APRs to 0%–9.99% for 12–60 months and waive late fees while you pay down principal.
-                            </p>
-                            <div class="pt-1 text-xs font-mono text-purple-300">
-                                Action: Ask specifically for "Long-Term Hardship / Payment Relief Plan"
-                            </div>
-                        </div>
-
-                        <!-- Card 3: Legal & Collection Verification -->
-                        <div class="p-5 rounded-xl bg-slate-950/90 border border-amber-500/30 space-y-2.5">
-                            <div class="flex items-center justify-between">
-                                <span class="px-2 py-0.5 text-[10px] font-mono bg-amber-950 text-amber-300 border border-amber-700 rounded">COLLECTIONS ($20,291.45)</span>
-                            </div>
-                            <h4 class="font-bold text-white text-base">3. CFPB Validation Rights &amp; Legal Aid (Holzman Law / Ronald B Rich Trust)</h4>
-                            <p class="text-slate-300 text-xs leading-relaxed">
-                                For <strong>Holzman Law ($16,291.45)</strong> and <strong>Ronald B Rich Trust ($4,000.00)</strong>, exercise your federal FDCPA right to request written debt validation and check if any court summons exists. If a lawsuit is active, contact your state Legal Aid office immediately before signing a lump-sum or consent agreement.
-                            </p>
-                            <div class="pt-1 text-xs font-mono text-amber-300">
-                                Resources: <a href="https://www.consumerfinance.gov/ask-cfpb/" target="_blank" rel="noopener" class="underline hover:text-white">consumerfinance.gov</a> • <a href="https://www.lawhelp.org" target="_blank" rel="noopener" class="underline hover:text-white">lawhelp.org</a>
-                            </div>
-                        </div>
-
-                        <!-- Card 4: Medical Financial Assistance & Housing -->
-                        <div class="p-5 rounded-xl bg-slate-950/90 border border-emerald-500/30 space-y-2.5">
-                            <div class="flex items-center justify-between">
-                                <span class="px-2 py-0.5 text-[10px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-700 rounded">MEDICAL ($588.94) &amp; MORTGAGE ($2,134.66/MO)</span>
-                            </div>
-                            <h4 class="font-bold text-white text-base">4. Charity Care / Hanger Clinic Aid &amp; HUD Mortgage Counseling</h4>
-                            <p class="text-slate-300 text-xs leading-relaxed">
-                                Request an itemized bill and financial assistance / prompt-pay discount from <strong>Hanger Clinic ($588.94)</strong>—providers regularly settle or reduce balances by 30%–60% or offer 0% hardship plans. To protect <strong>Champion Mortgage ($2,134.66/mo)</strong>, consult a free HUD-approved housing counselor and call <strong>211</strong> for local utility/household relief.
-                            </p>
-                            <div class="pt-1 text-xs font-mono text-emerald-300">
-                                Resources: <a href="https://www.hud.gov/counseling" target="_blank" rel="noopener" class="underline hover:text-white">hud.gov/counseling</a> • <a href="https://dollarfor.org" target="_blank" rel="noopener" class="underline hover:text-white">dollarfor.org</a> • Dial 211
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 4: STATEMENT SNAPSHOT OCR -->
+            <!-- TAB 3: STATEMENT SNAPSHOT OCR -->
             <section id="tab-ocr" class="tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl space-y-5">
                     <div>
@@ -718,7 +619,7 @@
                 </div>
             </section>
 
-            <!-- TAB 5: SECURITY & PORTABLE ENCRYPTED BACKUP -->
+            <!-- TAB 4: SECURITY & PORTABLE ENCRYPTED BACKUP -->
             <section id="tab-security" class="tab-content hidden space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="glass-panel p-6 rounded-2xl space-y-4">
@@ -781,7 +682,7 @@
                 </div>
             </section>
 
-            <!-- DEV-ONLY TAB 6: DIRECT GEMINI COPILOT -->
+            <!-- DEV-ONLY TAB 5: DIRECT GEMINI COPILOT -->
             <section id="tab-gemini" class="dev-only tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl flex flex-col h-[640px] border border-purple-500/30 space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
@@ -815,12 +716,12 @@
                     <div id="geminiChatFeed" class="flex-1 overflow-y-auto bg-slate-950/70 border border-slate-800/90 rounded-xl p-4 space-y-3 text-xs sm:text-sm">
                         <div class="p-3.5 rounded-xl bg-slate-900/90 border border-purple-500/20 text-slate-200">
                             <span class="text-purple-400 font-mono text-xs font-bold block mb-1">GEMINI COPILOT</span>
-                            Ready. Add your Gemini API key above and ask about your payoff math, APR priorities, or settlement strategy across your $44,149.02 ledger.
+                            Ready. Add your Gemini API key above and ask about your payoff math, APR priorities, or budget allocation using your current vault numbers.
                         </div>
                     </div>
                     <form id="geminiChatForm" class="flex gap-2">
                         <input type="text" id="geminiPromptInput" required
-                            placeholder="Ask Gemini about your payoff schedule or settlement priorities..."
+                            placeholder="Ask Gemini about your payoff schedule or monthly surplus..."
                             class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500">
                         <button type="submit" id="geminiSendBtn"
                             class="px-5 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold rounded-xl text-xs sm:text-sm transition">
@@ -830,7 +731,7 @@
                 </div>
             </section>
 
-            <!-- DEV-ONLY TAB 7: 3D BOT FARM -->
+            <!-- DEV-ONLY TAB 6: 3D BOT FARM -->
             <section id="tab-botfarm" class="dev-only tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
@@ -858,7 +759,7 @@
                 </div>
             </section>
 
-            <!-- DEV-ONLY TAB 8: LIVE xAI GROK CONSOLE -->
+            <!-- DEV-ONLY TAB 7: LIVE xAI GROK CONSOLE -->
             <section id="tab-xai" class="dev-only tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
@@ -897,16 +798,16 @@
                 </div>
             </section>
 
-            <!-- DEV-ONLY TAB 9: TEST OPERATIONS -->
+            <!-- DEV-ONLY TAB 8: TEST OPERATIONS -->
             <section id="tab-testing" class="dev-only tab-content hidden space-y-6">
                 <div class="glass-panel p-6 rounded-2xl space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                         <div>
                             <div class="flex items-center space-x-2">
-                                <h3 class="text-xl font-extrabold text-white">Operations Sandbox &amp; Baseline Controls</h3>
+                                <h3 class="text-xl font-extrabold text-white">Operations Sandbox &amp; Clean Slate Controls</h3>
                                 <span class="px-2 py-0.5 text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-700 rounded">DEV ONLY</span>
                             </div>
-                            <p class="text-slate-400 text-xs">Verify storage encryption, test paydown math, or reload your baseline ledger.</p>
+                            <p class="text-slate-400 text-xs">Verify storage encryption, test paydown math, or reset to a blank slate.</p>
                         </div>
                         <button onclick="lockDeveloperMode()" class="px-3 py-1.5 bg-emerald-950 border border-emerald-700 text-emerald-300 rounded-lg text-xs font-bold hover:bg-emerald-900">
                             Return to User Mode
@@ -923,16 +824,16 @@
                         <div class="p-5 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between space-y-4">
                             <div>
                                 <h5 class="text-white font-bold text-sm">Simulate Paydown Math</h5>
-                                <p class="text-xs text-slate-400 mt-1">Runs a live Snowball vs. Avalanche check across your 10 vault accounts.</p>
+                                <p class="text-xs text-slate-400 mt-1">Runs a live Snowball vs. Avalanche check across your current vault accounts.</p>
                             </div>
                             <button onclick="runMathCheck()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition">Run Math Check</button>
                         </div>
                         <div class="p-5 rounded-xl bg-slate-900/90 border border-rose-500/40 flex flex-col justify-between space-y-4">
                             <div>
-                                <h5 class="text-white font-bold text-sm">Reload Baseline Ledger</h5>
-                                <p class="text-xs text-slate-400 mt-1">Restores your 10 accounts ($44,149.02) and recurring bills snapshot.</p>
+                                <h5 class="text-white font-bold text-sm">Reset to Brand New</h5>
+                                <p class="text-xs text-slate-400 mt-1">Wipes all local storage, PIN keys, and Dev password back to a clean $0.00 first-run app.</p>
                             </div>
-                            <button onclick="resetToActualBaseline(false)" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-lg transition">Reload Baseline</button>
+                            <button onclick="resetToBrandNewApp(false)" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-lg transition">Reset to Brand New</button>
                         </div>
                     </div>
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 h-44 overflow-y-auto space-y-1" id="test-terminal">
@@ -945,38 +846,23 @@
     </div>
 
     <script>
-        const VAULT_STORAGE_KEY = 'nexus_prime_actual_ledger_v12';
+        const VAULT_STORAGE_KEY = 'nexus_prime_solo_vault_v1';
         const PIN_META_KEY = 'nexus_prime_pin_meta_v1';
         const DEV_PASS_HASH_KEY = 'nexus_prime_dev_pass_hash_v1';
         const GEMINI_KEY_STORAGE = 'nexus_prime_gemini_key_v1';
         const BACKEND_URL_STORAGE = 'nexus_prime_backend_url_v1';
         const IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 
-        // Actual accounts & bills from screenshot
-        const ACTUAL_BASELINE_STATE = {
-            version: 12,
-            strategy: 'avalanche',
-            extraMonthly: 150,
-            debts: [
-                { id: 1001, name: 'Hanger clinic', type: 'collection', balance: 588.94, limit: 0, apr: 0, minPay: 0.00 },
-                { id: 1002, name: 'Holzman Law', type: 'collection', balance: 16291.45, limit: 0, apr: 0, minPay: 0.00 },
-                { id: 1003, name: 'Capital one #6626', type: 'credit_card', balance: 920.97, limit: 1000.00, apr: 26.65, minPay: 25.00 },
-                { id: 1004, name: 'Capital one', type: 'credit_card', balance: 6019.97, limit: 6500.00, apr: 28.65, minPay: 209.00 },
-                { id: 1005, name: 'Amex #61007', type: 'credit_card', balance: 2437.46, limit: 2600.00, apr: 29.99, minPay: 0.00 },
-                { id: 1006, name: 'Amex skymiles', type: 'credit_card', balance: 1000.00, limit: 2400.00, apr: 24.00, minPay: 100.00 },
-                { id: 1007, name: 'Amex blue #52009', type: 'credit_card', balance: 600.00, limit: 1000.00, apr: 19.99, minPay: 40.00 },
-                { id: 1008, name: 'Chase 9190', type: 'credit_card', balance: 5993.99, limit: 5993.99, apr: 0, minPay: 150.00 },
-                { id: 1009, name: 'Mastercard mgmt', type: 'credit_card', balance: 6296.24, limit: 7600.00, apr: 0, minPay: 130.00 },
-                { id: 1010, name: 'Ronald B rich trust', type: 'collection', balance: 4000.00, limit: 0, apr: 0, minPay: 100.00 }
-            ],
-            bills: [
-                { id: 2001, name: 'Progressive auto insurance', category: 'Insurance', amount: 0.00, dueDay: 4 },
-                { id: 2002, name: 'Champion Mortgage', category: 'Housing', amount: 2134.66, dueDay: 1 }
-            ],
+        const BLANK_STATE = {
+            version: 1,
+            strategy: 'snowball',
+            extraMonthly: 0,
+            debts: [],
+            bills: [],
             syncedTransactions: []
         };
 
-        let appState = structuredClone(ACTUAL_BASELINE_STATE);
+        let appState = structuredClone(BLANK_STATE);
         let activePin = null;
         let isDeveloperMode = false;
         let devModalAction = 'unlock';
@@ -984,9 +870,6 @@
         let idleTimer = null;
         let donutChart = null;
         let paydownChart = null;
-        let lastFilteredTxns = [];
-        let lastFilteredTotal = 0;
-        let lastActiveCategory = 'ALL';
 
         function bufToB64(buf) {
             return btoa(String.fromCharCode(...new Uint8Array(buf)));
@@ -1082,43 +965,6 @@
             await saveVaultState();
             const statusEl = document.getElementById('plaidSyncStatus');
             if (statusEl) statusEl.textContent = `Added ${fmtMoney(delta)} to Extra Monthly Payment (now ${fmtMoney(appState.extraMonthly)}/mo).`;
-        }
-
-        async function applyFilteredTotalToExtraSnowball() {
-            const delta = Math.abs(Number(lastFilteredTotal) || 0);
-            if (!lastFilteredTxns.length || delta <= 0) {
-                const statusEl = document.getElementById('plaidSyncStatus');
-                if (statusEl) statusEl.textContent = 'No positive filtered transaction total to add to Extra Monthly Payment.';
-                return;
-            }
-            appState.extraMonthly = Number(((Number(appState.extraMonthly) || 0) + delta).toFixed(2));
-            await saveVaultState();
-            const statusEl = document.getElementById('plaidSyncStatus');
-            if (statusEl) {
-                statusEl.textContent = `Added filtered total (${fmtMoney(delta)} across ${lastFilteredTxns.length} items) to Extra Monthly Payment (now ${fmtMoney(appState.extraMonthly)}/mo).`;
-            }
-        }
-
-        async function applyFilteredTotalAsBill() {
-            const amt = Math.abs(Number(lastFilteredTotal) || 0);
-            if (!lastFilteredTxns.length || amt <= 0) {
-                const statusEl = document.getElementById('plaidSyncStatus');
-                if (statusEl) statusEl.textContent = 'No positive filtered transaction total to save as a recurring bill.';
-                return;
-            }
-            const catLabel = lastActiveCategory === 'ALL' ? 'All Categories' : lastActiveCategory;
-            appState.bills.push({
-                id: Date.now(),
-                name: `${catLabel} Synced Total`,
-                category: lastActiveCategory === 'ALL' ? 'Subscription' : lastActiveCategory,
-                amount: Number(amt.toFixed(2)),
-                dueDay: 15
-            });
-            await saveVaultState();
-            const statusEl = document.getElementById('plaidSyncStatus');
-            if (statusEl) {
-                statusEl.textContent = `Saved filtered total (${fmtMoney(amt)}) as a recurring monthly bill under "${catLabel}".`;
-            }
         }
 
         async function connectPlaidBank() {
@@ -1229,6 +1075,10 @@
                 ]);
             });
 
+            if (rows.length === 1) {
+                rows.push(['Summary', 'Empty Vault', 'Blank Slate', '0.00', '0.00', '0.00', '0.00', '', appState.strategy, Number(appState.extraMonthly || 0).toFixed(2)]);
+            }
+
             const csvContent = rows.map(r => r.map(csvEscape).join(',')).join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -1253,9 +1103,8 @@
             const totalDebt = appState.debts.reduce((s, d) => s + d.balance, 0);
             const totalBills = appState.bills.reduce((s, b) => s + b.amount, 0);
             const sim = simulatePayoffSchedule();
-            const acctLines = appState.debts.map(d => `${d.name} (${d.type}): ${fmtMoney(d.balance)} @ ${d.apr}% APR, min ${fmtMoney(d.minPay)}`).join('; ');
             document.getElementById('geminiPromptInput').value =
-                `Analyze my 10 accounts totaling ${fmtMoney(totalDebt)} (${acctLines}) plus ${fmtMoney(totalBills)}/mo recurring bills, extra ${fmtMoney(appState.extraMonthly)}/mo under ${appState.strategy} (projected ${sim.payoffLabel}, ${sim.months} mos). Rank my best payoff and settlement moves.`;
+                `Review my ledger: ${appState.debts.length} debt accounts (${fmtMoney(totalDebt)}), ${appState.bills.length} recurring bills (${fmtMoney(totalBills)}/mo), extra monthly payment ${fmtMoney(appState.extraMonthly)}, strategy ${appState.strategy}, projected payoff ${sim.payoffLabel} (${sim.months} mos). What should my next move be?`;
             document.getElementById('geminiPromptInput').focus();
         }
 
@@ -1314,7 +1163,8 @@
                     `Vault Telemetry: ` +
                     `Debts=${appState.debts.length} accounts totaling ${fmtMoney(totalDebt)}; ` +
                     `Monthly Bills=${fmtMoney(totalBills)}; Strategy=${appState.strategy}; ` +
-                    `Extra Monthly=${fmtMoney(appState.extraMonthly)}; Projected Payoff=${sim.payoffLabel} (${sim.months} mos).\n\nQuestion: ${userPrompt}`;
+                    `Extra Monthly=${fmtMoney(appState.extraMonthly)}; Projected Payoff=${sim.payoffLabel} (${sim.months} mos); ` +
+                    `Synced Transactions=${(appState.syncedTransactions || []).length}.\n\nQuestion: ${userPrompt}`;
             }
 
             try {
@@ -1542,14 +1392,11 @@
                 try {
                     const parsed = JSON.parse(raw);
                     if (parsed && !parsed.encrypted && parsed.data) {
-                        appState = { ...structuredClone(ACTUAL_BASELINE_STATE), ...parsed.data };
+                        appState = { ...structuredClone(BLANK_STATE), ...parsed.data };
                     }
                 } catch (_) {
-                    appState = structuredClone(ACTUAL_BASELINE_STATE);
+                    appState = structuredClone(BLANK_STATE);
                 }
-            } else {
-                appState = structuredClone(ACTUAL_BASELINE_STATE);
-                await saveVaultState();
             }
             updateSecurityBadges();
             renderAll();
@@ -1576,7 +1423,7 @@
             try {
                 const raw = JSON.parse(localStorage.getItem(VAULT_STORAGE_KEY) || '{}');
                 const decrypted = await decryptPayload(raw, pin);
-                appState = { ...structuredClone(ACTUAL_BASELINE_STATE), ...decrypted };
+                appState = { ...structuredClone(BLANK_STATE), ...decrypted };
                 activePin = pin;
                 hidePinOverlay();
                 resetIdleTimer();
@@ -1638,7 +1485,7 @@
             activePin = null;
             isDeveloperMode = false;
             applyRoleModeUI();
-            appState = { version: 12, strategy: 'avalanche', extraMonthly: 0, debts: [], bills: [], syncedTransactions: [] };
+            appState = structuredClone(BLANK_STATE);
             renderAll();
             showPinOverlay();
         }
@@ -1727,7 +1574,7 @@
                 try {
                     const envelope = JSON.parse(e.target.result);
                     const restored = await decryptPayload(envelope, pass);
-                    appState = { ...structuredClone(ACTUAL_BASELINE_STATE), ...restored };
+                    appState = { ...structuredClone(BLANK_STATE), ...restored };
                     await saveVaultState();
                     logTerminal('Imported and decrypted .nexusvault backup successfully.', 'text-cyan-400');
                 } catch (_) {
@@ -1797,30 +1644,6 @@
             e.target.reset();
             await saveVaultState();
         });
-
-        async function editDebtField(id, field) {
-            const item = appState.debts.find(d => d.id === id);
-            if (!item) return;
-            const currentVal = item[field] ?? 0;
-            const labelMap = { balance: 'Balance ($)', apr: 'APR (%)', minPay: 'Minimum Monthly Payment ($)', limit: 'Credit Limit ($)' };
-            const raw = prompt(`Update ${labelMap[field] || field} for ${item.name}:`, String(currentVal));
-            if (raw === null) return;
-            const num = parseFloat(raw);
-            if (Number.isNaN(num) || num < 0) return;
-            item[field] = Number(num.toFixed(2));
-            await saveVaultState();
-        }
-
-        async function editBillAmount(id) {
-            const bill = appState.bills.find(b => b.id === id);
-            if (!bill) return;
-            const raw = prompt(`Update Monthly Amount ($) for ${bill.name}:`, String(bill.amount));
-            if (raw === null) return;
-            const num = parseFloat(raw);
-            if (Number.isNaN(num) || num < 0) return;
-            bill.amount = Number(num.toFixed(2));
-            await saveVaultState();
-        }
 
         async function removeDebt(id) {
             appState.debts = appState.debts.filter(d => d.id !== id);
@@ -1927,14 +1750,11 @@
                     <tr>
                         <td class="py-3 font-semibold text-white">${escapeHtml(d.name)}</td>
                         <td class="py-3 text-slate-400 font-mono text-xs">${escapeHtml(d.type)}</td>
-                        <td onclick="editDebtField(${d.id}, 'balance')" title="Tap to edit balance" class="py-3 font-bold text-cyan-300 sensitive-val cursor-pointer hover:underline">${fmtMoney(d.balance)}</td>
-                        <td onclick="editDebtField(${d.id}, 'limit')" title="Tap to edit limit" class="py-3 text-slate-400 sensitive-val cursor-pointer hover:underline">${d.limit ? fmtMoney(d.limit) : '--'}</td>
-                        <td onclick="editDebtField(${d.id}, 'apr')" title="Tap to edit APR" class="py-3 text-amber-400 cursor-pointer hover:underline">${d.apr}%</td>
-                        <td onclick="editDebtField(${d.id}, 'minPay')" title="Tap to edit min pay" class="py-3 text-white sensitive-val cursor-pointer hover:underline">${fmtMoney(d.minPay)}</td>
-                        <td class="py-3 text-right whitespace-nowrap space-x-2">
-                            <button onclick="editDebtField(${d.id}, 'minPay')" class="text-cyan-400 hover:text-cyan-300 text-xs" title="Edit Payment"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="removeDebt(${d.id})" class="text-rose-400 hover:text-rose-300 text-xs" title="Remove"><i class="fa-solid fa-trash"></i></button>
-                        </td>
+                        <td class="py-3 font-bold text-cyan-300 sensitive-val">${fmtMoney(d.balance)}</td>
+                        <td class="py-3 text-slate-400 sensitive-val">${d.limit ? fmtMoney(d.limit) : '--'}</td>
+                        <td class="py-3 text-amber-400">${d.apr}%</td>
+                        <td class="py-3 text-white sensitive-val">${fmtMoney(d.minPay)}</td>
+                        <td class="py-3 text-right"><button onclick="removeDebt(${d.id})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `).join('');
             }
@@ -1947,18 +1767,14 @@
                     <tr>
                         <td class="py-3 font-semibold text-white">${escapeHtml(b.name)}</td>
                         <td class="py-3 text-slate-400 text-xs">${escapeHtml(b.category)}</td>
-                        <td onclick="editBillAmount(${b.id})" title="Tap to update amount" class="py-3 font-bold text-emerald-300 sensitive-val cursor-pointer hover:underline">
-                            ${fmtMoney(b.amount)} ${b.amount === 0 ? '<span class="text-[10px] text-amber-400 font-mono ml-1">(tap to set)</span>' : ''}
-                        </td>
+                        <td class="py-3 font-bold text-emerald-300 sensitive-val">${fmtMoney(b.amount)}</td>
                         <td class="py-3 text-slate-300 font-mono">Day ${b.dueDay}</td>
-                        <td class="py-3 text-right whitespace-nowrap space-x-2">
-                            <button onclick="editBillAmount(${b.id})" class="text-cyan-400 hover:text-cyan-300 text-xs" title="Edit Amount"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="removeBill(${b.id})" class="text-rose-400 hover:text-rose-300 text-xs" title="Remove"><i class="fa-solid fa-trash"></i></button>
-                        </td>
+                        <td class="py-3 text-right"><button onclick="removeBill(${b.id})" class="text-rose-400 hover:text-rose-300 text-xs"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `).join('');
             }
 
+            // Synced Transactions Category Filter + Summary + Table
             const allTxns = Array.isArray(appState.syncedTransactions) ? appState.syncedTransactions : [];
             const filterSelect = document.getElementById('txnCategoryFilter');
             if (filterSelect) {
@@ -1975,10 +1791,6 @@
                 : allTxns.filter(t => (t.category || 'General') === activeFilter);
 
             const filteredTotal = filteredTxns.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
-            lastFilteredTxns = filteredTxns;
-            lastFilteredTotal = filteredTotal;
-            lastActiveCategory = activeFilter;
-
             const countEl = document.getElementById('txnSummaryCount');
             const totalEl = document.getElementById('txnSummaryTotal');
             if (countEl) countEl.textContent = filteredTxns.length;
@@ -2020,7 +1832,7 @@
                         labels: hasData ? appState.debts.map(d => d.name) : ['Empty'],
                         datasets: [{
                             data: hasData ? appState.debts.map(d => d.balance) : [1],
-                            backgroundColor: hasData ? ['#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#38bdf8', '#14b8a6', '#f97316', '#6366f1', '#22c55e'] : ['#1e293b'],
+                            backgroundColor: hasData ? ['#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#38bdf8'] : ['#1e293b'],
                             borderWidth: 0
                         }]
                     },
@@ -2385,19 +2197,22 @@
             logTerminal(`[MATH CHECK] ${appState.debts.length} accounts simulated -> Payoff estimate: ${sim.payoffLabel} (${sim.months} months).`, 'text-cyan-400');
         }
 
-        async function resetToActualBaseline(fromLockScreen = false) {
+        function resetToBrandNewApp(fromLockScreen = false) {
             const msg = fromLockScreen
-                ? 'Wipe encrypted vault and reload your 10-account baseline ledger?'
-                : 'Reload your 10-account baseline ledger ($44,149.02) and recurring bills?';
+                ? 'Wipe encrypted vault and PIN to start fresh?'
+                : 'Reset everything back to a brand-new $0.00 blank slate?';
             if (!confirm(msg)) return;
             localStorage.removeItem(VAULT_STORAGE_KEY);
             localStorage.removeItem(PIN_META_KEY);
+            localStorage.removeItem(DEV_PASS_HASH_KEY);
             activePin = null;
+            isDeveloperMode = false;
             clearTimeout(idleTimer);
-            appState = structuredClone(ACTUAL_BASELINE_STATE);
+            appState = structuredClone(BLANK_STATE);
             hidePinOverlay();
-            await saveVaultState();
-            logTerminal('[BASELINE] Loaded 10 active accounts ($44,149.02) and recurring bills.', 'text-cyan-400');
+            updateSecurityBadges();
+            renderAll();
+            logTerminal('[RESET] Local data wiped. App restored to brand-new $0.00 state.', 'text-rose-400');
         }
 
         window.addEventListener('DOMContentLoaded', () => {

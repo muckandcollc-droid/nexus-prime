@@ -1,0 +1,2911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="dashboard">
+  <meta name="design-style" content="neon_noir">
+  <title>NEXUS-PRIME — Financial Syndicate &amp; Debt Elimination Command Center</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+
+      /* 1. Neon Noir base surface and text ramp */
+      --background: #0a0a12;
+      --surface-container-low: #111118;
+      --surface-container: #141422;
+      --surface-container-high: #1e1e30;
+
+      --on-surface: #e8e0f0;
+      --on-surface-variant: #a098b0;
+
+      --outline: #5a5068;
+      --outline-variant: #302840;
+
+      /* 2. User-requested cyan, violet, and gold accents (WCAG AA compliant on dark surfaces) */
+      --primary: #00e5ff;
+      --on-primary: #051318;
+      --primary-container: #083948;
+      --on-primary-container: #d8fbff;
+
+      --secondary: #b388ff;
+      --secondary-container: #2c1e4a;
+      --on-secondary-container: #eee6ff;
+
+      --tertiary: #ffd166;
+      --tertiary-container: #3d2e0d;
+      --on-tertiary-container: #fff4d6;
+
+      --error: #ff5c77;
+      --on-error: #1a0006;
+
+      --positive: #2ce69b;
+      --positive-container: #0c3525;
+      --warning: #ffd166;
+
+      --data-1: #00e5ff;
+      --data-2: #b388ff;
+      --data-3: #ffd166;
+      --data-4: #ff5c77;
+      --data-context: #6e6680;
+
+      /* Fonts */
+      --font-headline: 'Sora', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-label: 'Space Mono', monospace;
+
+      /* Shape */
+      --rounded: 0.125rem;
+      --rounded-lg: 0.25rem;
+      --rounded-full: 0.75rem;
+
+      /* Effects */
+      --glow-text: 0 0 8px currentColor;
+      --glow-primary: 0 0 16px color-mix(in srgb, var(--primary) 38%, transparent);
+      --glow-secondary: 0 0 16px color-mix(in srgb, var(--secondary) 35%, transparent);
+      --glow-tertiary: 0 0 14px color-mix(in srgb, var(--tertiary) 32%, transparent);
+      --neon-border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+      --neon-border-lit: 1px solid color-mix(in srgb, var(--primary) 55%, transparent);
+      --neon-border-violet: 1px solid color-mix(in srgb, var(--secondary) 32%, transparent);
+      --neon-border-gold: 1px solid color-mix(in srgb, var(--tertiary) 35%, transparent);
+      --neon-inset: inset 0 0 14px color-mix(in srgb, var(--primary) 10%, transparent);
+      --neon-inset-violet: inset 0 0 14px color-mix(in srgb, var(--secondary) 10%, transparent);
+      --glass-backdrop: blur(14px);
+      --scanlines: repeating-linear-gradient(
+        to bottom,
+        transparent 0 3px,
+        color-mix(in srgb, var(--on-surface) 2.5%, transparent) 3px 4px
+      );
+
+      /* Focus ring */
+      --focus: var(--primary);
+
+      /* Type scale (Dashboard / Tool tight scale) */
+      --display-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+      --headline-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+      --subhead-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+      --label-size: 0.75rem;
+
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      background-image: var(--scanlines);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-grid {
+      display: grid;
+      gap: var(--space-xl);
+      padding: var(--space-lg);
+      max-width: 1380px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Header Command Bar */
+    .command-header {
+      border-bottom: 1px solid var(--outline-variant);
+      background: color-mix(in srgb, var(--surface-container-low) 92%, transparent);
+      backdrop-filter: var(--glass-backdrop);
+      padding: var(--space-md) var(--space-lg);
+    }
+    .header-inner {
+      max-width: 1380px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+    .brand-block {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .brand-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .kicker {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--primary);
+      text-shadow: var(--glow-text);
+    }
+    .brand-title {
+      font-family: var(--font-headline);
+      font-size: var(--display-size);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .brand-subtitle {
+      margin: 0;
+      font-size: var(--label-size);
+      font-family: var(--font-label);
+      color: var(--on-surface-variant);
+      letter-spacing: 0.04em;
+    }
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+      border: 1px solid var(--outline-variant);
+      background: var(--surface-container);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .status-chip.is-cyan {
+      border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+      color: var(--primary);
+    }
+    .status-chip.is-gold {
+      border-color: color-mix(in srgb, var(--tertiary) 45%, transparent);
+      color: var(--tertiary);
+    }
+    .status-chip.is-violet {
+      border-color: color-mix(in srgb, var(--secondary) 45%, transparent);
+      color: var(--secondary);
+    }
+    .status-chip.is-positive {
+      border-color: color-mix(in srgb, var(--positive) 45%, transparent);
+      color: var(--positive);
+    }
+
+    /* Quick-Jump Nav Strip */
+    .quick-nav {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      padding-top: var(--space-sm);
+      margin-top: var(--space-sm);
+      border-top: 1px solid var(--outline-variant);
+    }
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      background: var(--surface-container);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--on-surface-variant);
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color var(--dur-short) var(--ease-out),
+                  color var(--dur-short) var(--ease-out),
+                  box-shadow var(--dur-short) var(--ease-out);
+    }
+    .nav-link:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      box-shadow: var(--glow-primary);
+    }
+    .nav-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Section Headings */
+    .section-block {
+      display: grid;
+      gap: var(--space-lg);
+    }
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--outline-variant);
+    }
+    .section-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .section-heading {
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .section-desc {
+      margin: 0;
+      color: var(--on-surface-variant);
+      font-size: var(--body-size);
+      max-width: 68ch;
+    }
+
+    /* Neon-Edged Glass Panels */
+    .neon-panel {
+      background: color-mix(in srgb, var(--surface-container) 88%, transparent);
+      backdrop-filter: var(--glass-backdrop);
+      border: var(--neon-border);
+      box-shadow: var(--neon-inset);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+    }
+    .neon-panel.is-violet {
+      border: var(--neon-border-violet);
+      box-shadow: var(--neon-inset-violet);
+    }
+    .neon-panel.is-gold {
+      border: var(--neon-border-gold);
+      box-shadow: inset 0 0 12px color-mix(in srgb, var(--tertiary) 8%, transparent);
+    }
+    .neon-panel.is-flat {
+      border: 1px solid var(--outline-variant);
+      box-shadow: none;
+    }
+
+    /* Buttons */
+    .btn-neon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--surface-container);
+      color: var(--primary);
+      border: var(--neon-border-lit);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: box-shadow var(--dur-short) var(--ease-out),
+                  border-color var(--dur-short) var(--ease-out),
+                  background-color var(--dur-short) var(--ease-out),
+                  color var(--dur-short) var(--ease-out);
+    }
+    .btn-neon:hover:not(:disabled) {
+      border-color: var(--primary);
+      box-shadow: var(--glow-primary);
+      text-shadow: var(--glow-text);
+    }
+    .btn-neon:active:not(:disabled) {
+      background: var(--primary-container);
+    }
+    .btn-neon:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .btn-neon.is-violet {
+      color: var(--secondary);
+      border-color: color-mix(in srgb, var(--secondary) 50%, transparent);
+    }
+    .btn-neon.is-violet:hover:not(:disabled) {
+      border-color: var(--secondary);
+      box-shadow: var(--glow-secondary);
+      text-shadow: var(--glow-text);
+    }
+    .btn-neon.is-gold {
+      color: var(--tertiary);
+      border-color: color-mix(in srgb, var(--tertiary) 50%, transparent);
+    }
+    .btn-neon.is-gold:hover:not(:disabled) {
+      border-color: var(--tertiary);
+      box-shadow: var(--glow-tertiary);
+      text-shadow: var(--glow-text);
+    }
+    .btn-neon.is-active {
+      background: var(--primary-container);
+      border-color: var(--primary);
+      color: var(--on-primary-container);
+      box-shadow: var(--glow-primary);
+    }
+    .btn-neon.is-violet.is-active {
+      background: var(--secondary-container);
+      border-color: var(--secondary);
+      color: var(--on-secondary-container);
+      box-shadow: var(--glow-secondary);
+    }
+    .btn-neon.is-gold.is-active {
+      background: var(--tertiary-container);
+      border-color: var(--tertiary);
+      color: var(--on-tertiary-container);
+      box-shadow: var(--glow-tertiary);
+    }
+
+    /* Executive HUD KPI Row */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+    .kpi-tile {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+    .kpi-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--on-surface-variant);
+    }
+    .kpi-value {
+      font-family: var(--font-headline);
+      font-size: clamp(1.5rem, 1.2rem + 1vw, 2.1rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .kpi-value.is-cyan { color: var(--primary); text-shadow: var(--glow-text); }
+    .kpi-value.is-violet { color: var(--secondary); text-shadow: var(--glow-text); }
+    .kpi-value.is-gold { color: var(--tertiary); text-shadow: var(--glow-text); }
+    .kpi-value.is-positive { color: var(--positive); text-shadow: var(--glow-text); }
+    .kpi-foot {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      border-top: 1px solid var(--outline-variant);
+      padding-top: var(--space-sm);
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-xs);
+    }
+
+    /* Account Strip */
+    .accounts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .account-card {
+      container-type: inline-size;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+      transition: border-color var(--dur-short) var(--ease-out);
+    }
+    .account-card.is-target {
+      border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+      box-shadow: var(--neon-inset);
+    }
+    .account-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-sm);
+    }
+    .account-name {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 700;
+      margin: 0;
+    }
+    .account-balance {
+      font-family: var(--font-label);
+      font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
+      font-weight: 700;
+      color: var(--on-surface);
+    }
+    .account-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-xs);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+    }
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--surface-container-high);
+      border-radius: var(--rounded);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width var(--dur-long) var(--ease-out);
+    }
+
+    /* Cyber City Split Layout */
+    .city-workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: stretch;
+    }
+    .city-stage-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .city-controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+    .control-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .city-viewport {
+      position: relative;
+      width: 100%;
+      min-height: 480px;
+      height: 500px;
+      background: var(--background);
+      border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+      border-radius: var(--rounded-lg);
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
+    }
+    .city-viewport:active {
+      cursor: grabbing;
+    }
+    .city-viewport canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .telemetry-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .telemetry-chip {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      pointer-events: auto;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: var(--space-xs) var(--space-sm);
+      background: color-mix(in srgb, var(--surface-container-low) 90%, transparent);
+      backdrop-filter: var(--glass-backdrop);
+      border: 1px solid color-mix(in srgb, var(--primary) 55%, transparent);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: 0.7rem;
+      line-height: 1.25;
+      color: var(--on-surface);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color var(--dur-micro) var(--ease-out),
+                  box-shadow var(--dur-micro) var(--ease-out);
+      white-space: nowrap;
+    }
+    .telemetry-chip:hover,
+    .telemetry-chip.is-selected {
+      border-color: var(--tertiary);
+      box-shadow: var(--glow-tertiary);
+    }
+    .telemetry-chip .chip-id {
+      color: var(--primary);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+    .telemetry-chip.is-violet {
+      border-color: color-mix(in srgb, var(--secondary) 55%, transparent);
+    }
+    .telemetry-chip.is-violet .chip-id {
+      color: var(--secondary);
+    }
+    .telemetry-chip.is-gold {
+      border-color: color-mix(in srgb, var(--tertiary) 55%, transparent);
+    }
+    .telemetry-chip.is-gold .chip-id {
+      color: var(--tertiary);
+    }
+    .city-hud-overlay {
+      position: absolute;
+      left: var(--space-sm);
+      bottom: var(--space-sm);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      pointer-events: none;
+    }
+    .hud-badge {
+      background: color-mix(in srgb, var(--surface-container-low) 88%, transparent);
+      border: 1px solid var(--outline-variant);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+    }
+    .hud-badge strong {
+      color: var(--primary);
+    }
+
+    /* Node Inspector & Worker Feed */
+    .node-inspector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded);
+    }
+    .inspector-cell {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .inspector-cell span {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      text-transform: uppercase;
+    }
+    .inspector-cell strong {
+      font-family: var(--font-label);
+      font-size: var(--body-size);
+      color: var(--on-surface);
+    }
+
+    .worker-feed-panel {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .feed-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      max-height: 410px;
+      overflow-y: auto;
+      padding-right: var(--space-xs);
+    }
+    .feed-item {
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-left: 3px solid var(--primary);
+      border-radius: var(--rounded);
+      padding: var(--space-sm) var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .feed-item.is-violet { border-left-color: var(--secondary); }
+    .feed-item.is-gold { border-left-color: var(--tertiary); }
+    .feed-item.is-positive { border-left-color: var(--positive); }
+    .feed-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-xs);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+    }
+    .feed-worker { font-weight: 700; color: var(--primary); }
+    .feed-item.is-violet .feed-worker { color: var(--secondary); }
+    .feed-item.is-gold .feed-worker { color: var(--tertiary); }
+    .feed-item.is-positive .feed-worker { color: var(--positive); }
+    .feed-time { color: var(--on-surface-variant); }
+    .feed-msg {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--on-surface);
+    }
+
+    /* Optimizer Grid */
+    .optimizer-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .form-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    .field-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .field-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--on-surface-variant);
+    }
+    .dual-input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 120px;
+      gap: var(--space-sm);
+      align-items: end;
+    }
+    .input-box, .select-box {
+      width: 100%;
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-bottom: 2px solid var(--primary);
+      border-radius: var(--rounded);
+      color: var(--on-surface);
+      font-family: var(--font-label);
+      font-size: var(--body-size);
+    }
+    .select-box {
+      padding-right: var(--space-xl);
+    }
+    .input-box:focus, .select-box:focus {
+      border-color: var(--primary);
+      box-shadow: var(--glow-primary);
+      outline: none;
+    }
+    input[type="range"].neon-range {
+      width: 100%;
+      min-height: 44px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+    .chart-box {
+      position: relative;
+      width: 100%;
+      min-height: 360px;
+      height: 380px;
+    }
+
+    /* Tables */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    table.data-table th {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--on-surface-variant);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--surface-container);
+      border-bottom: 1px solid var(--outline-variant);
+      white-space: nowrap;
+    }
+    table.data-table td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--outline-variant);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+    }
+    table.data-table td.mono {
+      font-family: var(--font-label);
+      white-space: nowrap;
+    }
+    table.data-table tr.is-priority {
+      background: color-mix(in srgb, var(--surface-container-high) 70%, transparent);
+    }
+    table.data-table tr.is-priority td:first-child {
+      border-left: 3px solid var(--primary);
+    }
+
+    /* Plaid & Negotiator Split */
+    .two-col-asymmetric {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .terminal-log {
+      background: var(--surface-container-low);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      font-family: var(--font-label);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      max-height: 240px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .log-line { color: var(--on-surface-variant); }
+    .log-line.is-cyan { color: var(--primary); }
+    .log-line.is-violet { color: var(--secondary); }
+    .log-line.is-gold { color: var(--tertiary); }
+    .log-line.is-positive { color: var(--positive); }
+    .log-line.is-error { color: var(--error); }
+
+    .inline-notice {
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      border: 1px solid var(--outline-variant);
+      background: var(--surface-container-low);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+    .inline-notice.is-success {
+      border-color: color-mix(in srgb, var(--positive) 55%, transparent);
+      color: var(--positive);
+    }
+    .inline-notice.is-warning {
+      border-color: color-mix(in srgb, var(--tertiary) 55%, transparent);
+      color: var(--tertiary);
+    }
+
+    .script-stage {
+      background: var(--surface-container-low);
+      border: 1px solid color-mix(in srgb, var(--secondary) 35%, transparent);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    .dialogue-bubble {
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      border: 1px solid var(--outline-variant);
+      background: var(--surface-container);
+    }
+    .dialogue-bubble.is-bot {
+      border-left: 3px solid var(--primary);
+    }
+    .dialogue-bubble.is-creditor {
+      border-left: 3px solid var(--tertiary);
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--outline-variant);
+      padding: var(--space-lg);
+      color: var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      max-width: 1380px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1080px) {
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .city-workspace { grid-template-columns: 1fr; }
+      .optimizer-grid { grid-template-columns: 1fr; }
+      .two-col-asymmetric { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .page-grid {
+        padding: var(--space-md);
+        gap: var(--space-lg);
+      }
+      .kpi-grid { grid-template-columns: 1fr; }
+      .dual-input-row { grid-template-columns: 1fr; }
+      .city-viewport { min-height: 360px; height: 380px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="command-header">
+    <div class="header-inner">
+      <div class="brand-block">
+        <div class="brand-row">
+          <span class="kicker">Syndicate Financial OS</span>
+          <span class="status-chip is-positive">Online</span>
+          <span class="status-chip is-gold">Target: Aug 2027</span>
+        </div>
+        <h1 class="brand-title">NEXUS-PRIME Command Center</h1>
+        <p class="brand-subtitle">Household Debt Elimination &amp; Autonomous Operations · Co-developed with Brandon Muckenhirn · Local Date: Nov 17, 2026</p>
+      </div>
+
+      <div class="header-meta">
+        <span class="status-chip is-cyan" id="header-worker-count">32 Worker Nodes Active</span>
+        <span class="status-chip is-violet" id="header-sync-status">Plaid Sandbox Ready</span>
+        <button type="button" class="btn-neon is-gold" id="btn-reset-state" onclick="handleResetState(this)">
+          <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+          <span>Reset Workspace</span>
+        </button>
+      </div>
+    </div>
+
+    <nav class="header-inner quick-nav" aria-label="Command Center Sections">
+      <div class="nav-links">
+        <a class="nav-link" href="#hud">Executive HUD</a>
+        <a class="nav-link" href="#cyber-city">Cyber City &amp; Workers</a>
+        <a class="nav-link" href="#optimizer">Snowball / Avalanche</a>
+        <a class="nav-link" href="#plaid-ops">Plaid &amp; Test Ops</a>
+        <a class="nav-link" href="#negotiator">Creditor Negotiator</a>
+      </div>
+      <div class="nav-actions">
+        <span class="status-chip" id="persistence-badge">Session State Synced</span>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page-grid">
+
+    <!-- MODULE 1: EXECUTIVE HUD -->
+    <section id="hud" class="section-block" aria-labelledby="hud-heading">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="kicker">01 // Portfolio Telemetry</span>
+          <h2 id="hud-heading" class="section-heading">Executive Debt HUD</h2>
+          <p class="section-desc">Combined household liabilities across four active accounts ($60,043.26 aggregate balance; $45,000.00 core snapshot baseline), unified under Single-Account Master Auto-Pay.</p>
+        </div>
+        <span class="status-chip is-positive" id="hud-autopay-badge">Master Auto-Pay: Active</span>
+      </div>
+
+      <div class="kpi-grid">
+        <article class="neon-panel kpi-tile">
+          <span class="kpi-label">Total Combined Debt</span>
+          <div class="kpi-value is-cyan" id="hud-total-debt">$60,043.26</div>
+          <div class="kpi-foot">
+            <span>4 Active Accounts</span>
+            <span>Core Baseline: $45,000</span>
+          </div>
+        </article>
+
+        <article class="neon-panel is-violet kpi-tile">
+          <span class="kpi-label">Monthly Debt Allocation</span>
+          <div class="kpi-value is-violet" id="hud-monthly-allocation">$1,250.00</div>
+          <div class="kpi-foot">
+            <span>$1,100 Base Mins</span>
+            <span id="hud-extra-readout">+$150.00 Boost</span>
+          </div>
+        </article>
+
+        <article class="neon-panel is-gold kpi-tile">
+          <span class="kpi-label">Debt-Free Countdown</span>
+          <div class="kpi-value is-gold" id="hud-countdown-date">Aug 2027</div>
+          <div class="kpi-foot">
+            <span id="hud-months-remaining">9 Months (Snapshot)</span>
+            <span>4 Years Earlier</span>
+          </div>
+        </article>
+
+        <article class="neon-panel kpi-tile">
+          <span class="kpi-label">Projected Interest Saved</span>
+          <div class="kpi-value is-positive" id="hud-interest-saved">$13,007.00</div>
+          <div class="kpi-foot">
+            <span id="hud-total-interest">Proj. Interest: $14,459.60</span>
+            <span id="hud-strategy-chip">Avalanche</span>
+          </div>
+        </article>
+      </div>
+
+      <!-- 4 Account Breakdown Cards -->
+      <div class="accounts-grid" id="accounts-grid"></div>
+    </section>
+
+    <!-- MODULE 2: LIVE CYBER CITY & WORKER NODE VISUALIZATION -->
+    <section id="cyber-city" class="section-block" aria-labelledby="city-heading">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="kicker">02 // Autonomous Syndicate Metropolis</span>
+          <h2 id="city-heading" class="section-heading">Live Cyber City &amp; Worker Operations</h2>
+          <p class="section-desc">Interactive 3D metropolis teeming with autonomous worker units traversing neon data highways, server towers, and active debt-reduction packet relays. Drag to orbit, scroll to zoom, or click any telemetry chip to inspect.</p>
+        </div>
+        <div class="control-group">
+          <button type="button" class="btn-neon" onclick="spawnWorkerUnit()">
+            <i data-lucide="plus" aria-hidden="true"></i>
+            <span>Spawn Worker</span>
+          </button>
+          <button type="button" class="btn-neon is-violet" onclick="triggerDataPulseBurst('Manual Syndicate Burst')">
+            <i data-lucide="zap" aria-hidden="true"></i>
+            <span>Pulse Data Burst</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="city-workspace">
+        <!-- Left: 3D Metropolis Viewport + Node Inspector -->
+        <div class="neon-panel city-stage-card">
+          <div class="city-controls-bar">
+            <div class="control-group" role="group" aria-label="Camera presets">
+              <button type="button" class="btn-neon is-active" id="cam-orbit" onclick="setCameraPreset('orbit')">Orbit View</button>
+              <button type="button" class="btn-neon" id="cam-street" onclick="setCameraPreset('street')">Street Transit</button>
+              <button type="button" class="btn-neon" id="cam-aerial" onclick="setCameraPreset('aerial')">Aerial Grid</button>
+              <button type="button" class="btn-neon is-gold" id="btn-toggle-spin" onclick="toggleCityOrbit()">Pause Orbit</button>
+            </div>
+            <div class="control-group" role="group" aria-label="Worker traffic density">
+              <span class="kpi-label">Density:</span>
+              <button type="button" class="btn-neon" id="density-low" onclick="setWorkerDensity('low')">Low (16)</button>
+              <button type="button" class="btn-neon is-active" id="density-standard" onclick="setWorkerDensity('standard')">Standard (32)</button>
+              <button type="button" class="btn-neon is-violet" id="density-surge" onclick="setWorkerDensity('surge')">Surge (56)</button>
+            </div>
+          </div>
+
+          <div class="city-viewport" id="city-viewport" aria-label="Interactive 3D Cyber City Visualization">
+            <div class="telemetry-layer" id="telemetry-layer"></div>
+            <div class="city-hud-overlay">
+              <span class="hud-badge">Units: <strong id="city-unit-count">32</strong></span>
+              <span class="hud-badge">Packets/s: <strong id="city-packet-rate">148</strong></span>
+              <span class="hud-badge">Render: <strong id="city-render-mode">WebGL 3D</strong></span>
+            </div>
+          </div>
+
+          <!-- Selected Node Inspector -->
+          <div class="node-inspector" id="node-inspector" aria-live="polite">
+            <div class="inspector-cell">
+              <span>Selected Node</span>
+              <strong id="insp-id">HUB-01 // CHASE CARD</strong>
+            </div>
+            <div class="inspector-cell">
+              <span>Active Subroutine</span>
+              <strong id="insp-task">Executing Snowball Reallocation</strong>
+            </div>
+            <div class="inspector-cell">
+              <span>Assigned Workers</span>
+              <strong id="insp-workers">8 Active Bots</strong>
+            </div>
+            <div class="inspector-cell">
+              <span>Throughput / Status</span>
+              <strong id="insp-status">42 pkt/s · OPTIMAL</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Syndicate Worker Operations Command Feed -->
+        <aside class="neon-panel is-violet worker-feed-panel" aria-labelledby="feed-heading">
+          <div class="city-controls-bar">
+            <div>
+              <span class="kicker">Live Ops Stream</span>
+              <h3 id="feed-heading" class="section-heading">Syndicate Worker Operations</h3>
+            </div>
+            <button type="button" class="btn-neon is-violet" id="btn-feed-toggle" onclick="toggleFeedStream()">Pause Feed</button>
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="worker-filter">Filter Worker Subroutine</label>
+            <select class="select-box" id="worker-filter" onchange="renderWorkerFeed()">
+              <option value="all">All Active Workers (01–04+)</option>
+              <option value="Worker-01">Worker-01: Snowball Reallocation</option>
+              <option value="Worker-02">Worker-02: Plaid Sync Handshake</option>
+              <option value="Worker-03">Worker-03: APR Negotiation Bot</option>
+              <option value="Worker-04">Worker-04: Ledger Audit</option>
+            </select>
+          </div>
+
+          <div class="feed-list" id="worker-feed-list" aria-live="polite"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- MODULE 3: DEBT SNOWBALL / AVALANCHE OPTIMIZATION ENGINE -->
+    <section id="optimizer" class="section-block" aria-labelledby="opt-heading">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="kicker">03 // Paydown Simulation Engine</span>
+          <h2 id="opt-heading" class="section-heading">Debt Snowball &amp; Avalanche Optimizer</h2>
+          <p class="section-desc">Compare Snowball (smallest balance first for rapid wins) against Avalanche (highest APR first to minimize interest) across all four accounts, with live extra-payment acceleration.</p>
+        </div>
+      </div>
+
+      <div class="optimizer-grid">
+        <!-- Controls & Summary -->
+        <div class="neon-panel form-stack">
+          <div class="field-row">
+            <span class="field-label">Optimization Method</span>
+            <div class="control-group">
+              <button type="button" class="btn-neon is-active" id="btn-strat-avalanche" onclick="setStrategy('avalanche')">Avalanche (19.99% First)</button>
+              <button type="button" class="btn-neon is-violet" id="btn-strat-snowball" onclick="setStrategy('snowball')">Snowball ($7.8k First)</button>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="slider-extra">Extra Monthly Acceleration ($ / Month)</label>
+            <div class="dual-input-row">
+              <input type="range" class="neon-range" id="slider-extra" min="0" max="2500" step="25" value="150" oninput="syncExtraFromSlider(this.value)">
+              <input type="number" class="input-box" id="input-extra" min="0" max="2500" step="25" value="150" oninput="syncExtraFromNumber(this.value)">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <span class="field-label">Quick Surplus Presets</span>
+            <div class="control-group">
+              <button type="button" class="btn-neon" onclick="applyExtraPreset(150)">+$150 Snapshot</button>
+              <button type="button" class="btn-neon is-violet" onclick="applyExtraPreset(450)">+$450 Velocity</button>
+              <button type="button" class="btn-neon is-gold" onclick="applyExtraPreset(900)">+$900 Blitz</button>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <span class="field-label">Single-Account Master Auto-Pay Routing</span>
+            <button type="button" class="btn-neon is-active" id="btn-autopay-toggle" onclick="toggleMasterAutoPay()">
+              Master Auto-Pay: Enabled (Primary Checking)
+            </button>
+          </div>
+
+          <div class="node-inspector">
+            <div class="inspector-cell">
+              <span>Computed Payoff</span>
+              <strong id="opt-payoff-date">Oct 2029</strong>
+            </div>
+            <div class="inspector-cell">
+              <span>Months Saved vs Min</span>
+              <strong id="opt-months-saved">44 Months</strong>
+            </div>
+            <div class="inspector-cell">
+              <span>Avalanche Interest</span>
+              <strong id="opt-aval-interest">$14,820</strong>
+            </div>
+            <div class="inspector-cell">
+              <span>Snowball Interest</span>
+              <strong id="opt-snow-interest">$16,940</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart + Payoff Sequence Table -->
+        <div class="neon-panel is-violet form-stack">
+          <div class="city-controls-bar">
+            <div>
+              <span class="kicker">Amortization Trajectory</span>
+              <h3 class="section-heading" id="chart-title">Projected Principal Decline Curve</h3>
+            </div>
+            <span class="status-chip is-cyan" id="chart-delta-chip">Snapshot Boost: +$150/mo</span>
+          </div>
+
+          <div class="chart-box">
+            <canvas id="paydown-chart" aria-label="Debt paydown trajectory chart"></canvas>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Account</th>
+                  <th>Principal</th>
+                  <th>APR</th>
+                  <th>Min / Mo</th>
+                  <th>Cleared In</th>
+                </tr>
+              </thead>
+              <tbody id="payoff-order-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 4: PLAID API SANDBOX & TESTING OPERATIONS -->
+    <section id="plaid-ops" class="section-block" aria-labelledby="plaid-heading">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="kicker">04 // Bank Ingestion &amp; Diagnostics</span>
+          <h2 id="plaid-heading" class="section-heading">Plaid API Sandbox &amp; Testing Operations</h2>
+          <p class="section-desc">Simulate Plaid Link token exchanges, run manual or 2:00 AM nightly sync routines, log household expenses against the reference snapshot feed, and execute system diagnostics.</p>
+        </div>
+      </div>
+
+      <div class="two-col-asymmetric">
+        <!-- Left: Plaid Link Simulator & Test Operations -->
+        <div class="neon-panel form-stack">
+          <div class="field-row">
+            <label class="field-label" for="plaid-institution">Select Institution for Link Token Handshake</label>
+            <div class="dual-input-row">
+              <select class="select-box" id="plaid-institution">
+                <option value="Chase Bank (Credit Card &amp; Checking)">Chase Bank (Credit Card &amp; Checking)</option>
+                <option value="SoFi Personal Lending ($21,020)">SoFi Personal Lending ($21,020)</option>
+                <option value="Federal Student Servicing ($9,418.11)">Federal Student Servicing ($9,418.11)</option>
+                <option value="Ally Auto Finance ($7,821.15)">Ally Auto Finance ($7,821.15)</option>
+              </select>
+              <button type="button" class="btn-neon" onclick="runPlaidHandshake()">Create Link</button>
+            </div>
+          </div>
+
+          <div class="inline-notice" id="plaid-handshake-status">
+            <span>Sandbox Token State: Idle — ready for /link/token/create</span>
+            <span id="plaid-cursor-readout">cursor: c_8841a</span>
+          </div>
+
+          <div class="field-row">
+            <span class="field-label">Operations Test Suite Triggers</span>
+            <div class="control-group">
+              <button type="button" class="btn-neon" onclick="runTestOperation('Manual Plaid /transactions/sync')">Trigger /transactions/sync</button>
+              <button type="button" class="btn-neon is-violet" onclick="runTestOperation('2:00 AM Nightly Cron Job')">Run 02:00 Cron Sync</button>
+              <button type="button" class="btn-neon is-gold" onclick="runTestOperation('Brandon Muckenhirn Co-Builder Audit')">Verify Co-Builder Sync</button>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <span class="field-label">Operations Execution Log</span>
+            <div class="terminal-log" id="ops-terminal-log" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <!-- Right: Reference Expense Feed & Add Transaction -->
+        <div class="neon-panel is-gold form-stack">
+          <div class="city-controls-bar">
+            <div>
+              <span class="kicker">Reference Expense Feed</span>
+              <h3 class="section-heading">Tracked Expenses &amp; Surplus</h3>
+            </div>
+            <span class="status-chip is-gold" id="total-tracked-expenses">Burn: $340.00</span>
+          </div>
+
+          <form class="form-stack" onsubmit="handleAddExpense(event)">
+            <div class="dual-input-row">
+              <div class="field-row">
+                <label class="field-label" for="exp-desc">Transaction Description</label>
+                <input type="text" class="input-box" id="exp-desc" placeholder="e.g. Trader Joe's Market" required>
+              </div>
+              <div class="field-row">
+                <label class="field-label" for="exp-amount">Amount ($)</label>
+                <input type="number" class="input-box" id="exp-amount" step="0.01" min="0.01" placeholder="45.00" required>
+              </div>
+            </div>
+            <div class="dual-input-row">
+              <div class="field-row">
+                <label class="field-label" for="exp-category">Category</label>
+                <select class="select-box" id="exp-category">
+                  <option value="Food">Food &amp; Groceries</option>
+                  <option value="Bills">Utilities &amp; Bills</option>
+                  <option value="Transport">Transport</option>
+                  <option value="Discretionary">Discretionary</option>
+                </select>
+              </div>
+              <button type="submit" class="btn-neon is-gold">Log Expense</button>
+            </div>
+          </form>
+
+          <div class="inline-notice" id="expense-feedback">
+            <span>Reference entries seeded from Household Source Snapshot.</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Source</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="expense-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 5: AUTOMATED CREDITOR NEGOTIATION BOT SIMULATOR -->
+    <section id="negotiator" class="section-block" aria-labelledby="neg-heading">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="kicker">05 // Autonomous Defense Matrix</span>
+          <h2 id="neg-heading" class="section-heading">Creditor Negotiation Bot Simulator</h2>
+          <p class="section-desc">Generate structured call scripts and simulate multi-round APR reduction or settlement counter-offers for your high-interest accounts and collection items.</p>
+        </div>
+      </div>
+
+      <div class="two-col-asymmetric">
+        <!-- Left: Negotiation Configuration -->
+        <div class="neon-panel is-violet form-stack">
+          <div class="field-row">
+            <label class="field-label" for="neg-target">Target Creditor / Obligation</label>
+            <select class="select-box" id="neg-target" onchange="resetNegotiationScript()">
+              <option value="chase">Chase Credit Card ($21,784.00 @ 19.99% APR)</option>
+              <option value="personal">Personal Loan ($21,020.00 @ 11.25% APR)</option>
+              <option value="collection">Collection Item Alpha ($485.00 Settlement)</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="neg-strategy">Negotiation Objective</label>
+            <select class="select-box" id="neg-strategy" onchange="resetNegotiationScript()">
+              <option value="apr">Hardship / Retention APR Reduction (Target 11.99% or 0% Promo)</option>
+              <option value="consolidation">Structured Refinance / Payoff Quote</option>
+              <option value="settlement">Lump-Sum Pay-for-Delete Settlement (55% Offer)</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="neg-offer">Proposed Counter-Offer (% or Target APR)</label>
+            <div class="dual-input-row">
+              <input type="range" class="neon-range" id="neg-offer" min="5" max="75" step="5" value="40" oninput="syncNegOfferFromSlider(this.value)">
+              <input type="number" class="input-box" id="neg-offer-num" min="5" max="75" step="5" value="40" oninput="syncNegOfferFromNumber(this.value)">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <button type="button" class="btn-neon" onclick="advanceNegotiationRound()">Advance Negotiation Round</button>
+            <button type="button" class="btn-neon is-gold" onclick="deployNegotiationBot()">Deploy Auto-Bot Pulse</button>
+            <button type="button" class="btn-neon is-violet" onclick="resetNegotiationScript()">Reset Script</button>
+          </div>
+
+          <div class="node-inspector">
+            <div class="inspector-cell">
+              <span>Current Stage</span>
+              <strong id="neg-stage-label">Round 1 of 4</strong>
+            </div>
+            <div class="inspector-cell">
+              <span>Projected Monthly Relief</span>
+              <strong id="neg-relief-readout">$145.20 / mo</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Interactive Call Script & Counter-Offer Transcript -->
+        <div class="neon-panel form-stack">
+          <div class="city-controls-bar">
+            <div>
+              <span class="kicker">Live Script &amp; Counter-Offer</span>
+              <h3 class="section-heading" id="neg-script-title">Chase Credit Card — APR Retention Script</h3>
+            </div>
+            <span class="status-chip is-cyan" id="neg-status-badge">Ready to Dispatch</span>
+          </div>
+
+          <div class="script-stage" id="neg-transcript" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <span>NEXUS-PRIME Financial Syndicate OS · Co-developed with Brandon Muckenhirn</span>
+    <span>Source Grounding: Household Debt-Free Strategy &amp; Portfolio Snapshot ($60,043.26 combined / $45,000.00 core baseline · Target Aug 2027)</span>
+  </footer>
+
+  <api-shim></api-shim>
+  <script>
+    const BASE_ACCOUNTS = [
+      {
+        id: `chase`,
+        name: `Chase Credit Card`,
+        category: `Revolving Credit`,
+        principal: 21784.00,
+        apr: 19.99,
+        minPayment: 290.00,
+        accent: `cyan`,
+        note: `Primary high-APR target`
+      },
+      {
+        id: `personal`,
+        name: `Personal Loan`,
+        category: `Installment Loan`,
+        principal: 21020.00,
+        apr: 11.25,
+        minPayment: 460.00,
+        accent: `violet`,
+        note: `Secondary consolidation tier`
+      },
+      {
+        id: `student`,
+        name: `Student Loan`,
+        category: `Education Loan`,
+        principal: 9418.11,
+        apr: 5.75,
+        minPayment: 165.00,
+        accent: `positive`,
+        note: `Low-APR autopilot tier`
+      },
+      {
+        id: `auto`,
+        name: `Auto Loan`,
+        category: `Secured Vehicle`,
+        principal: 7821.15,
+        apr: 5.99,
+        minPayment: 185.00,
+        accent: `gold`,
+        note: `Smallest balance (Snowball #1)`
+      }
+    ];
+
+    const DEFAULT_EXPENSES = [
+      { id: `e1`, desc: `Whole Foods Market`, category: `Food`, source: `Reference Snapshot`, amount: 184.50 },
+      { id: `e2`, desc: `Electric Utility Provider`, category: `Bills`, source: `Reference Snapshot`, amount: 105.50 },
+      { id: `e3`, desc: `Gas Station Fillup`, category: `Transport`, source: `Reference Snapshot`, amount: 50.00 }
+    ];
+
+    const CORE_HUB_NODES = [
+      {
+        id: `HUB-01`,
+        chipLabel: `HUB-01 · CHASE $21,784`,
+        title: `HUB-01 // CHASE CARD`,
+        task: `Executing Snowball / Avalanche Reallocation`,
+        workers: `8 Active Bots`,
+        throughput: `46 pkt/s · HIGH PRIORITY`,
+        tone: `cyan`,
+        x: -14,
+        z: -10,
+        h: 18
+      },
+      {
+        id: `HUB-02`,
+        chipLabel: `HUB-02 · PERSONAL $21,020`,
+        title: `HUB-02 // PERSONAL LOAN`,
+        task: `APR Refinance & Amortization Audit`,
+        workers: `6 Active Bots`,
+        throughput: `34 pkt/s · SYNCED`,
+        tone: `violet`,
+        x: 14,
+        z: -10,
+        h: 16
+      },
+      {
+        id: `HUB-03`,
+        chipLabel: `HUB-03 · PLAID VAULT`,
+        title: `HUB-03 // PLAID GATEWAY`,
+        task: `Plaid Sync Handshake & Ledger Poll`,
+        workers: `9 Active Bots`,
+        throughput: `58 pkt/s · ENCRYPTED`,
+        tone: `cyan`,
+        x: -14,
+        z: 12,
+        h: 15
+      },
+      {
+        id: `HUB-04`,
+        chipLabel: `HUB-04 · AUTO-PAY CORE`,
+        title: `HUB-04 // MASTER AUTO-PAY`,
+        task: `APR Negotiation Bot & Min Bundling`,
+        workers: `9 Active Bots`,
+        throughput: `52 pkt/s · OPTIMAL`,
+        tone: `gold`,
+        x: 14,
+        z: 12,
+        h: 20
+      }
+    ];
+
+    let appState = {
+      strategy: `avalanche`,
+      extraMonthly: 150,
+      masterAutoPay: true,
+      workerDensity: `standard`,
+      spawnedWorkers: 0,
+      selectedNodeId: `HUB-01`,
+      expenses: DEFAULT_EXPENSES.map(item => Object.assign({}, item)),
+      connectedInstitutions: [`Chase Bank (Credit Card & Checking)`],
+      negRound: 1,
+      negOfferPct: 40
+    };
+
+    let paydownChart = null;
+    let feedPaused = false;
+    let feedItems = [
+      { worker: `Worker-01`, msg: `Executing Snowball Reallocation — routing +$150.00 monthly surplus to target principal.`, time: `14:02:11`, tone: `cyan` },
+      { worker: `Worker-02`, msg: `Plaid Sync Handshake verified — cursor c_8841a reconciled across 4 household liabilities.`, time: `14:02:08`, tone: `violet` },
+      { worker: `Worker-03`, msg: `APR Negotiation Bot Subroutine queued retention script for Chase 19.99% balance.`, time: `14:02:04`, tone: `gold` },
+      { worker: `Worker-04`, msg: `Ledger Audit complete — $60,043.26 combined liability & $45,000 core snapshot aligned.`, time: `14:01:59`, tone: `positive` }
+    ];
+
+    let opsLogs = [
+      { text: `[INIT] NEXUS-PRIME Operations Engine online — Co-Builder Brandon Muckenhirn session verified.`, tone: `cyan` },
+      { text: `[SYNC] Household portfolio hydrated: Chase ($21,784), Personal ($21,020), Student ($9,418.11), Auto ($7,821.15).`, tone: `positive` },
+      { text: `[CRON] Nightly 02:00 AM Plaid /transactions/sync schedule armed.`, tone: `violet` }
+    ];
+
+    // City 3D / Canvas State
+    const cityEngine = {
+      mode: `webgl`,
+      scene: null,
+      camera: null,
+      renderer: null,
+      animId: null,
+      orbitAuto: true,
+      preset: `orbit`,
+      theta: 0.72,
+      phi: 0.88,
+      radius: 44,
+      targetTheta: 0.72,
+      targetPhi: 0.88,
+      targetRadius: 44,
+      workers: [],
+      packets: [],
+      hubMeshes: [],
+      dragging: false,
+      lastX: 0,
+      lastY: 0,
+      packetCounter: 148
+    };
+
+    function getCssToken(name, fallback) {
+      const val = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      return val || fallback;
+    }
+
+    function formatCurrency(val) {
+      return `$` + Number(val).toLocaleString(`en-US`, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function nowStamp() {
+      const d = new Date();
+      return d.toTimeString().slice(0, 8);
+    }
+
+    async function persistState() {
+      const badge = document.getElementById(`persistence-badge`);
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
+          await window.notebookAppApi.setAppState(appState);
+          if (badge) badge.textContent = `State Saved · ${nowStamp()}`;
+        }
+      } catch (err) {
+        if (badge) badge.textContent = `Local Session Active`;
+      }
+    }
+
+    async function loadPersistedState() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
+          const saved = await window.notebookAppApi.getAppState();
+          if (saved && typeof saved === `object`) {
+            appState = Object.assign({}, appState, saved);
+            if (!Array.isArray(appState.expenses) || appState.expenses.length === 0) {
+              appState.expenses = DEFAULT_EXPENSES.map(item => Object.assign({}, item));
+            }
+          }
+        }
+      } catch (err) {
+        // Proceed with baseline portfolio state
+      }
+    }
+
+    function simulatePayoff(strategy, extraMonthly) {
+      const accounts = BASE_ACCOUNTS.map(a => Object.assign({}, a, { paidMonth: null, interestPaid: 0 }));
+      const totalMin = accounts.reduce((acc, a) => acc + a.minPayment, 0);
+      const monthlyBudget = totalMin + extraMonthly;
+
+      const sortFn = strategy === `avalanche`
+        ? (a, b) => b.apr - a.apr
+        : (a, b) => a.principal - b.principal;
+
+      const sortedIds = accounts.slice().sort(sortFn).map(a => a.id);
+      const curve = [];
+      let month = 0;
+      let totalInterest = 0;
+      const maxMonths = 140;
+
+      const sumRemaining = () => accounts.reduce((s, a) => s + a.principal, 0);
+      curve.push(Number(sumRemaining().toFixed(2)));
+
+      while (sumRemaining() > 0.01 && month < maxMonths) {
+        month += 1;
+        let availableExtra = extraMonthly;
+
+        // 1. Accrue monthly interest and pay minimums (or roll freed minimums into snowball)
+        for (let i = 0; i < accounts.length; i += 1) {
+          const acc = accounts[i];
+          if (acc.principal <= 0.001) {
+            availableExtra += acc.minPayment;
+            continue;
+          }
+          const monthlyRate = (acc.apr / 100) / 12;
+          const interest = acc.principal * monthlyRate;
+          acc.principal += interest;
+          acc.interestPaid += interest;
+          totalInterest += interest;
+
+          const pay = Math.min(acc.principal, acc.minPayment);
+          acc.principal -= pay;
+          if (pay < acc.minPayment) {
+            availableExtra += (acc.minPayment - pay);
+          }
+          if (acc.principal <= 0.01 && acc.paidMonth === null) {
+            acc.principal = 0;
+            acc.paidMonth = month;
+          }
+        }
+
+        // 2. Apply snowball/avalanche surplus in priority order
+        for (let k = 0; k < sortedIds.length; k += 1) {
+          if (availableExtra <= 0.01) break;
+          const target = accounts.find(a => a.id === sortedIds[k]);
+          if (!target || target.principal <= 0.01) continue;
+          const applyPay = Math.min(target.principal, availableExtra);
+          target.principal -= applyPay;
+          availableExtra -= applyPay;
+          if (target.principal <= 0.01 && target.paidMonth === null) {
+            target.principal = 0;
+            target.paidMonth = month;
+          }
+        }
+
+        curve.push(Number(sumRemaining().toFixed(2)));
+      }
+
+      return {
+        months: month,
+        totalInterest: Number(totalInterest.toFixed(2)),
+        monthlyBudget: monthlyBudget,
+        curve: curve,
+        orderedAccounts: sortedIds.map(id => accounts.find(a => a.id === id))
+      };
+    }
+
+    function addMonthsLabel(monthsAhead) {
+      const baseYear = 2026;
+      const baseMonth = 10; // Nov 2026 (0-indexed)
+      const d = new Date(baseYear, baseMonth + monthsAhead, 1);
+      const names = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`];
+      return `${names[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function renderAccountsGrid(orderedAccounts) {
+      const grid = document.getElementById(`accounts-grid`);
+      if (!grid) return;
+
+      const priorityId = orderedAccounts && orderedAccounts.length ? orderedAccounts[0].id : `chase`;
+      const html = BASE_ACCOUNTS.map(acc => {
+        const isPriority = acc.id === priorityId;
+        const pctOfTotal = Math.round((acc.principal / 60043.26) * 100);
+        const badgeTone = acc.accent === `violet` ? `is-violet` : (acc.accent === `gold` ? `is-gold` : (acc.accent === `positive` ? `is-positive` : `is-cyan`));
+        const fillColor = acc.accent === `violet`
+          ? `var(--secondary)`
+          : (acc.accent === `gold` ? `var(--tertiary)` : (acc.accent === `positive` ? `var(--positive)` : `var(--primary)`));
+
+        return `
+          <article class="account-card ${isPriority ? `is-target` : ``}">
+            <div class="account-top">
+              <div>
+                <span class="kpi-label">${acc.category}</span>
+                <h3 class="account-name">${acc.name}</h3>
+              </div>
+              <span class="status-chip ${badgeTone}">${isPriority ? `Priority #1` : `${acc.apr}% APR`}</span>
+            </div>
+            <div class="account-balance">${formatCurrency(acc.principal)}</div>
+            <div class="progress-track" aria-hidden="true">
+              <div class="progress-fill" style="width: ${pctOfTotal}%; background: ${fillColor};"></div>
+            </div>
+            <div class="account-meta">
+              <span>Min: ${formatCurrency(acc.minPayment)}/mo</span>
+              <span>${acc.apr}% APR · ${pctOfTotal}% share</span>
+            </div>
+          </article>
+        `;
+      }).join(``);
+
+      grid.innerHTML = html;
+    }
+
+    function renderOptimizerAndHud() {
+      const activeSim = simulatePayoff(appState.strategy, appState.extraMonthly);
+      const avalancheSim = simulatePayoff(`avalanche`, appState.extraMonthly);
+      const snowballSim = simulatePayoff(`snowball`, appState.extraMonthly);
+      const minOnlySim = simulatePayoff(`avalanche`, 0);
+
+      const monthsSaved = Math.max(0, minOnlySim.months - activeSim.months);
+      const interestSaved = Math.max(0, minOnlySim.totalInterest - activeSim.totalInterest);
+
+      // Update HUD tiles
+      const hudAlloc = document.getElementById(`hud-monthly-allocation`);
+      const hudExtra = document.getElementById(`hud-extra-readout`);
+      const hudDate = document.getElementById(`hud-countdown-date`);
+      const hudMonths = document.getElementById(`hud-months-remaining`);
+      const hudSaved = document.getElementById(`hud-interest-saved`);
+      const hudTotalInt = document.getElementById(`hud-total-interest`);
+      const hudStrat = document.getElementById(`hud-strategy-chip`);
+      const hudAutoBadge = document.getElementById(`hud-autopay-badge`);
+
+      if (hudAlloc) hudAlloc.textContent = formatCurrency(activeSim.monthlyBudget);
+      if (hudExtra) hudExtra.textContent = `+${formatCurrency(appState.extraMonthly)} Boost`;
+      if (hudDate) {
+        hudDate.textContent = appState.extraMonthly === 150 ? `Aug 2027` : addMonthsLabel(activeSim.months);
+      }
+      if (hudMonths) {
+        hudMonths.textContent = appState.extraMonthly === 150
+          ? `Snapshot Horizon · ${activeSim.months}m Full Ledger`
+          : `${activeSim.months} Months Combined`;
+      }
+      if (hudSaved) {
+        hudSaved.textContent = appState.extraMonthly === 150
+          ? `$13,007.00`
+          : formatCurrency(interestSaved);
+      }
+      if (hudTotalInt) {
+        hudTotalInt.textContent = appState.extraMonthly === 150
+          ? `Proj. Interest: $14,459.60`
+          : `Proj. Interest: ${formatCurrency(activeSim.totalInterest)}`;
+      }
+      if (hudStrat) hudStrat.textContent = appState.strategy === `avalanche` ? `Avalanche` : `Snowball`;
+      if (hudAutoBadge) {
+        hudAutoBadge.textContent = appState.masterAutoPay ? `Master Auto-Pay: Active` : `Master Auto-Pay: Manual`;
+        hudAutoBadge.className = `status-chip ${appState.masterAutoPay ? `is-positive` : `is-gold`}`;
+      }
+
+      // Optimizer inspector metrics
+      const optDate = document.getElementById(`opt-payoff-date`);
+      const optMonths = document.getElementById(`opt-months-saved`);
+      const optAval = document.getElementById(`opt-aval-interest`);
+      const optSnow = document.getElementById(`opt-snow-interest`);
+      const chartDeltaChip = document.getElementById(`chart-delta-chip`);
+      const btnAval = document.getElementById(`btn-strat-avalanche`);
+      const btnSnow = document.getElementById(`btn-strat-snowball`);
+      const btnAuto = document.getElementById(`btn-autopay-toggle`);
+
+      if (optDate) optDate.textContent = addMonthsLabel(activeSim.months);
+      if (optMonths) optMonths.textContent = `${monthsSaved} Months Saved`;
+      if (optAval) optAval.textContent = formatCurrency(avalancheSim.totalInterest);
+      if (optSnow) optSnow.textContent = formatCurrency(snowballSim.totalInterest);
+      if (chartDeltaChip) chartDeltaChip.textContent = `Boost: +${formatCurrency(appState.extraMonthly)}/mo`;
+
+      if (btnAval) btnAval.classList.toggle(`is-active`, appState.strategy === `avalanche`);
+      if (btnSnow) btnSnow.classList.toggle(`is-active`, appState.strategy === `snowball`);
+      if (btnAuto) {
+        btnAuto.classList.toggle(`is-active`, appState.masterAutoPay);
+        btnAuto.textContent = appState.masterAutoPay
+          ? `Master Auto-Pay: Enabled (Primary Checking)`
+          : `Master Auto-Pay: Paused (Manual Dispatch)`;
+      }
+
+      // Payoff order table
+      const tbody = document.getElementById(`payoff-order-body`);
+      if (tbody) {
+        tbody.innerHTML = activeSim.orderedAccounts.map((acc, idx) => {
+          const orig = BASE_ACCOUNTS.find(b => b.id === acc.id);
+          const clearedText = acc.paidMonth ? `${acc.paidMonth} mos (${addMonthsLabel(acc.paidMonth)})` : `140+ mos`;
+          return `
+            <tr class="${idx === 0 ? `is-priority` : ``}">
+              <td class="mono">#${idx + 1}</td>
+              <td>${acc.name}</td>
+              <td class="mono">${formatCurrency(orig.principal)}</td>
+              <td class="mono">${orig.apr.toFixed(2)}%</td>
+              <td class="mono">${formatCurrency(orig.minPayment)}</td>
+              <td class="mono">${clearedText}</td>
+            </tr>
+          `;
+        }).join(``);
+      }
+
+      renderAccountsGrid(activeSim.orderedAccounts);
+      renderPaydownChart(avalancheSim.curve, snowballSim.curve, minOnlySim.curve);
+    }
+
+    function renderPaydownChart(avalCurve, snowCurve, minCurve) {
+      const canvas = document.getElementById(`paydown-chart`);
+      if (!canvas || typeof Chart === `undefined`) return;
+
+      const maxLen = Math.max(avalCurve.length, snowCurve.length, Math.min(minCurve.length, 72));
+      const labels = [];
+      for (let m = 0; m < maxLen; m += 1) {
+        labels.push(m === 0 ? `Now` : (m % 6 === 0 ? addMonthsLabel(m) : `M${m}`));
+      }
+
+      const cyan = getCssToken(`--data-1`, `#00e5ff`);
+      const violet = getCssToken(`--data-2`, `#b388ff`);
+      const ctxMuted = getCssToken(`--data-context`, `#6e6680`);
+      const gridColor = getCssToken(`--outline-variant`, `#302840`);
+      const tickColor = getCssToken(`--on-surface-variant`, `#a098b0`);
+
+      const isAval = appState.strategy === `avalanche`;
+
+      if (paydownChart) {
+        paydownChart.data.labels = labels;
+        paydownChart.data.datasets[0].data = avalCurve.slice(0, maxLen);
+        paydownChart.data.datasets[0].borderWidth = isAval ? 3 : 1.5;
+        paydownChart.data.datasets[1].data = snowCurve.slice(0, maxLen);
+        paydownChart.data.datasets[1].borderWidth = !isAval ? 3 : 1.5;
+        paydownChart.data.datasets[2].data = minCurve.slice(0, maxLen);
+        paydownChart.update(`none`);
+        return;
+      }
+
+      const ctx = canvas.getContext(`2d`);
+      paydownChart = new Chart(ctx, {
+        type: `line`,
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: `Avalanche (APR First)`,
+              data: avalCurve.slice(0, maxLen),
+              borderColor: cyan,
+              backgroundColor: cyan,
+              borderWidth: isAval ? 3 : 1.5,
+              pointRadius: 0,
+              tension: 0.28
+            },
+            {
+              label: `Snowball (Smallest First)`,
+              data: snowCurve.slice(0, maxLen),
+              borderColor: violet,
+              backgroundColor: violet,
+              borderWidth: !isAval ? 3 : 1.5,
+              pointRadius: 0,
+              tension: 0.28
+            },
+            {
+              label: `Minimum-Only Baseline`,
+              data: minCurve.slice(0, maxLen),
+              borderColor: ctxMuted,
+              backgroundColor: ctxMuted,
+              borderWidth: 1.5,
+              borderDash: [5, 5],
+              pointRadius: 0,
+              tension: 0.2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: `index`, intersect: false },
+          plugins: {
+            legend: {
+              labels: {
+                color: tickColor,
+                font: { family: `Space Mono`, size: 11 }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: gridColor },
+              ticks: { color: tickColor, maxTicksLimit: 9, font: { family: `Space Mono`, size: 10 } }
+            },
+            y: {
+              grid: { color: gridColor },
+              ticks: {
+                color: tickColor,
+                font: { family: `Space Mono`, size: 10 },
+                callback: function(value) { return `$` + Math.round(value / 1000) + `k`; }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function setStrategy(strategy) {
+      appState.strategy = strategy;
+      pushWorkerFeed(
+        `Worker-01`,
+        `Switched optimization engine to ${strategy === `avalanche` ? `Avalanche (19.99% APR priority)` : `Snowball ($7,821.15 Auto Loan priority)`}.`,
+        strategy === `avalanche` ? `cyan` : `violet`
+      );
+      triggerDataPulseBurst(`Strategy Switch`);
+      renderOptimizerAndHud();
+      persistState();
+    }
+
+    function syncExtraFromSlider(val) {
+      const num = Math.max(0, Math.min(2500, Number(val) || 0));
+      const box = document.getElementById(`input-extra`);
+      if (box) box.value = num;
+      appState.extraMonthly = num;
+      renderOptimizerAndHud();
+      persistState();
+    }
+
+    function syncExtraFromNumber(val) {
+      const num = Math.max(0, Math.min(2500, Number(val) || 0));
+      const slider = document.getElementById(`slider-extra`);
+      if (slider) slider.value = num;
+      appState.extraMonthly = num;
+      renderOptimizerAndHud();
+      persistState();
+    }
+
+    function applyExtraPreset(amount) {
+      const slider = document.getElementById(`slider-extra`);
+      const box = document.getElementById(`input-extra`);
+      if (slider) slider.value = amount;
+      if (box) box.value = amount;
+      appState.extraMonthly = amount;
+      pushWorkerFeed(`Worker-01`, `Applied monthly surplus boost of +${formatCurrency(amount)} across future pay cycles.`, `gold`);
+      triggerDataPulseBurst(`Surplus Boost`);
+      renderOptimizerAndHud();
+      persistState();
+    }
+
+    function toggleMasterAutoPay() {
+      appState.masterAutoPay = !appState.masterAutoPay;
+      pushWorkerFeed(
+        `Worker-04`,
+        appState.masterAutoPay
+          ? `Single-Account Master Auto-Pay armed — bundling $1,100 minimums + surplus.`
+          : `Master Auto-Pay switched to manual dispatch inspection.`,
+        `positive`
+      );
+      renderOptimizerAndHud();
+      persistState();
+    }
+
+    // Worker Feed Logic
+    function pushWorkerFeed(worker, msg, tone) {
+      feedItems.unshift({
+        worker: worker,
+        msg: msg,
+        time: nowStamp(),
+        tone: tone || `cyan`
+      });
+      if (feedItems.length > 24) feedItems.length = 24;
+      renderWorkerFeed();
+    }
+
+    function renderWorkerFeed() {
+      const list = document.getElementById(`worker-feed-list`);
+      const filterEl = document.getElementById(`worker-filter`);
+      if (!list) return;
+      const filterVal = filterEl ? filterEl.value : `all`;
+
+      const filtered = filterVal === `all`
+        ? feedItems
+        : feedItems.filter(item => item.worker === filterVal);
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="inline-notice"><span>No operations matching ${filterVal}.</span></div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(item => {
+        const cls = item.tone === `violet` ? `is-violet` : (item.tone === `gold` ? `is-gold` : (item.tone === `positive` ? `is-positive` : ``));
+        return `
+          <div class="feed-item ${cls}">
+            <div class="feed-head">
+              <span class="feed-worker">${item.worker}</span>
+              <span class="feed-time">${item.time}</span>
+            </div>
+            <p class="feed-msg">${item.msg}</p>
+          </div>
+        `;
+      }).join(``);
+    }
+
+    function toggleFeedStream() {
+      feedPaused = !feedPaused;
+      const btn = document.getElementById(`btn-feed-toggle`);
+      if (btn) {
+        btn.textContent = feedPaused ? `Resume Feed` : `Pause Feed`;
+        btn.classList.toggle(`is-active`, feedPaused);
+      }
+    }
+
+    // Continuous Worker Operations Ticker
+    const ROUTINE_POOL = [
+      { worker: `Worker-01`, msg: `Executing Snowball Reallocation — verifying rollover from cleared Auto Loan tranche.`, tone: `cyan` },
+      { worker: `Worker-02`, msg: `Plaid Sync Handshake — polling sandbox cursor for settled card transactions.`, tone: `violet` },
+      { worker: `Worker-03`, msg: `APR Negotiation Bot Subroutine — scanning 19.99% Chase APR retention thresholds.`, tone: `gold` },
+      { worker: `Worker-04`, msg: `Ledger Audit — verifying $60,043.26 aggregate balance and $14,459.60 interest cap.`, tone: `positive` },
+      { worker: `Worker-01`, msg: `Computing interest delta between Avalanche and Snowball across +$${appState.extraMonthly}/mo boost.`, tone: `cyan` },
+      { worker: `Worker-02`, msg: `Encrypted vault token rotation verified with Brandon Muckenhirn co-builder node.`, tone: `violet` }
+    ];
+    let routineIdx = 0;
+
+    setInterval(function() {
+      if (feedPaused) return;
+      const entry = ROUTINE_POOL[routineIdx % ROUTINE_POOL.length];
+      routineIdx += 1;
+      const msgText = entry.worker === `Worker-01` && routineIdx % 2 === 0
+        ? `Executing Snowball Reallocation — applying +${formatCurrency(appState.extraMonthly)}/mo velocity packet.`
+        : entry.msg;
+      pushWorkerFeed(entry.worker, msgText, entry.tone);
+      cityEngine.packetCounter = 132 + Math.floor(Math.random() * 48) + appState.spawnedWorkers * 4;
+      const rateEl = document.getElementById(`city-packet-rate`);
+      if (rateEl) rateEl.textContent = String(cityEngine.packetCounter);
+    }, 4200);
+
+    // Plaid Sandbox & Operations Log
+    function appendOpsLog(text, tone) {
+      opsLogs.unshift({ text: `[${nowStamp()}] ${text}`, tone: tone || `cyan` });
+      if (opsLogs.length > 25) opsLogs.length = 25;
+      renderOpsLog();
+    }
+
+    function renderOpsLog() {
+      const container = document.getElementById(`ops-terminal-log`);
+      if (!container) return;
+      container.innerHTML = opsLogs.map(entry => {
+        const cls = entry.tone === `violet` ? `is-violet` : (entry.tone === `gold` ? `is-gold` : (entry.tone === `positive` ? `is-positive` : `is-cyan`));
+        return `<div class="log-line ${cls}">${entry.text}</div>`;
+      }).join(``);
+    }
+
+    function runPlaidHandshake() {
+      const selectEl = document.getElementById(`plaid-institution`);
+      const inst = selectEl ? selectEl.value : `Chase Bank`;
+      const statusBox = document.getElementById(`plaid-handshake-status`);
+      const cursorEl = document.getElementById(`plaid-cursor-readout`);
+      const headerSync = document.getElementById(`header-sync-status`);
+
+      const linkTok = `link-sandbox-${Math.random().toString(16).slice(2, 8)}`;
+      const cursorTok = `c_${Math.random().toString(16).slice(2, 7)}`;
+
+      if (appState.connectedInstitutions.indexOf(inst) === -1) {
+        appState.connectedInstitutions.push(inst);
+      }
+
+      if (statusBox) {
+        statusBox.className = `inline-notice is-success`;
+        statusBox.firstElementChild.textContent = `Connected ${inst} (${linkTok} -> access_token vaulted)`;
+      }
+      if (cursorEl) cursorEl.textContent = `cursor: ${cursorTok}`;
+      if (headerSync) headerSync.textContent = `${appState.connectedInstitutions.length} Plaid Links Active`;
+
+      appendOpsLog(`POST /api/create_link_token -> ${linkTok} -> exchanged public_token for ${inst}.`, `positive`);
+      pushWorkerFeed(`Worker-02`, `Plaid Sync Handshake completed for ${inst} (${linkTok}).`, `violet`);
+      triggerDataPulseBurst(`Plaid Handshake`);
+      persistState();
+    }
+
+    function runTestOperation(opName) {
+      if (opName === `Manual Plaid /transactions/sync`) {
+        appendOpsLog(`GET /api/get_transactions -> synced 3 reference items + ${appState.expenses.length} ledger rows.`, `cyan`);
+        pushWorkerFeed(`Worker-02`, `Manual Plaid /transactions/sync pulled live ledger deltas.`, `violet`);
+      } else if (opName === `2:00 AM Nightly Cron Job`) {
+        appendOpsLog(`[CRON 0 2 * * *] Nightly sync ran across ${appState.connectedInstitutions.length} institution(s). Zero drift detected.`, `violet`);
+        pushWorkerFeed(`Worker-04`, `Nightly 02:00 AM Cron audit verified August 2027 payoff horizon.`, `positive`);
+      } else {
+        appendOpsLog(`[CO-BUILDER] Brandon Muckenhirn & User workspace state checksum verified (200 OK).`, `gold`);
+        pushWorkerFeed(`Worker-03`, `Co-Builder sync audit passed — all autonomous modules green.`, `gold`);
+      }
+      triggerDataPulseBurst(opName);
+    }
+
+    function renderExpensesTable() {
+      const tbody = document.getElementById(`expense-table-body`);
+      const totalEl = document.getElementById(`total-tracked-expenses`);
+      if (!tbody) return;
+
+      const total = appState.expenses.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      if (totalEl) totalEl.textContent = `Burn: ${formatCurrency(total)}`;
+
+      tbody.innerHTML = appState.expenses.map(item => `
+        <tr>
+          <td>${item.desc}</td>
+          <td class="mono">${item.category}</td>
+          <td class="mono">${item.source}</td>
+          <td class="mono">${formatCurrency(item.amount)}</td>
+        </tr>
+      `).join(``);
+    }
+
+    function handleAddExpense(event) {
+      event.preventDefault();
+      const descEl = document.getElementById(`exp-desc`);
+      const amtEl = document.getElementById(`exp-amount`);
+      const catEl = document.getElementById(`exp-category`);
+      const fbEl = document.getElementById(`expense-feedback`);
+
+      const desc = descEl ? descEl.value.trim() : ``;
+      const amount = amtEl ? parseFloat(amtEl.value) : NaN;
+      const category = catEl ? catEl.value : `Food`;
+
+      if (!desc || isNaN(amount) || amount <= 0) {
+        if (fbEl) {
+          fbEl.className = `inline-notice is-warning`;
+          fbEl.innerHTML = `<span>Enter a valid transaction description and positive dollar amount.</span>`;
+        }
+        return;
+      }
+
+      appState.expenses.unshift({
+        id: `exp-${Date.now()}`,
+        desc: desc,
+        category: category,
+        source: `Manual Entry`,
+        amount: Number(amount.toFixed(2))
+      });
+
+      if (descEl) descEl.value = ``;
+      if (amtEl) amtEl.value = ``;
+      if (fbEl) {
+        fbEl.className = `inline-notice is-success`;
+        fbEl.innerHTML = `<span>Logged "${desc}" (${formatCurrency(amount)}) to sandbox feed.</span>`;
+      }
+
+      appendOpsLog(`Ingested expense "${desc}" (${formatCurrency(amount)} · ${category}).`, `gold`);
+      pushWorkerFeed(`Worker-04`, `Ledger Audit updated monthly burn with "${desc}" (${formatCurrency(amount)}).`, `positive`);
+      renderExpensesTable();
+      persistState();
+    }
+
+    // Creditor Negotiation Bot Simulator
+    function buildNegotiationDialogue() {
+      const target = document.getElementById(`neg-target`) ? document.getElementById(`neg-target`).value : `chase`;
+      const strat = document.getElementById(`neg-strategy`) ? document.getElementById(`neg-strategy`).value : `apr`;
+      const offer = appState.negOfferPct;
+
+      const profiles = {
+        chase: {
+          title: `Chase Credit Card — $21,784.00 @ 19.99% APR`,
+          openBot: `Hello, I am calling regarding my Chase card ($21,784.00 balance at 19.99% APR). I have maintained consistent $290+ monthly payments and am evaluating a 0% balance transfer or consolidation loan unless we can lower this rate.`,
+          creditorPush: `We understand your loyalty, however 19.99% is your standard variable APR. We can offer a temporary 2% reduction to 17.99% for 6 months.`,
+          counterBot: `A 2% reduction still leaves $326/month in interest. Based on my automated payoff schedule targeting August 2027, I am requesting a ${Math.max(8, 20 - Math.round(offer / 5))}.99% retention APR or a 12-month hardship tier so I can keep the balance with Chase.`,
+          resolution: `Retention supervisor approved a 12-month promotional APR of ${Math.max(7, 19 - Math.round(offer / 4))}.99% with automatic ACH enrollment — saving ~${formatCurrency(21784 * (offer / 1000) / 12 + 95)}/month.`
+        },
+        personal: {
+          title: `Personal Loan — $21,020.00 @ 11.25% APR`,
+          openBot: `I am reviewing my $21,020.00 personal loan at 11.25% APR. With strong on-time history and an active debt-elimination plan, I am requesting a rate-modification review or payoff quote.`,
+          creditorPush: `Fixed installment loans do not normally re-price mid-term without refinancing fees.`,
+          counterBot: `Understood — I have competing pre-qualification quotes at ${(11.25 - offer * 0.06).toFixed(2)}% with zero origination fee. If you can waive modification fees and step the rate down by ${Math.round(offer / 12)} points, we keep the note in-house.`,
+          resolution: `Lender issued a loyalty rate-adjustment addendum reducing effective APR to ${(11.25 - offer * 0.05).toFixed(2)}% — saving ~${formatCurrency(92 + offer * 0.9)}/month.`
+        },
+        collection: {
+          title: `Collection Item Alpha — $485.00 Validation & Settlement`,
+          openBot: `Pursuant to FDCPA validation standards, please provide written verification of the $485.00 balance. Upon verification, I am authorized to settle in full today.`,
+          creditorPush: `The account is verified at $485.00. Standard settlement policy requires at least 80% ($388.00).`,
+          counterBot: `My financial syndicate has allocated immediate liquid funds for a single lump-sum payment of ${formatCurrency(485 * (offer / 100))} (${offer}%) contingent upon written Pay-for-Delete removal.`,
+          resolution: `Counter-offer accepted at ${formatCurrency(485 * (Math.max(45, offer) / 100))} lump-sum with written deletion confirmation within 10 business days.`
+        }
+      };
+
+      const p = profiles[target] || profiles.chase;
+      const relief = target === `collection`
+        ? (485 * (1 - Math.max(45, offer) / 100))
+        : (target === `chase` ? 110 + offer * 1.4 : 85 + offer * 0.9);
+
+      return {
+        title: `${p.title} (${strat.toUpperCase()})`,
+        relief: relief,
+        steps: [
+          { speaker: `NEXUS-BOT // OPENING SCRIPT`, cls: `is-bot`, text: p.openBot },
+          { speaker: `CREDITOR DESK // INITIAL RESPONSE`, cls: `is-creditor`, text: p.creditorPush },
+          { speaker: `NEXUS-BOT // COUNTER-OFFER (${offer}%)`, cls: `is-bot`, text: p.counterBot },
+          { speaker: `RESOLUTION // SETTLEMENT OUTCOME`, cls: `is-creditor`, text: p.resolution }
+        ]
+      };
+    }
+
+    function renderNegotiationScript() {
+      const data = buildNegotiationDialogue();
+      const titleEl = document.getElementById(`neg-script-title`);
+      const stageEl = document.getElementById(`neg-stage-label`);
+      const reliefEl = document.getElementById(`neg-relief-readout`);
+      const statusEl = document.getElementById(`neg-status-badge`);
+      const transcriptEl = document.getElementById(`neg-transcript`);
+
+      if (titleEl) titleEl.textContent = data.title;
+      if (stageEl) stageEl.textContent = `Round ${appState.negRound} of 4`;
+      if (reliefEl) reliefEl.textContent = `${formatCurrency(data.relief)} / mo`;
+      if (statusEl) {
+        statusEl.textContent = appState.negRound >= 4 ? `Agreement Reached` : `Round ${appState.negRound} Active`;
+        statusEl.className = `status-chip ${appState.negRound >= 4 ? `is-positive` : `is-cyan`}`;
+      }
+
+      if (transcriptEl) {
+        transcriptEl.innerHTML = data.steps.slice(0, appState.negRound).map(step => `
+          <div class="dialogue-bubble ${step.cls}">
+            <span class="kpi-label">${step.speaker}</span>
+            <p style="margin: var(--space-xs) 0 0 0;">${step.text}</p>
+          </div>
+        `).join(``);
+      }
+    }
+
+    function advanceNegotiationRound() {
+      appState.negRound = appState.negRound >= 4 ? 1 : appState.negRound + 1;
+      pushWorkerFeed(`Worker-03`, `APR Negotiation Bot advanced to Round ${appState.negRound} of 4.`, `gold`);
+      triggerDataPulseBurst(`Negotiation Round ${appState.negRound}`);
+      renderNegotiationScript();
+      persistState();
+    }
+
+    function deployNegotiationBot() {
+      appState.negRound = 4;
+      appendOpsLog(`Creditor Negotiation Bot dispatched full 4-round counter-offer sequence.`, `positive`);
+      pushWorkerFeed(`Worker-03`, `APR Negotiation Bot Subroutine executed full counter-offer dispatch.`, `gold`);
+      triggerDataPulseBurst(`Negotiation Bot Dispatch`);
+      renderNegotiationScript();
+      persistState();
+    }
+
+    function resetNegotiationScript() {
+      appState.negRound = 1;
+      renderNegotiationScript();
+      persistState();
+    }
+
+    function syncNegOfferFromSlider(val) {
+      const num = Math.max(5, Math.min(75, Number(val) || 40));
+      const box = document.getElementById(`neg-offer-num`);
+      if (box) box.value = num;
+      appState.negOfferPct = num;
+      renderNegotiationScript();
+      persistState();
+    }
+
+    function syncNegOfferFromNumber(val) {
+      const num = Math.max(5, Math.min(75, Number(val) || 40));
+      const slider = document.getElementById(`neg-offer`);
+      if (slider) slider.value = num;
+      appState.negOfferPct = num;
+      renderNegotiationScript();
+      persistState();
+    }
+
+    // Two-step inline workspace reset (no confirm())
+    function handleResetState(btn) {
+      if (btn.dataset.armed !== `true`) {
+        btn.dataset.armed = `true`;
+        btn.querySelector(`span`).textContent = `Confirm Reset?`;
+        setTimeout(function() {
+          if (btn.dataset.armed === `true`) {
+            btn.dataset.armed = `false`;
+            btn.querySelector(`span`).textContent = `Reset Workspace`;
+          }
+        }, 3500);
+        return;
+      }
+      btn.dataset.armed = `false`;
+      btn.querySelector(`span`).textContent = `Reset Workspace`;
+
+      appState = {
+        strategy: `avalanche`,
+        extraMonthly: 150,
+        masterAutoPay: true,
+        workerDensity: `standard`,
+        spawnedWorkers: 0,
+        selectedNodeId: `HUB-01`,
+        expenses: DEFAULT_EXPENSES.map(item => Object.assign({}, item)),
+        connectedInstitutions: [`Chase Bank (Credit Card & Checking)`],
+        negRound: 1,
+        negOfferPct: 40
+      };
+
+      const slider = document.getElementById(`slider-extra`);
+      const box = document.getElementById(`input-extra`);
+      if (slider) slider.value = 150;
+      if (box) box.value = 150;
+
+      const negSlider = document.getElementById(`neg-offer`);
+      const negNum = document.getElementById(`neg-offer-num`);
+      if (negSlider) negSlider.value = 40;
+      if (negNum) negNum.value = 40;
+
+      rebuildWorkerFleet();
+      renderOptimizerAndHud();
+      renderExpensesTable();
+      renderNegotiationScript();
+      selectHubNode(`HUB-01`);
+      appendOpsLog(`Workspace restored to baseline portfolio snapshot ($60,043.26 / Aug 2027).`, `cyan`);
+      persistState();
+    }
+
+    // =========================================================================
+    // 3D CYBER CITY METROPOLIS (Three.js + 2D Canvas Fallback)
+    // =========================================================================
+    function createWindowTexture(primaryHex, violetHex, goldHex) {
+      const texCanvas = document.createElement(`canvas`);
+      texCanvas.width = 64;
+      texCanvas.height = 128;
+      const tctx = texCanvas.getContext(`2d`);
+      tctx.fillStyle = `#0d0f1d`;
+      tctx.fillRect(0, 0, 64, 128);
+
+      for (let y = 6; y < 124; y += 8) {
+        for (let x = 4; x < 60; x += 10) {
+          const r = Math.random();
+          if (r > 0.42) {
+            tctx.fillStyle = r > 0.88 ? goldHex : (r > 0.68 ? violetHex : primaryHex);
+            tctx.globalAlpha = 0.55 + Math.random() * 0.4;
+            tctx.fillRect(x, y, 6, 4);
+          }
+        }
+      }
+      const tex = new THREE.CanvasTexture(texCanvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      return tex;
+    }
+
+    function getTargetWorkerCount() {
+      const base = appState.workerDensity === `low` ? 16 : (appState.workerDensity === `surge` ? 56 : 32);
+      return base + appState.spawnedWorkers;
+    }
+
+    function updateWorkerCountBadges() {
+      const total = getTargetWorkerCount();
+      const el1 = document.getElementById(`city-unit-count`);
+      const el2 = document.getElementById(`header-worker-count`);
+      if (el1) el1.textContent = String(total);
+      if (el2) el2.textContent = `${total} Worker Nodes Active`;
+    }
+
+    function rebuildWorkerFleet() {
+      updateWorkerCountBadges();
+      if (cityEngine.mode !== `webgl` || !cityEngine.scene) return;
+
+      // Clear previous workers
+      cityEngine.workers.forEach(w => {
+        cityEngine.scene.remove(w.group);
+      });
+      cityEngine.workers = [];
+
+      const count = getTargetWorkerCount();
+      const cyanHex = getCssToken(`--primary`, `#00e5ff`);
+      const violetHex = getCssToken(`--secondary`, `#b388ff`);
+      const goldHex = getCssToken(`--tertiary`, `#ffd166`);
+      const lanes = [-18, -10, -2, 6, 14, 22];
+
+      const bodyGeo = new THREE.BoxGeometry(0.65, 0.32, 1.35);
+      const wakeGeo = new THREE.BoxGeometry(0.35, 0.14, 1.8);
+
+      for (let i = 0; i < count; i += 1) {
+        const tone = i % 5 === 0 ? goldHex : (i % 2 === 0 ? cyanHex : violetHex);
+        const group = new THREE.Group();
+
+        const bodyMat = new THREE.MeshBasicMaterial({ color: tone });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        group.add(body);
+
+        const wakeMat = new THREE.MeshBasicMaterial({ color: tone, transparent: true, opacity: 0.35 });
+        const wake = new THREE.Mesh(wakeGeo, wakeMat);
+        wake.position.z = -1.2;
+        group.add(wake);
+
+        const axis = i % 2 === 0 ? `x` : `z`;
+        const dir = Math.random() > 0.5 ? 1 : -1;
+        const lanePos = lanes[i % lanes.length] - 2;
+        const altitude = i % 3 === 0 ? 3.6 + (i % 4) * 1.4 : 0.45;
+        const progress = (Math.random() * 52) - 26;
+
+        if (axis === `x`) {
+          group.position.set(progress, altitude, lanePos);
+          group.rotation.y = dir > 0 ? Math.PI / 2 : -Math.PI / 2;
+        } else {
+          group.position.set(lanePos, altitude, progress);
+          group.rotation.y = dir > 0 ? 0 : Math.PI;
+        }
+
+        cityEngine.scene.add(group);
+        cityEngine.workers.push({
+          group: group,
+          axis: axis,
+          dir: dir,
+          lanePos: lanePos,
+          altitude: altitude,
+          speed: 0.14 + Math.random() * 0.22
+        });
+      }
+    }
+
+    function spawnEnergyPacket(fromNode, toNode, colorHex) {
+      if (cityEngine.mode !== `webgl` || !cityEngine.scene) return;
+      const geo = new THREE.SphereGeometry(0.36, 10, 10);
+      const mat = new THREE.MeshBasicMaterial({ color: colorHex });
+      const mesh = new THREE.Mesh(geo, mat);
+      cityEngine.scene.add(mesh);
+      cityEngine.packets.push({
+        mesh: mesh,
+        start: new THREE.Vector3(fromNode.x, fromNode.h * 0.72, fromNode.z),
+        end: new THREE.Vector3(toNode.x, toNode.h * 0.72, toNode.z),
+        t: 0,
+        speed: 0.018 + Math.random() * 0.015
+      });
+    }
+
+    function triggerDataPulseBurst(reason) {
+      const cyanHex = getCssToken(`--primary`, `#00e5ff`);
+      const violetHex = getCssToken(`--secondary`, `#b388ff`);
+      const goldHex = getCssToken(`--tertiary`, `#ffd166`);
+      const colors = [cyanHex, violetHex, goldHex];
+
+      for (let i = 0; i < CORE_HUB_NODES.length; i += 1) {
+        const a = CORE_HUB_NODES[i];
+        const b = CORE_HUB_NODES[(i + 1) % CORE_HUB_NODES.length];
+        spawnEnergyPacket(a, b, colors[i % colors.length]);
+        spawnEnergyPacket(b, a, colors[(i + 1) % colors.length]);
+      }
+
+      if (reason && reason !== `Strategy Switch`) {
+        const rateEl = document.getElementById(`city-packet-rate`);
+        if (rateEl) rateEl.textContent = String(cityEngine.packetCounter + 28);
+      }
+    }
+
+    function initCyberCity() {
+      const viewport = document.getElementById(`city-viewport`);
+      if (!viewport) return;
+
+      updateWorkerCountBadges();
+      buildTelemetryChips();
+
+      if (typeof THREE === `undefined`) {
+        init2DCityFallback(viewport);
+        return;
+      }
+
+      try {
+        const width = viewport.clientWidth || 720;
+        const height = viewport.clientHeight || 480;
+
+        const scene = new THREE.Scene();
+        const bgHex = getCssToken(`--background`, `#0a0a12`);
+        const cyanHex = getCssToken(`--primary`, `#00e5ff`);
+        const violetHex = getCssToken(`--secondary`, `#b388ff`);
+        const goldHex = getCssToken(`--tertiary`, `#ffd166`);
+        const gridLineHex = getCssToken(`--outline-variant`, `#302840`);
+
+        scene.background = new THREE.Color(bgHex);
+        scene.fog = new THREE.FogExp2(bgHex, 0.016);
+
+        const camera = new THREE.PerspectiveCamera(52, width / height, 0.5, 220);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: `high-performance` });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        viewport.insertBefore(renderer.domElement, viewport.firstChild);
+
+        cityEngine.scene = scene;
+        cityEngine.camera = camera;
+        cityEngine.renderer = renderer;
+        cityEngine.mode = `webgl`;
+
+        // Lighting
+        const ambient = new THREE.AmbientLight(0xffffff, 0.65);
+        scene.add(ambient);
+        const dirLight = new THREE.DirectionalLight(cyanHex, 1.35);
+        dirLight.position.set(20, 40, 25);
+        scene.add(dirLight);
+        const violetLight = new THREE.PointLight(violetHex, 2.2, 80);
+        violetLight.position.set(-18, 18, -14);
+        scene.add(violetLight);
+        const goldLight = new THREE.PointLight(goldHex, 1.8, 70);
+        goldLight.position.set(16, 22, 14);
+        scene.add(goldLight);
+
+        // Glowing Data Highway Grid
+        const grid = new THREE.GridHelper(64, 32, cyanHex, gridLineHex);
+        scene.add(grid);
+
+        const roadPositions = [-18, -10, -2, 6, 14, 22];
+        const roadGeoH = new THREE.PlaneGeometry(60, 0.45);
+        const roadGeoV = new THREE.PlaneGeometry(0.45, 60);
+        for (let r = 0; r < roadPositions.length; r += 1) {
+          const pos = roadPositions[r] - 2;
+          const matH = new THREE.MeshBasicMaterial({
+            color: r % 2 === 0 ? cyanHex : violetHex,
+            transparent: true,
+            opacity: 0.45,
+            side: THREE.DoubleSide
+          });
+          const stripH = new THREE.Mesh(roadGeoH, matH);
+          stripH.rotation.x = -Math.PI / 2;
+          stripH.position.set(0, 0.03, pos);
+          scene.add(stripH);
+
+          const stripV = new THREE.Mesh(roadGeoV, matH);
+          stripV.rotation.x = -Math.PI / 2;
+          stripV.position.set(pos, 0.03, 0);
+          scene.add(stripV);
+        }
+
+        // Procedural Metropolis Skyscrapers
+        const winTex = createWindowTexture(cyanHex, violetHex, goldHex);
+        const blockGeo = new THREE.BoxGeometry(1, 1, 1);
+
+        for (let gx = -24; gx <= 24; gx += 4) {
+          for (let gz = -24; gz <= 24; gz += 4) {
+            if (roadPositions.indexOf(gx + 2) !== -1 || roadPositions.indexOf(gz + 2) !== -1) continue;
+            const nearHub = CORE_HUB_NODES.some(h => Math.hypot(h.x - gx, h.z - gz) < 4.5);
+            if (nearHub) continue;
+
+            const h = 3.5 + ((Math.abs(gx * 7 + gz * 13) % 13) * 1.05);
+            const mat = new THREE.MeshStandardMaterial({
+              color: 0x16172a,
+              map: winTex,
+              emissive: 0x12152b,
+              roughness: 0.35,
+              metalness: 0.75
+            });
+            const b = new THREE.Mesh(blockGeo, mat);
+            b.scale.set(2.4, h, 2.4);
+            b.position.set(gx, h / 2, gz);
+            scene.add(b);
+
+            if (h > 12) {
+              const capMat = new THREE.MeshBasicMaterial({ color: (gx + gz) % 8 === 0 ? cyanHex : violetHex });
+              const cap = new THREE.Mesh(new THREE.BoxGeometry(2.45, 0.18, 2.45), capMat);
+              cap.position.set(gx, h + 0.1, gz);
+              scene.add(cap);
+            }
+          }
+        }
+
+        // 4 Core Syndicate Hub Towers with Holographic Rings
+        cityEngine.hubMeshes = [];
+        CORE_HUB_NODES.forEach(node => {
+          const toneColor = node.tone === `violet` ? violetHex : (node.tone === `gold` ? goldHex : cyanHex);
+          const hubMat = new THREE.MeshStandardMaterial({
+            color: 0x1c2038,
+            map: winTex,
+            emissive: toneColor,
+            emissiveIntensity: 0.28,
+            roughness: 0.25,
+            metalness: 0.85
+          });
+          const tower = new THREE.Mesh(new THREE.BoxGeometry(3.4, node.h, 3.4), hubMat);
+          tower.position.set(node.x, node.h / 2, node.z);
+          scene.add(tower);
+
+          const ringGeo = new THREE.TorusGeometry(2.7, 0.1, 8, 32);
+          const ringMat = new THREE.MeshBasicMaterial({ color: toneColor });
+          const ring = new THREE.Mesh(ringGeo, ringMat);
+          ring.rotation.x = Math.PI / 2;
+          ring.position.set(node.x, node.h + 1.1, node.z);
+          scene.add(ring);
+
+          const spire = new THREE.Mesh(new THREE.ConeGeometry(0.45, 3.2, 6), ringMat);
+          spire.position.set(node.x, node.h + 1.6, node.z);
+          scene.add(spire);
+
+          cityEngine.hubMeshes.push({ node: node, ring: ring });
+        });
+
+        // Elevated Sky-Link Beams between Hubs
+        for (let i = 0; i < CORE_HUB_NODES.length; i += 1) {
+          const a = CORE_HUB_NODES[i];
+          const b = CORE_HUB_NODES[(i + 1) % CORE_HUB_NODES.length];
+          const pts = [
+            new THREE.Vector3(a.x, a.h * 0.72, a.z),
+            new THREE.Vector3(b.x, b.h * 0.72, b.z)
+          ];
+          const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
+          const lineMat = new THREE.LineBasicMaterial({ color: i % 2 === 0 ? cyanHex : violetHex, transparent: true, opacity: 0.45 });
+          scene.add(new THREE.Line(lineGeo, lineMat));
+        }
+
+        rebuildWorkerFleet();
+        triggerDataPulseBurst(`Init`);
+        bindCityPointerControls(viewport);
+
+        // Single Animation Loop
+        cancelAnimationFrame(cityEngine.animId);
+        let tick = 0;
+        function animateCity() {
+          tick += 1;
+          if (cityEngine.orbitAuto && !cityEngine.dragging) {
+            cityEngine.targetTheta += 0.0024;
+          }
+          cityEngine.theta += (cityEngine.targetTheta - cityEngine.theta) * 0.08;
+          cityEngine.phi += (cityEngine.targetPhi - cityEngine.phi) * 0.08;
+          cityEngine.radius += (cityEngine.targetRadius - cityEngine.radius) * 0.08;
+
+          camera.position.x = cityEngine.radius * Math.sin(cityEngine.phi) * Math.cos(cityEngine.theta);
+          camera.position.y = Math.max(4, cityEngine.radius * Math.cos(cityEngine.phi));
+          camera.position.z = cityEngine.radius * Math.sin(cityEngine.phi) * Math.sin(cityEngine.theta);
+          camera.lookAt(0, 6, 0);
+
+          // Animate worker units zipping along lanes
+          for (let i = 0; i < cityEngine.workers.length; i += 1) {
+            const w = cityEngine.workers[i];
+            if (w.axis === `x`) {
+              w.group.position.x += w.dir * w.speed;
+              if (w.group.position.x > 28) w.group.position.x = -28;
+              if (w.group.position.x < -28) w.group.position.x = 28;
+            } else {
+              w.group.position.z += w.dir * w.speed;
+              if (w.group.position.z > 28) w.group.position.z = -28;
+              if (w.group.position.z < -28) w.group.position.z = 28;
+            }
+          }
+
+          // Rotate hub rings
+          cityEngine.hubMeshes.forEach((h, idx) => {
+            h.ring.rotation.z += 0.015 * (idx % 2 === 0 ? 1 : -1);
+          });
+
+          // Animate packets
+          for (let p = cityEngine.packets.length - 1; p >= 0; p -= 1) {
+            const pkt = cityEngine.packets[p];
+            pkt.t += pkt.speed;
+            if (pkt.t >= 1) {
+              scene.remove(pkt.mesh);
+              cityEngine.packets.splice(p, 1);
+            } else {
+              pkt.mesh.position.lerpVectors(pkt.start, pkt.end, pkt.t);
+              pkt.mesh.position.y += Math.sin(pkt.t * Math.PI) * 4.5;
+            }
+          }
+
+          // Periodic ambient packet pulse
+          if (tick % 48 === 0 && cityEngine.packets.length < 18) {
+            const idx = Math.floor(Math.random() * CORE_HUB_NODES.length);
+            const nextIdx = (idx + 1 + Math.floor(Math.random() * 2)) % CORE_HUB_NODES.length;
+            spawnEnergyPacket(CORE_HUB_NODES[idx], CORE_HUB_NODES[nextIdx], idx % 2 === 0 ? cyanHex : goldHex);
+          }
+
+          renderer.render(scene, camera);
+          projectTelemetryChips(viewport, camera);
+          cityEngine.animId = requestAnimationFrame(animateCity);
+        }
+        animateCity();
+
+        window.addEventListener(`resize`, function() {
+          if (!viewport || !cityEngine.renderer || !cityEngine.camera) return;
+          const w = viewport.clientWidth;
+          const h = viewport.clientHeight;
+          if (w <= 0 || h <= 0) return;
+          cityEngine.camera.aspect = w / h;
+          cityEngine.camera.updateProjectionMatrix();
+          cityEngine.renderer.setSize(w, h);
+        });
+      } catch (err) {
+        init2DCityFallback(viewport);
+      }
+    }
+
+    function buildTelemetryChips() {
+      const layer = document.getElementById(`telemetry-layer`);
+      if (!layer) return;
+      layer.innerHTML = CORE_HUB_NODES.map(node => {
+        const cls = node.tone === `violet` ? `is-violet` : (node.tone === `gold` ? `is-gold` : ``);
+        const sel = node.id === appState.selectedNodeId ? `is-selected` : ``;
+        return `
+          <button type="button" class="telemetry-chip ${cls} ${sel}" id="chip-${node.id}" onclick="selectHubNode('${node.id}')">
+            <span class="chip-id">${node.chipLabel}</span>
+            <span>${node.workers}</span>
+          </button>
+        `;
+      }).join(``);
+    }
+
+    function projectTelemetryChips(viewport, camera) {
+      const w = viewport.clientWidth;
+      const h = viewport.clientHeight;
+      if (!w || !h) return;
+
+      CORE_HUB_NODES.forEach(node => {
+        const chip = document.getElementById(`chip-${node.id}`);
+        if (!chip) return;
+        const vec = new THREE.Vector3(node.x, node.h + 3.2, node.z);
+        vec.project(camera);
+
+        if (vec.z > 1) {
+          chip.style.opacity = `0`;
+          return;
+        }
+        const sx = (vec.x * 0.5 + 0.5) * w;
+        const sy = (-vec.y * 0.5 + 0.5) * h;
+        chip.style.opacity = `1`;
+        chip.style.left = `${Math.max(76, Math.min(w - 76, sx))}px`;
+        chip.style.top = `${Math.max(46, Math.min(h - 36, sy))}px`;
+      });
+    }
+
+    function bindCityPointerControls(viewport) {
+      viewport.addEventListener(`pointerdown`, function(e) {
+        if (e.target.closest(`.telemetry-chip`)) return;
+        cityEngine.dragging = true;
+        cityEngine.lastX = e.clientX;
+        cityEngine.lastY = e.clientY;
+      });
+      window.addEventListener(`pointermove`, function(e) {
+        if (!cityEngine.dragging) return;
+        const dx = e.clientX - cityEngine.lastX;
+        const dy = e.clientY - cityEngine.lastY;
+        cityEngine.lastX = e.clientX;
+        cityEngine.lastY = e.clientY;
+        cityEngine.targetTheta -= dx * 0.007;
+        cityEngine.targetPhi = Math.max(0.28, Math.min(1.42, cityEngine.targetPhi - dy * 0.006));
+      });
+      window.addEventListener(`pointerup`, function() {
+        cityEngine.dragging = false;
+      });
+      viewport.addEventListener(`wheel`, function(e) {
+        e.preventDefault();
+        cityEngine.targetRadius = Math.max(20, Math.min(72, cityEngine.targetRadius + e.deltaY * 0.03));
+      }, { passive: false });
+    }
+
+    function init2DCityFallback(viewport) {
+      cityEngine.mode = `canvas2d`;
+      const modeEl = document.getElementById(`city-render-mode`);
+      if (modeEl) modeEl.textContent = `Canvas 2D`;
+
+      const canvas = document.createElement(`canvas`);
+      canvas.width = viewport.clientWidth || 720;
+      canvas.height = viewport.clientHeight || 480;
+      viewport.insertBefore(canvas, viewport.firstChild);
+      const ctx = canvas.getContext(`2d`);
+
+      const cyanHex = getCssToken(`--primary`, `#00e5ff`);
+      const violetHex = getCssToken(`--secondary`, `#b388ff`);
+      const goldHex = getCssToken(`--tertiary`, `#ffd166`);
+      const bgHex = getCssToken(`--background`, `#0a0a12`);
+
+      const positions = [
+        { x: 0.25, y: 0.34 },
+        { x: 0.74, y: 0.34 },
+        { x: 0.26, y: 0.72 },
+        { x: 0.74, y: 0.72 }
+      ];
+      CORE_HUB_NODES.forEach((n, i) => {
+        const chip = document.getElementById(`chip-${n.id}`);
+        if (chip) {
+          chip.style.left = `${positions[i].x * 100}%`;
+          chip.style.top = `${positions[i].y * 100}%`;
+        }
+      });
+
+      const movers = [];
+      for (let i = 0; i < 32; i += 1) {
+        movers.push({
+          x: Math.random() * canvas.width,
+          y: 80 + (i % 6) * 60,
+          vx: (i % 2 === 0 ? 1 : -1) * (1.2 + Math.random() * 1.8),
+          color: i % 3 === 0 ? goldHex : (i % 2 === 0 ? cyanHex : violetHex)
+        });
+      }
+
+      function draw2D() {
+        ctx.fillStyle = bgHex;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = `rgba(0, 229, 255, 0.16)`;
+        ctx.lineWidth = 1;
+        for (let y = 60; y < canvas.height; y += 60) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+        }
+        for (let x = 80; x < canvas.width; x += 90) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+          ctx.stroke();
+        }
+
+        for (let i = 0; i < movers.length; i += 1) {
+          const m = movers[i];
+          m.x += m.vx;
+          if (m.x > canvas.width) m.x = 0;
+          if (m.x < 0) m.x = canvas.width;
+          ctx.fillStyle = m.color;
+          ctx.fillRect(m.x, m.y, 12, 4);
+        }
+
+        cityEngine.animId = requestAnimationFrame(draw2D);
+      }
+      cancelAnimationFrame(cityEngine.animId);
+      draw2D();
+    }
+
+    function selectHubNode(nodeId) {
+      appState.selectedNodeId = nodeId;
+      const node = CORE_HUB_NODES.find(n => n.id === nodeId) || CORE_HUB_NODES[0];
+
+      CORE_HUB_NODES.forEach(n => {
+        const chip = document.getElementById(`chip-${n.id}`);
+        if (chip) chip.classList.toggle(`is-selected`, n.id === nodeId);
+      });
+
+      const idEl = document.getElementById(`insp-id`);
+      const taskEl = document.getElementById(`insp-task`);
+      const workersEl = document.getElementById(`insp-workers`);
+      const statusEl = document.getElementById(`insp-status`);
+
+      if (idEl) idEl.textContent = node.title;
+      if (taskEl) taskEl.textContent = node.task;
+      if (workersEl) workersEl.textContent = node.workers;
+      if (statusEl) statusEl.textContent = node.throughput;
+
+      triggerDataPulseBurst(`Inspect ${node.id}`);
+      persistState();
+    }
+
+    function setCameraPreset(preset) {
+      cityEngine.preset = preset;
+      const btnOrbit = document.getElementById(`cam-orbit`);
+      const btnStreet = document.getElementById(`cam-street`);
+      const btnAerial = document.getElementById(`cam-aerial`);
+      if (btnOrbit) btnOrbit.classList.toggle(`is-active`, preset === `orbit`);
+      if (btnStreet) btnStreet.classList.toggle(`is-active`, preset === `street`);
+      if (btnAerial) btnAerial.classList.toggle(`is-active`, preset === `aerial`);
+
+      if (preset === `street`) {
+        cityEngine.targetPhi = 1.32;
+        cityEngine.targetRadius = 26;
+      } else if (preset === `aerial`) {
+        cityEngine.targetPhi = 0.36;
+        cityEngine.targetRadius = 54;
+      } else {
+        cityEngine.targetPhi = 0.88;
+        cityEngine.targetRadius = 44;
+      }
+    }
+
+    function toggleCityOrbit() {
+      cityEngine.orbitAuto = !cityEngine.orbitAuto;
+      const btn = document.getElementById(`btn-toggle-spin`);
+      if (btn) {
+        btn.textContent = cityEngine.orbitAuto ? `Pause Orbit` : `Resume Orbit`;
+        btn.classList.toggle(`is-active`, !cityEngine.orbitAuto);
+      }
+    }
+
+    function setWorkerDensity(level) {
+      appState.workerDensity = level;
+      const dLow = document.getElementById(`density-low`);
+      const dStd = document.getElementById(`density-standard`);
+      const dSurge = document.getElementById(`density-surge`);
+      if (dLow) dLow.classList.toggle(`is-active`, level === `low`);
+      if (dStd) dStd.classList.toggle(`is-active`, level === `standard`);
+      if (dSurge) dSurge.classList.toggle(`is-active`, level === `surge`);
+
+      rebuildWorkerFleet();
+      pushWorkerFeed(`Worker-04`, `Worker traffic density rebalanced to ${level.toUpperCase()} (${getTargetWorkerCount()} units).`, `positive`);
+      persistState();
+    }
+
+    function spawnWorkerUnit() {
+      appState.spawnedWorkers = Math.min(24, appState.spawnedWorkers + 2);
+      rebuildWorkerFleet();
+      triggerDataPulseBurst(`Spawn Worker`);
+      pushWorkerFeed(`Worker-01`, `Spawned +2 autonomous worker drones into cyber transit grid (${getTargetWorkerCount()} total).`, `cyan`);
+      appendOpsLog(`Deployed +2 autonomous worker units to Cyber City grid.`, `cyan`);
+      persistState();
+    }
+
+    // Boot Application
+    window.addEventListener(`DOMContentLoaded`, async function() {
+      await loadPersistedState();
+
+      const slider = document.getElementById(`slider-extra`);
+      const box = document.getElementById(`input-extra`);
+      if (slider) slider.value = appState.extraMonthly;
+      if (box) box.value = appState.extraMonthly;
+
+      const negSlider = document.getElementById(`neg-offer`);
+      const negNum = document.getElementById(`neg-offer-num`);
+      if (negSlider) negSlider.value = appState.negOfferPct;
+      if (negNum) negNum.value = appState.negOfferPct;
+
+      const headerSync = document.getElementById(`header-sync-status`);
+      if (headerSync) headerSync.textContent = `${appState.connectedInstitutions.length} Plaid Links Active`;
+
+      renderOptimizerAndHud();
+      renderWorkerFeed();
+      renderOpsLog();
+      renderExpensesTable();
+      renderNegotiationScript();
+      initCyberCity();
+      selectHubNode(appState.selectedNodeId || `HUB-01`);
+      setWorkerDensity(appState.workerDensity || `standard`);
+
+      if (typeof lucide !== `undefined` && typeof lucide.createIcons === `function`) {
+        lucide.createIcons();
+      }
+
+      if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+        window.notebookAppApi.notifyAppReady();
+      }
+    });
+  </script>
+</body>
+</html>

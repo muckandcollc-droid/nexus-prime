@@ -1,0 +1,2740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="tool">
+  <meta name="design-style" content="aurora">
+  <title>NEXUS-PRIME — Debt Elimination, Budgeting &amp; Financial Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+
+      /* Page and surfaces: deep oceanic slate steps */
+      --background: #0c1214;
+      --surface-container-low: #111a1e;
+      --surface-container: #152024;
+      --surface-container-high: #1c2a30;
+
+      /* Text */
+      --on-surface: #edf3f5;
+      --on-surface-variant: #94a8b0;
+
+      /* Borders */
+      --outline: #38515c;
+      --outline-variant: #213138;
+
+      /* Accents */
+      --primary: #63c7d6;
+      --on-primary: #081214;
+      --primary-container: #163840;
+      --on-primary-container: #c7f0f7;
+      --secondary: #5d7882;
+      --tertiary: #87d69b;
+      --error: #f27474;
+      --on-error: #1a0606;
+
+      /* Data series, in order of use */
+      --data-1: #63c7d6;
+      --data-2: #87d69b;
+      --data-3: #e8b954;
+      --data-4: #f08c70;
+      --data-context: #415861;
+
+      /* Fonts */
+      --font-headline: 'Instrument Sans', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-label: 'Geist Mono', monospace;
+
+      /* Shape */
+      --rounded: 0.5rem;
+      --rounded-lg: 0.75rem;
+      --rounded-full: 9999px;
+
+      /* Style effects */
+      --hairline: 1px solid var(--outline-variant);
+      --hairline-strong: 1px solid var(--outline);
+      --panel-gradient: linear-gradient(180deg, #162226 0%, #111a1e 100%);
+      --heading-tracking: -0.025em;
+      --label-tracking: 0.06em;
+      --sage-tint: color-mix(in srgb, var(--tertiary) 13%, transparent);
+      --cyan-tint: color-mix(in srgb, var(--primary) 13%, transparent);
+      --cyan-chart-fill: rgba(99, 199, 214, 0.12);
+      --amber-tint: color-mix(in srgb, var(--warning) 14%, transparent);
+      --error-tint: color-mix(in srgb, var(--error) 14%, transparent);
+      --sage-border: color-mix(in srgb, var(--tertiary) 35%, transparent);
+      --cyan-border: color-mix(in srgb, var(--primary) 35%, transparent);
+      --amber-border: color-mix(in srgb, var(--warning) 35%, transparent);
+      --error-border: color-mix(in srgb, var(--error) 35%, transparent);
+
+      /* Shared foundation tokens */
+      --positive: #87d69b;
+      --warning: #e8b954;
+      --focus: #63c7d6;
+
+      /* Type scale (Tool / Dashboard) */
+      --display-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+      --headline-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+      --subhead-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+      --label-size: 0.75rem;
+
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+
+    .page-grid {
+      display: grid;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      max-width: 1320px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Focus rings */
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    /* Header & Toolbar */
+    .command-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--space-md);
+      padding-bottom: var(--space-md);
+      border-bottom: var(--hairline);
+    }
+
+    .title-block {
+      max-width: 65ch;
+    }
+
+    .title {
+      font-family: var(--font-headline);
+      font-size: var(--display-size);
+      font-weight: 600;
+      letter-spacing: var(--heading-tracking);
+      line-height: 1.1;
+      color: var(--on-surface);
+      margin: 0 0 var(--space-xs) 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--on-surface-variant);
+      font-size: var(--body-size);
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Section Headings */
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    .section-title {
+      font-family: var(--font-headline);
+      font-size: var(--headline-size);
+      font-weight: 600;
+      letter-spacing: var(--heading-tracking);
+      line-height: 1.15;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .section-desc {
+      margin: var(--space-xs) 0 0 0;
+      color: var(--on-surface-variant);
+      font-size: var(--body-size);
+      max-width: 65ch;
+    }
+
+    .subhead {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 600;
+      letter-spacing: var(--heading-tracking);
+      color: var(--on-surface);
+      margin: 0 0 var(--space-sm) 0;
+    }
+
+    /* Aurora Panels & Wells */
+    .panel {
+      background: var(--panel-gradient);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+      transition: border-color var(--dur-short) var(--ease-out);
+    }
+
+    .well {
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+    }
+
+    /* Data Labels & Tabular Figures */
+    .data-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 500;
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+      display: block;
+    }
+
+    .metric-value {
+      font-family: var(--font-headline);
+      font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: var(--heading-tracking);
+      line-height: 1.15;
+      color: var(--on-surface);
+      margin: var(--space-xs) 0;
+    }
+
+    .metric-delta {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--tertiary);
+    }
+    .metric-delta.warn { color: var(--warning); }
+    .metric-delta.err { color: var(--error); }
+    .metric-delta.muted { color: var(--on-surface-variant); }
+
+    .tabular-num {
+      font-family: var(--font-label);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Privacy Mask */
+    .masked-active .sensitive-val {
+      filter: blur(6px);
+      user-select: none;
+    }
+
+    /* KPI Strip */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+
+    .kpi-card {
+      background: var(--panel-gradient);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Module Anchor Jump Strip */
+    .jump-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+
+    .jump-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      background: var(--surface-container);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      color: var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      text-transform: uppercase;
+      letter-spacing: var(--label-tracking);
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .jump-pill:hover {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+      border-color: var(--outline);
+    }
+    .jump-pill.active {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-color: var(--cyan-border);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      min-height: 44px;
+      padding: 0 var(--space-md);
+      border-radius: var(--rounded);
+      font-family: var(--font-headline);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+      white-space: nowrap;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--on-primary-container);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--on-surface);
+      border: var(--hairline-strong);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--surface-container-high);
+    }
+
+    .btn-danger {
+      background: var(--error-tint);
+      color: var(--error);
+      border: 1px solid var(--error-border);
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: var(--error);
+      color: var(--on-error);
+    }
+
+    .btn-sm {
+      min-height: 36px;
+      padding: 0 var(--space-sm);
+      font-size: 0.8125rem;
+    }
+
+    .btn-icon {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+    }
+
+    /* Form Controls */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: var(--space-md);
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .field label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--background);
+      color: var(--on-surface);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      transition: border-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+    }
+
+    select {
+      padding-right: var(--space-xl);
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+      line-height: 1.45;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--cyan-tint);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+      min-height: 44px;
+      cursor: pointer;
+    }
+
+    /* Status Chips */
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      background: var(--sage-tint);
+      color: var(--tertiary);
+      border: 1px solid var(--sage-border);
+      border-radius: var(--rounded);
+      padding: 2px var(--space-sm);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      white-space: nowrap;
+    }
+    .status-chip.cyan {
+      background: var(--cyan-tint);
+      color: var(--primary);
+      border-color: var(--cyan-border);
+    }
+    .status-chip.warn {
+      background: var(--amber-tint);
+      color: var(--warning);
+      border-color: var(--amber-border);
+    }
+    .status-chip.err {
+      background: var(--error-tint);
+      color: var(--error);
+      border-color: var(--error-border);
+    }
+
+    /* Asymmetric Split Layouts */
+    .split-engine {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .split-ingestion {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .split-telemetry {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    /* Strategy Selector Pills */
+    .strategy-group {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+
+    .strategy-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      min-height: 60px;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      color: var(--on-surface);
+      cursor: pointer;
+      text-align: left;
+      transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+    }
+    .strategy-btn:hover {
+      background: var(--surface-container-high);
+      border-color: var(--outline);
+    }
+    .strategy-btn.active {
+      background: var(--primary-container);
+      border-color: var(--primary);
+    }
+    .strategy-btn strong {
+      font-family: var(--font-headline);
+      font-size: 0.9375rem;
+      font-weight: 600;
+    }
+    .strategy-btn span {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+    }
+    .strategy-btn.active span {
+      color: var(--on-primary-container);
+    }
+
+    /* Tables */
+    .table-scroll {
+      overflow-x: auto;
+      border-radius: var(--rounded);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    th {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 500;
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+      text-align: left;
+      padding: var(--space-sm) var(--space-sm);
+      border-bottom: var(--hairline-strong);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: var(--space-sm) var(--space-sm);
+      border-bottom: var(--hairline);
+      vertical-align: middle;
+    }
+
+    th.num, td.num {
+      text-align: right;
+      font-family: var(--font-label);
+      font-variant-numeric: tabular-nums;
+    }
+
+    tbody tr:hover {
+      background: var(--surface-container-high);
+    }
+
+    /* Chart Wrappers */
+    .chart-wrap {
+      position: relative;
+      height: 320px;
+      min-height: 320px;
+      width: 100%;
+    }
+
+    /* Cashflow Waterfall Bar */
+    .waterfall-bar {
+      display: flex;
+      height: 22px;
+      border-radius: var(--rounded);
+      overflow: hidden;
+      background: var(--background);
+      border: var(--hairline);
+      margin: var(--space-md) 0;
+    }
+    .wf-seg {
+      height: 100%;
+      transition: width var(--dur-short) var(--ease-out);
+    }
+    .wf-fixed { background: var(--data-4); }
+    .wf-living { background: var(--data-3); }
+    .wf-minimums { background: var(--data-1); }
+    .wf-surplus { background: var(--data-2); }
+
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    /* Utilization Progress Bars */
+    .util-track {
+      width: 100%;
+      height: 10px;
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded-full);
+      overflow: hidden;
+      position: relative;
+    }
+    .util-fill {
+      height: 100%;
+      background: var(--tertiary);
+      transition: width var(--dur-short) var(--ease-out), background-color var(--dur-short) var(--ease-out);
+    }
+    .util-fill.warn { background: var(--warning); }
+    .util-fill.err { background: var(--error); }
+
+    /* Inline Message Banner */
+    .inline-msg {
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+      margin-top: var(--space-sm);
+      display: none;
+    }
+    .inline-msg.visible { display: block; }
+    .inline-msg.ok {
+      background: var(--sage-tint);
+      color: var(--tertiary);
+      border: 1px solid var(--sage-border);
+    }
+    .inline-msg.err {
+      background: var(--error-tint);
+      color: var(--error);
+      border: 1px solid var(--error-border);
+    }
+    .inline-msg.info {
+      background: var(--cyan-tint);
+      color: var(--primary);
+      border: 1px solid var(--cyan-border);
+    }
+
+    /* Bureau Freeze Cards */
+    .bureau-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+    .bureau-card {
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    /* Empty State */
+    .empty-state {
+      padding: var(--space-lg);
+      text-align: center;
+      border: var(--hairline);
+      border-style: dashed;
+      border-radius: var(--rounded);
+      color: var(--on-surface-variant);
+    }
+
+    /* Sources Footer */
+    .sources-footer {
+      border-top: var(--hairline);
+      padding-top: var(--space-lg);
+      color: var(--on-surface-variant);
+      font-size: 0.8125rem;
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    /* Utility Spacing */
+    .stack-sm { display: grid; gap: var(--space-sm); }
+    .stack-md { display: grid; gap: var(--space-md); }
+    .stack-lg { display: grid; gap: var(--space-lg); }
+    .row-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+    .row-between {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 960px) {
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .split-engine,
+      .split-ingestion,
+      .split-telemetry { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .page-grid {
+        grid-template-columns: 1fr;
+        padding: var(--space-md);
+        gap: var(--space-md);
+      }
+      .kpi-grid { grid-template-columns: 1fr; }
+      .strategy-group { grid-template-columns: 1fr; }
+      .bureau-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-grid" id="app-root">
+    <!-- HEADER -->
+    <header class="command-header">
+      <div class="title-block">
+        <h1 class="title">NEXUS-PRIME Financial Command Center</h1>
+        <p class="subtitle">Integrated checkstub income ingestion, household cash-flow budgeting, real-time debt acceleration, and credit utilization telemetry.</p>
+      </div>
+      <div class="header-actions">
+        <div class="field">
+          <label for="preset-select">Scenario Preset</label>
+          <select id="preset-select" onchange="loadPreset(this.value)">
+            <option value="reference">Reference Household ($60,043)</option>
+            <option value="experian">Experian 3-Card Benchmark ($16,000)</option>
+            <option value="blank">Blank Slate ($0.00)</option>
+            <option value="custom" hidden>Custom Working State</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-secondary" id="mask-btn" onclick="togglePrivacyMask()">
+          <i data-lucide="eye-off" aria-hidden="true"></i>
+          <span id="mask-btn-label">Mask Figures</span>
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="exportScheduleCsv()">
+          <i data-lucide="download" aria-hidden="true"></i>
+          <span>Export CSV</span>
+        </button>
+        <button type="button" class="btn btn-danger" id="reset-btn" onclick="resetToBlank(this)">
+          <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+          <span>Reset Blank</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- GLOBAL STATUS BAR -->
+    <div id="global-status" class="inline-msg" role="status" aria-live="polite"></div>
+
+    <!-- HERO KPI STRIP (LEAD WITH THE RESULT) -->
+    <section aria-label="Key Financial Metrics">
+      <div class="kpi-grid">
+        <article class="kpi-card">
+          <span class="data-label">Projected Debt-Free Horizon</span>
+          <div class="metric-value" id="kpi-debt-free-date">--</div>
+          <div class="metric-delta" id="kpi-months-delta">Calculating payoff trajectory…</div>
+        </article>
+        <article class="kpi-card">
+          <span class="data-label">Total Principal Remaining</span>
+          <div class="metric-value sensitive-val" id="kpi-total-debt">$0.00</div>
+          <div class="metric-delta muted" id="kpi-weighted-apr">0.00% weighted APR</div>
+        </article>
+        <article class="kpi-card">
+          <span class="data-label">Monthly Surplus Power</span>
+          <div class="metric-value sensitive-val" id="kpi-monthly-surplus">$0.00</div>
+          <div class="metric-delta" id="kpi-cashflow-ratio">After overhead &amp; minimums</div>
+        </article>
+        <article class="kpi-card">
+          <span class="data-label">Interest Saved vs. Minimums</span>
+          <div class="metric-value sensitive-val" id="kpi-interest-saved">$0.00</div>
+          <div class="metric-delta" id="kpi-revolving-util">0.0% revolving utilization</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- MODULE JUMP STRIP -->
+    <nav class="jump-nav" aria-label="Command Center Modules">
+      <button type="button" class="jump-pill active" onclick="scrollToSection('sec-engine', this)">1. Paydown Engine</button>
+      <button type="button" class="jump-pill" onclick="scrollToSection('sec-income', this)">2. Income &amp; Checkstubs</button>
+      <button type="button" class="jump-pill" onclick="scrollToSection('sec-tradelines', this)">3. Debt Tradelines</button>
+      <button type="button" class="jump-pill" onclick="scrollToSection('sec-budget', this)">4. Dynamic Budget</button>
+      <button type="button" class="jump-pill" onclick="scrollToSection('sec-telemetry', this)">5. Credit Telemetry &amp; Schedule</button>
+    </nav>
+
+    <!-- SECTION 1: DEBT PAYDOWN ACCELERATION ENGINE -->
+    <section id="sec-engine" class="panel stack-lg">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Debt Paydown Acceleration Engine</h2>
+          <p class="section-desc">Compare Avalanche (highest APR first), Snowball (smallest balance first), and Hybrid (quick-win threshold then highest APR) trajectories with live surplus boosting.</p>
+        </div>
+        <span class="status-chip cyan" id="active-strategy-badge">Avalanche Active</span>
+      </div>
+
+      <div class="split-engine">
+        <!-- Left: Trajectory Chart & Strategy Comparison -->
+        <div class="stack-md">
+          <div class="well">
+            <div class="row-between" style="margin-bottom: var(--space-sm);">
+              <span class="data-label">Principal Paydown Trajectory (Months to Zero)</span>
+              <div class="legend-row">
+                <span class="legend-item"><span class="legend-swatch" style="background: var(--data-context);"></span>Minimum Only</span>
+                <span class="legend-item"><span class="legend-swatch" style="background: var(--data-1);"></span>Selected Strategy</span>
+                <span class="legend-item"><span class="legend-swatch" style="background: var(--data-2);"></span>Alternate Strategy</span>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="paydown-chart" aria-label="Debt paydown trajectory chart"></canvas>
+            </div>
+          </div>
+
+          <div class="well">
+            <span class="data-label" style="margin-bottom: var(--space-sm);">Strategy Benchmark Matrix</span>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Strategy</th>
+                    <th class="num">Months</th>
+                    <th>Payoff Date</th>
+                    <th class="num">Total Interest</th>
+                    <th class="num">Interest Saved</th>
+                  </tr>
+                </thead>
+                <tbody id="strategy-compare-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Strategy & Booster Controls -->
+        <div class="stack-md">
+          <div class="well stack-md">
+            <span class="data-label">Payoff Methodology</span>
+            <div class="strategy-group" role="radiogroup" aria-label="Payoff Strategy">
+              <button type="button" class="strategy-btn active" id="strat-avalanche" onclick="setStrategy('avalanche')">
+                <strong>Avalanche</strong>
+                <span>Highest APR first</span>
+              </button>
+              <button type="button" class="strategy-btn" id="strat-snowball" onclick="setStrategy('snowball')">
+                <strong>Snowball</strong>
+                <span>Smallest balance first</span>
+              </button>
+              <button type="button" class="strategy-btn" id="strat-hybrid" onclick="setStrategy('hybrid')">
+                <strong>Hybrid</strong>
+                <span>Quick wins &rarr; APR</span>
+              </button>
+            </div>
+
+            <div class="field" id="hybrid-threshold-wrap" style="display: none;">
+              <label for="hybrid-threshold-input">Hybrid Quick-Win Balance Cap ($)</label>
+              <input type="number" id="hybrid-threshold-input" min="0" max="25000" step="100" value="2500" oninput="updateHybridThreshold(this.value)">
+            </div>
+
+            <div class="stack-sm">
+              <div class="row-between">
+                <label class="data-label" for="booster-slider">Monthly Extra Surplus Booster ($)</label>
+                <span class="status-chip" id="booster-status-chip">+$150/mo boost</span>
+              </div>
+              <div class="form-grid" style="grid-template-columns: minmax(0, 1fr) 130px;">
+                <input type="range" id="booster-slider" min="0" max="3000" step="25" value="150" oninput="syncBoosterFromSlider(this.value)">
+                <div class="field">
+                  <label for="booster-number">Amount ($)</label>
+                  <input type="number" id="booster-number" min="0" max="25000" step="25" value="150" oninput="syncBoosterFromNumber(this.value)">
+                </div>
+              </div>
+              <div class="row-wrap">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="applyBoosterPreset(0)">+$0</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="applyBoosterPreset(150)">+$150</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="applyBoosterPreset(300)">+$300</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="applyBoosterPreset(500)">+$500</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btn-max-surplus" onclick="applyAvailableSurplus()">Apply Max Budget Surplus</button>
+              </div>
+            </div>
+
+            <div class="well" style="background: var(--surface-container);">
+              <span class="data-label">Active Monthly Debt Allocation</span>
+              <div class="row-between" style="margin-top: var(--space-xs);">
+                <span>Minimum Payments Sum</span>
+                <strong class="tabular-num sensitive-val" id="alloc-minimums">$0.00</strong>
+              </div>
+              <div class="row-between">
+                <span>Surplus Booster Applied</span>
+                <strong class="tabular-num sensitive-val" id="alloc-booster">$0.00</strong>
+              </div>
+              <div class="row-between" style="border-top: var(--hairline); padding-top: var(--space-xs); margin-top: var(--space-xs);">
+                <span>Total Monthly Debt Strike</span>
+                <strong class="tabular-num sensitive-val" style="color: var(--primary);" id="alloc-total">$0.00</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="well">
+            <span class="data-label" style="margin-bottom: var(--space-sm);">Principal vs. Projected Interest by Account</span>
+            <div class="chart-wrap" style="height: 240px; min-height: 240px;">
+              <canvas id="composition-chart" aria-label="Principal vs interest breakdown chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: INCOME & CHECKSTUB INGESTION -->
+    <section id="sec-income" class="panel stack-lg">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Income &amp; Checkstub Ingestion</h2>
+          <p class="section-desc">Normalize take-home pay across Weekly, Bi-Weekly, Semi-Monthly, and Monthly cycles, or paste raw paystub text to extract earnings automatically.</p>
+        </div>
+        <span class="status-chip" id="income-monthly-badge">Monthly Net: $0.00</span>
+      </div>
+
+      <div class="split-ingestion">
+        <!-- Left: Form + Checkstub Parser -->
+        <div class="stack-md">
+          <form class="well stack-md" onsubmit="addIncomeStream(event)">
+            <span class="subhead">Add Income Stream</span>
+            <div class="form-grid">
+              <div class="field">
+                <label for="inc-name">Income Source</label>
+                <input type="text" id="inc-name" required value="Primary Household Payroll">
+              </div>
+              <div class="field">
+                <label for="inc-freq">Pay Frequency</label>
+                <select id="inc-freq" onchange="previewCheckstubMath()">
+                  <option value="52">Weekly (52/yr)</option>
+                  <option value="26" selected>Bi-Weekly (26/yr)</option>
+                  <option value="24">Semi-Monthly (24/yr)</option>
+                  <option value="12">Monthly (12/yr)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="inc-gross">Gross Pay / Check ($)</label>
+                <input type="number" id="inc-gross" min="0" step="0.01" required value="3200" oninput="previewCheckstubMath()">
+              </div>
+              <div class="field">
+                <label for="inc-taxes">Taxes Withheld / Check ($)</label>
+                <input type="number" id="inc-taxes" min="0" step="0.01" value="640" oninput="previewCheckstubMath()">
+              </div>
+              <div class="field">
+                <label for="inc-deduct">Pre-Tax / Benefits ($)</label>
+                <input type="number" id="inc-deduct" min="0" step="0.01" value="210" oninput="previewCheckstubMath()">
+              </div>
+              <div class="field">
+                <label for="inc-net-preview">Computed Monthly Net</label>
+                <input type="text" id="inc-net-preview" readonly value="$5,091.67">
+              </div>
+            </div>
+            <div class="row-between">
+              <span class="data-label" id="inc-takehome-rate">Net take-home: 73.4% of gross</span>
+              <button type="submit" class="btn btn-primary">
+                <i data-lucide="plus" aria-hidden="true"></i>
+                <span>Add Income Stream</span>
+              </button>
+            </div>
+          </form>
+
+          <div class="well stack-sm">
+            <div class="row-between">
+              <span class="data-label">Checkstub Text Ingestion Parser</span>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="loadSampleCheckstub()">Load Sample Stub</button>
+            </div>
+            <div class="field">
+              <label for="stub-paste">Paste Checkstub Text (Gross, Federal/State/FICA Taxes, Deductions)</label>
+              <textarea id="stub-paste" placeholder="Example: Pay Period: Bi-Weekly | Gross Pay: $3,450.00 | Taxes: $710.25 | 401k &amp; Health: $245.00"></textarea>
+            </div>
+            <div class="row-between">
+              <button type="button" class="btn btn-secondary" onclick="parseCheckstubText()">
+                <i data-lucide="scan-text" aria-hidden="true"></i>
+                <span>Parse &amp; Populate Form</span>
+              </button>
+              <span id="stub-parse-msg" class="data-label" style="color: var(--tertiary);"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Active Income Streams Table -->
+        <div class="well stack-md">
+          <div class="row-between">
+            <span class="subhead" style="margin: 0;">Verified Income Streams</span>
+            <span class="data-label" id="income-annual-net">Annual Net: $0.00</span>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Source</th>
+                  <th>Frequency</th>
+                  <th class="num">Gross / Check</th>
+                  <th class="num">Net / Check</th>
+                  <th class="num">Monthly Net</th>
+                  <th class="num">Action</th>
+                </tr>
+              </thead>
+              <tbody id="income-tbody"></tbody>
+            </table>
+          </div>
+          <div id="income-empty" class="empty-state" style="display: none;">
+            No income streams entered yet. Add a payroll or checkstub entry on the left to compute monthly take-home surplus.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: STATEMENT & DEBT TRADELINE INGESTION -->
+    <section id="sec-tradelines" class="panel stack-lg">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Statement &amp; Debt Tradeline Ingestion</h2>
+          <p class="section-desc">Enter creditor balances, APRs, minimum payments, and credit limits manually or parse pasted monthly statement text.</p>
+        </div>
+        <span class="status-chip cyan" id="tradeline-count-badge">0 Active Tradelines</span>
+      </div>
+
+      <div class="split-ingestion">
+        <!-- Left: Tradeline Intake + Statement Parser -->
+        <div class="stack-md">
+          <form class="well stack-md" onsubmit="addOrUpdateTradeline(event)">
+            <div class="row-between">
+              <span class="subhead" style="margin: 0;" id="tradeline-form-title">Add Debt Tradeline</span>
+              <button type="button" class="btn btn-secondary btn-sm" id="cancel-edit-btn" style="display: none;" onclick="cancelTradelineEdit()">Cancel Edit</button>
+            </div>
+            <input type="hidden" id="tl-edit-id" value="">
+            <div class="form-grid">
+              <div class="field">
+                <label for="tl-name">Creditor / Account</label>
+                <input type="text" id="tl-name" required value="Sapphire Revolving">
+              </div>
+              <div class="field">
+                <label for="tl-cat">Account Type</label>
+                <select id="tl-cat">
+                  <option value="Credit Card">Credit Card</option>
+                  <option value="Personal Loan">Personal Loan</option>
+                  <option value="Auto Loan">Auto Loan</option>
+                  <option value="Student Loan">Student Loan</option>
+                  <option value="Collection / Other">Collection / Other</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="tl-bal">Current Balance ($)</label>
+                <input type="number" id="tl-bal" min="0" step="0.01" required value="4200">
+              </div>
+              <div class="field">
+                <label for="tl-apr">APR (%)</label>
+                <input type="number" id="tl-apr" min="0" max="99.99" step="0.01" required value="21.49">
+              </div>
+              <div class="field">
+                <label for="tl-min">Minimum Payment ($)</label>
+                <input type="number" id="tl-min" min="1" step="0.01" required value="125">
+              </div>
+              <div class="field">
+                <label for="tl-limit">Credit Limit ($ if revolving)</label>
+                <input type="number" id="tl-limit" min="0" step="1" value="6000">
+              </div>
+            </div>
+            <div class="row-between">
+              <div class="field" style="width: 140px;">
+                <label for="tl-due">Due Day (1–31)</label>
+                <input type="number" id="tl-due" min="1" max="31" value="15">
+              </div>
+              <button type="submit" class="btn btn-primary" id="tl-submit-btn">
+                <i data-lucide="plus" aria-hidden="true"></i>
+                <span>Save Tradeline</span>
+              </button>
+            </div>
+          </form>
+
+          <div class="well stack-sm">
+            <div class="row-between">
+              <span class="data-label">Statement Snapshot Text Parser</span>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="loadSampleStatement()">Load Sample Statement</button>
+            </div>
+            <div class="field">
+              <label for="stmt-paste">Paste Statement Summary (Creditor, New Balance, Purchase APR, Min Due, Credit Limit)</label>
+              <textarea id="stmt-paste" placeholder="Example: Chase Freedom | New Balance: $6,420.50 | APR: 23.99% | Minimum Payment Due: $185.00 | Credit Limit: $9,500 | Due Date: 18th"></textarea>
+            </div>
+            <div class="row-between">
+              <button type="button" class="btn btn-secondary" onclick="parseStatementText()">
+                <i data-lucide="file-scan" aria-hidden="true"></i>
+                <span>Extract to Tradeline Form</span>
+              </button>
+              <span id="stmt-parse-msg" class="data-label" style="color: var(--tertiary);"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Active Tradelines Ledger -->
+        <div class="well stack-md">
+          <div class="row-between">
+            <span class="subhead" style="margin: 0;">Active Creditor Ledger</span>
+            <div class="row-wrap">
+              <label for="tl-sort" class="data-label">Sort:</label>
+              <select id="tl-sort" style="width: auto; min-height: 36px; padding: 4px 32px 4px 10px;" onchange="renderTradelines()">
+                <option value="priority">Active Strategy Order</option>
+                <option value="apr_desc">Highest APR</option>
+                <option value="bal_asc">Lowest Balance</option>
+                <option value="bal_desc">Highest Balance</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Priority</th>
+                  <th>Creditor</th>
+                  <th class="num">Balance</th>
+                  <th class="num">APR</th>
+                  <th class="num">Min Pay</th>
+                  <th class="num">Util %</th>
+                  <th class="num">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tradelines-tbody"></tbody>
+            </table>
+          </div>
+          <div id="tradelines-empty" class="empty-state" style="display: none;">
+            No active debt tradelines. Add a credit card, loan, or collection account on the left to initialize simulations.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: DYNAMIC BUDGET INTEGRATION -->
+    <section id="sec-budget" class="panel stack-lg">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Dynamic Household Budget Integration</h2>
+          <p class="section-desc">Track fixed overhead and variable living expenses against net monthly take-home pay to determine true debt-elimination surplus.</p>
+        </div>
+        <span class="status-chip" id="budget-health-badge">Surplus Healthy</span>
+      </div>
+
+      <!-- Cashflow Waterfall Visual -->
+      <div class="well">
+        <div class="row-between">
+          <span class="data-label">Monthly Income Allocation Waterfall</span>
+          <span class="tabular-num sensitive-val" id="wf-summary-text">$0.00 / $0.00 allocated</span>
+        </div>
+        <div class="waterfall-bar" role="img" aria-label="Monthly cash-flow allocation bar">
+          <div class="wf-seg wf-fixed" id="wf-fixed-seg" style="width: 0%;"></div>
+          <div class="wf-seg wf-living" id="wf-living-seg" style="width: 0%;"></div>
+          <div class="wf-seg wf-minimums" id="wf-min-seg" style="width: 0%;"></div>
+          <div class="wf-seg wf-surplus" id="wf-surplus-seg" style="width: 0%;"></div>
+        </div>
+        <div class="legend-row">
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--data-4);"></span>Fixed Overhead (<span class="sensitive-val" id="lg-fixed">$0</span>)</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--data-3);"></span>Living Costs (<span class="sensitive-val" id="lg-living">$0</span>)</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--data-1);"></span>Debt Minimums (<span class="sensitive-val" id="lg-min">$0</span>)</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--data-2);"></span>Available Surplus (<span class="sensitive-val" id="lg-surplus">$0</span>)</span>
+        </div>
+      </div>
+
+      <div class="split-ingestion">
+        <!-- Left: Add Budget Expense -->
+        <form class="well stack-md" onsubmit="addBudgetItem(event)">
+          <span class="subhead">Add Overhead or Living Expense</span>
+          <div class="form-grid">
+            <div class="field">
+              <label for="bg-name">Expense Label</label>
+              <input type="text" id="bg-name" required value="Electric &amp; Fiber Internet">
+            </div>
+            <div class="field">
+              <label for="bg-type">Budget Bucket</label>
+              <select id="bg-type">
+                <option value="fixed">Fixed Overhead</option>
+                <option value="living">Variable Living Cost</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="bg-amt">Monthly Amount ($)</label>
+              <input type="number" id="bg-amt" min="0" step="1" required value="220">
+            </div>
+          </div>
+          <div class="row-between">
+            <span class="data-label" id="bg-overhead-ratio">Overhead ratio: 0% of net</span>
+            <button type="submit" class="btn btn-primary">
+              <i data-lucide="plus" aria-hidden="true"></i>
+              <span>Add Expense Line</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Right: Editable Budget Lines -->
+        <div class="well stack-md">
+          <div class="row-between">
+            <span class="subhead" style="margin: 0;">Monthly Expense Lines</span>
+            <span class="data-label sensitive-val" id="bg-total-label">Total Living &amp; Fixed: $0.00</span>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Expense</th>
+                  <th>Bucket</th>
+                  <th class="num">Monthly ($)</th>
+                  <th class="num">Share of Net</th>
+                  <th class="num">Action</th>
+                </tr>
+              </thead>
+              <tbody id="budget-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: CREDIT MONITORING TELEMETRY & INTERACTIVE PAYOFF SCHEDULE -->
+    <section id="sec-telemetry" class="panel stack-lg">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Credit Monitoring Telemetry &amp; Payoff Schedule</h2>
+          <p class="section-desc">Track revolving credit utilization thresholds, tri-bureau freeze readiness, FCRA dispute workflows, and month-by-month payoff milestones.</p>
+        </div>
+        <span class="status-chip" id="util-status-chip">Utilization Optimal</span>
+      </div>
+
+      <div class="split-telemetry">
+        <!-- Left: Credit Telemetry & Bureau Safeguards -->
+        <div class="stack-md">
+          <div class="well stack-md">
+            <div class="row-between">
+              <span class="data-label">Revolving Credit Utilization</span>
+              <strong class="tabular-num" style="font-size: 1.25rem;" id="tel-util-pct">0.0%</strong>
+            </div>
+            <div class="util-track">
+              <div class="util-fill" id="tel-util-bar" style="width: 0%;"></div>
+            </div>
+            <div class="row-between" style="font-size: 0.8125rem; color: var(--on-surface-variant);">
+              <span>Target &lt;30% threshold</span>
+              <span class="sensitive-val" id="tel-to-30">$0 to clear 30%</span>
+            </div>
+            <div class="row-between" style="font-size: 0.8125rem; color: var(--on-surface-variant);">
+              <span>Optimal &lt;10% FICO tier</span>
+              <span class="sensitive-val" id="tel-to-10">$0 to reach 10%</span>
+            </div>
+            <div class="well" style="background: var(--surface-container);">
+              <span class="data-label">Projected Threshold Dates</span>
+              <div class="row-between" style="margin-top: var(--space-xs);">
+                <span>Drops Below 30% Util</span>
+                <strong class="tabular-num" style="color: var(--primary);" id="tel-date-30">--</strong>
+              </div>
+              <div class="row-between">
+                <span>Drops Below 10% Util</span>
+                <strong class="tabular-num" style="color: var(--tertiary);" id="tel-date-10">--</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="well stack-sm">
+            <span class="data-label">Tri-Bureau Security Freeze &amp; Monitoring Log</span>
+            <div class="bureau-grid">
+              <div class="bureau-card">
+                <span class="data-label">Equifax</span>
+                <span class="status-chip" id="freeze-badge-eq">Unfrozen</span>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="toggleBureauFreeze('equifax')">Toggle Freeze</button>
+              </div>
+              <div class="bureau-card">
+                <span class="data-label">Experian</span>
+                <span class="status-chip" id="freeze-badge-ex">Unfrozen</span>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="toggleBureauFreeze('experian')">Toggle Freeze</button>
+              </div>
+              <div class="bureau-card">
+                <span class="data-label">TransUnion</span>
+                <span class="status-chip" id="freeze-badge-tu">Unfrozen</span>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="toggleBureauFreeze('transunion')">Toggle Freeze</button>
+              </div>
+            </div>
+            <p style="margin: var(--space-xs) 0 0 0; font-size: 0.8125rem; color: var(--on-surface-variant);">
+              Under the Fair Credit Reporting Act (FCRA), consumers may freeze bureau files free of charge and dispute inaccurate tradelines; furnishers and bureaus must investigate non-frivolous disputes and provide written resolution.
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Interactive Payoff Schedule & Account Milestones -->
+        <div class="well stack-md">
+          <div class="row-between">
+            <span class="subhead" style="margin: 0;">Interactive Amortization &amp; Milestone Schedule</span>
+            <div class="row-wrap">
+              <div class="field" style="width: 170px;">
+                <label for="sched-view-mode">Schedule View</label>
+                <select id="sched-view-mode" onchange="renderSchedule()">
+                  <option value="milestones">Account Payoff Milestones</option>
+                  <option value="monthly">Month-by-Month Ledger</option>
+                </select>
+              </div>
+              <div class="field" style="width: 180px;">
+                <label for="sched-account-filter">Filter Tradeline</label>
+                <select id="sched-account-filter" onchange="renderSchedule()">
+                  <option value="all">All Tradelines Combined</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-scroll" style="max-height: 410px; overflow-y: auto;">
+            <table>
+              <thead id="schedule-thead"></thead>
+              <tbody id="schedule-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOURCES & METHODOLOGY -->
+    <footer class="sources-footer">
+      <strong style="color: var(--on-surface);">Sources &amp; Quantitative Methodology</strong>
+      <span>Payoff modeling implements standard Avalanche (highest APR priority), Snowball (smallest balance priority), and Hybrid threshold rollover mechanics with monthly interest accrual and freed-minimum cascading, benchmarked against Experian debt payoff comparisons ($16,000 three-card case) and the Reference Household multi-tradeline portfolio ($60,043.26).</span>
+      <span>Behavioral &amp; Regulatory Grounding: Debt account elimination effects on cognitive bandwidth and anxiety reduction per Ong, Theseira &amp; Ng (PNAS / PMC6462060); credit monitoring and FCRA dispute/freeze rights per Consumer Financial Protection Bureau (CFPB), Federal Trade Commission (FTC), CRS Credit API, Equifax Developer Portal, and Intuit Credit Karma / Experian scoring distinctions (FICO Score 8 vs. VantageScore 3.0).</span>
+    </footer>
+  </main>
+
+  <api-shim></api-shim>
+  <script>
+    // =========================================================================
+    // STATE & PRESETS (Grounded in source figures; no hardcoded personal PII)
+    // =========================================================================
+    var appState = {
+      preset: 'reference',
+      strategy: 'avalanche',
+      hybridThreshold: 2500,
+      extraBooster: 150,
+      privacyMasked: false,
+      incomes: [],
+      tradelines: [],
+      budget: [],
+      freezes: { equifax: false, experian: false, transunion: false }
+    };
+
+    var paydownChartInstance = null;
+    var compositionChartInstance = null;
+    var lastSimulation = null;
+    var persistenceReady = false;
+
+    function buildPresetData(key) {
+      if (key === 'blank') {
+        return {
+          preset: 'blank',
+          strategy: 'avalanche',
+          hybridThreshold: 2500,
+          extraBooster: 0,
+          incomes: [],
+          tradelines: [],
+          budget: []
+        };
+      }
+      if (key === 'experian') {
+        return {
+          preset: 'experian',
+          strategy: 'avalanche',
+          hybridThreshold: 2500,
+          extraBooster: 100,
+          incomes: [
+            { id: 'inc-exp-1', name: `Primary Payroll`, freq: 26, gross: 2400, taxes: 450, deduct: 120 }
+          ],
+          tradelines: [
+            { id: 'tl-exp-1', name: `Revolving Card A`, category: `Credit Card`, balance: 8000, apr: 18.0, minPay: 160, limit: 10000, dueDay: 10 },
+            { id: 'tl-exp-2', name: `Revolving Card B`, category: `Credit Card`, balance: 3000, apr: 20.0, minPay: 75, limit: 5000, dueDay: 18 },
+            { id: 'tl-exp-3', name: `Revolving Card C`, category: `Credit Card`, balance: 5000, apr: 22.0, minPay: 125, limit: 6500, dueDay: 24 }
+          ],
+          budget: [
+            { id: 'bg-exp-1', name: `Housing & Utilities`, type: `fixed`, amount: 1650 },
+            { id: 'bg-exp-2', name: `Groceries & Household`, type: `living`, amount: 520 },
+            { id: 'bg-exp-3', name: `Transportation & Insurance`, type: `fixed`, amount: 380 }
+          ]
+        };
+      }
+      // Default: 'reference' — Grounded in source notebook figures
+      return {
+        preset: 'reference',
+        strategy: 'avalanche',
+        hybridThreshold: 2500,
+        extraBooster: 150,
+        incomes: [
+          { id: 'inc-1', name: `Primary Household Salary`, freq: 26, gross: 3200, taxes: 640, deduct: 210 },
+          { id: 'inc-2', name: `Secondary Contract Income`, freq: 12, gross: 1450, taxes: 290, deduct: 0 }
+        ],
+        tradelines: [
+          { id: 'tl-1', name: `Credit Card Portfolio`, category: `Credit Card`, balance: 21784.00, apr: 19.99, minPay: 545.00, limit: 28000, dueDay: 14 },
+          { id: 'tl-2', name: `Personal Consolidation Loan`, category: `Personal Loan`, balance: 21020.00, apr: 11.25, minPay: 460.00, limit: 0, dueDay: 20 },
+          { id: 'tl-3', name: `Federal Student Loan`, category: `Student Loan`, balance: 9418.11, apr: 5.75, minPay: 115.00, limit: 0, dueDay: 5 },
+          { id: 'tl-4', name: `Auto Installment Loan`, category: `Auto Loan`, balance: 7821.15, apr: 5.99, minPay: 245.00, limit: 0, dueDay: 26 }
+        ],
+        budget: [
+          { id: 'bg-1', name: `Housing / Mortgage or Rent`, type: `fixed`, amount: 1650 },
+          { id: 'bg-2', name: `Utilities, Power & Fiber`, type: `fixed`, amount: 260 },
+          { id: 'bg-3', name: `Auto & Health Insurance`, type: `fixed`, amount: 310 },
+          { id: 'bg-4', name: `Groceries & Essentials`, type: `living`, amount: 640 },
+          { id: 'bg-5', name: `Fuel, Transit & Misc`, type: `living`, amount: 280 }
+        ]
+      };
+    }
+
+    // =========================================================================
+    // INITIALIZATION & PERSISTENCE (notebookAppApi)
+    // =========================================================================
+    async function initApp() {
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === 'function') {
+          var saved = await window.notebookAppApi.getAppState();
+          if (saved && Array.isArray(saved.tradelines)) {
+            appState = Object.assign({}, appState, saved);
+          } else {
+            Object.assign(appState, buildPresetData('reference'));
+          }
+          persistenceReady = true;
+        } else {
+          Object.assign(appState, buildPresetData('reference'));
+        }
+      } catch (err) {
+        Object.assign(appState, buildPresetData('reference'));
+      }
+
+      syncUiControlsFromState();
+      recalculateAndRender();
+      previewCheckstubMath();
+
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+      if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === 'function') {
+        window.notebookAppApi.notifyAppReady();
+      }
+    }
+
+    async function persistState() {
+      if (!persistenceReady) return;
+      try {
+        if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === 'function') {
+          await window.notebookAppApi.setAppState(appState);
+        }
+      } catch (e) {
+        // Silent fallback if host persistence throttles
+      }
+    }
+
+    function syncUiControlsFromState() {
+      var presetSel = document.getElementById('preset-select');
+      if (presetSel) presetSel.value = appState.preset || 'custom';
+
+      var boosterSlider = document.getElementById('booster-slider');
+      var boosterNum = document.getElementById('booster-number');
+      if (boosterSlider) boosterSlider.value = Math.min(3000, appState.extraBooster || 0);
+      if (boosterNum) boosterNum.value = appState.extraBooster || 0;
+
+      var hybInput = document.getElementById('hybrid-threshold-input');
+      if (hybInput) hybInput.value = appState.hybridThreshold || 2500;
+
+      var root = document.getElementById('app-root');
+      if (root) {
+        if (appState.privacyMasked) root.classList.add('masked-active');
+        else root.classList.remove('masked-active');
+      }
+      var maskLbl = document.getElementById('mask-btn-label');
+      if (maskLbl) maskLbl.textContent = appState.privacyMasked ? 'Show Figures' : 'Mask Figures';
+
+      updateStrategyButtons();
+      renderBureauFreezes();
+    }
+
+    // =========================================================================
+    // FORMATTING & MATH HELPERS
+    // =========================================================================
+    function fmtMoney(val) {
+      var n = Number(val) || 0;
+      return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function fmtMoneyWhole(val) {
+      var n = Number(val) || 0;
+      return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+
+    function addMonthsToNow(months) {
+      if (!isFinite(months) || months >= 600) return '600+ mos (Cap)';
+      var d = new Date(2026, 10, 21); // Nov 2026 baseline
+      d.setMonth(d.getMonth() + months);
+      var names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return names[d.getMonth()] + ' ' + d.getFullYear();
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getTokenColor(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function showGlobalStatus(text, tone) {
+      var el = document.getElementById('global-status');
+      if (!el) return;
+      el.textContent = text;
+      el.className = 'inline-msg visible ' + (tone || 'info');
+      clearTimeout(el._hideTimer);
+      el._hideTimer = setTimeout(function() {
+        el.className = 'inline-msg';
+      }, 4500);
+    }
+
+    // =========================================================================
+    // SIMULATION ENGINE (Avalanche, Snowball, Hybrid, Minimum-Only)
+    // =========================================================================
+    function simulatePayoff(tradelines, strategy, extraMonthly, hybridThreshold, rollFreedMinimums) {
+      if (!tradelines || tradelines.length === 0) {
+        return {
+          months: 0,
+          payoffDate: 'No Debt',
+          totalInterest: 0,
+          timeline: [0],
+          scheduleRows: [],
+          milestones: [],
+          month30: null,
+          month10: null,
+          capped: false
+        };
+      }
+
+      var accounts = tradelines.map(function(t) {
+        return {
+          id: t.id,
+          name: t.name,
+          category: t.category,
+          balance: Math.max(0, Number(t.balance) || 0),
+          initialBalance: Math.max(0, Number(t.balance) || 0),
+          apr: Math.max(0, Number(t.apr) || 0),
+          minPay: Math.max(0, Number(t.minPay) || 0),
+          limit: Math.max(0, Number(t.limit) || 0),
+          interestAccrued: 0,
+          paidOffMonth: null
+        };
+      });
+
+      var totalLimits = accounts.reduce(function(acc, a) {
+        return acc + (a.category === 'Credit Card' || a.limit > 0 ? a.limit : 0);
+      }, 0);
+
+      var initialTotalBal = accounts.reduce(function(acc, a) { return acc + a.balance; }, 0);
+      var baseMinimumPool = accounts.reduce(function(acc, a) { return acc + a.minPay; }, 0);
+      var monthlyBudget = baseMinimumPool + Math.max(0, Number(extraMonthly) || 0);
+
+      var timeline = [Math.round(initialTotalBal * 100) / 100];
+      var scheduleRows = [];
+      var milestones = [];
+      var totalInterest = 0;
+      var month = 0;
+      var maxMonths = 600;
+      var month30 = null;
+      var month10 = null;
+
+      function calcRevUtil() {
+        if (totalLimits <= 0) return 0;
+        var revBal = accounts.reduce(function(acc, a) {
+          return acc + ((a.category === 'Credit Card' || a.limit > 0) ? a.balance : 0);
+        }, 0);
+        return (revBal / totalLimits) * 100;
+      }
+
+      var startUtil = calcRevUtil();
+      if (totalLimits > 0 && startUtil < 30) month30 = 0;
+      if (totalLimits > 0 && startUtil < 10) month10 = 0;
+
+      while (month < maxMonths) {
+        var active = accounts.filter(function(a) { return a.balance > 0.005; });
+        if (active.length === 0) break;
+
+        month += 1;
+        var monthInterest = 0;
+        var monthPrincipalPaid = 0;
+        var monthTotalPaid = 0;
+
+        // 1. Accrue monthly interest
+        for (var i = 0; i < active.length; i++) {
+          var a = active[i];
+          var intr = a.balance * (a.apr / 100 / 12);
+          a.balance += intr;
+          a.interestAccrued += intr;
+          monthInterest += intr;
+          totalInterest += intr;
+        }
+
+        // 2. Pay required minimums on active accounts
+        var spentThisMonth = 0;
+        var perAccPayments = {};
+        for (var j = 0; j < active.length; j++) {
+          var accObj = active[j];
+          var minDue = Math.min(accObj.balance, accObj.minPay);
+          accObj.balance -= minDue;
+          spentThisMonth += minDue;
+          monthTotalPaid += minDue;
+          perAccPayments[accObj.id] = minDue;
+        }
+
+        // 3. Roll freed minimums + extra booster if strategy is active
+        var pool = 0;
+        if (rollFreedMinimums) {
+          pool = Math.max(0, monthlyBudget - spentThisMonth);
+        }
+
+        if (pool > 0.005) {
+          var targets = accounts.filter(function(a) { return a.balance > 0.005; });
+          targets.sort(function(x, y) {
+            if (strategy === 'snowball') {
+              if (Math.abs(x.balance - y.balance) > 0.01) return x.balance - y.balance;
+              return y.apr - x.apr;
+            }
+            if (strategy === 'hybrid') {
+              var xSmall = x.balance <= hybridThreshold;
+              var ySmall = y.balance <= hybridThreshold;
+              if (xSmall && !ySmall) return -1;
+              if (!xSmall && ySmall) return 1;
+              if (xSmall && ySmall) return x.balance - y.balance;
+              if (Math.abs(y.apr - x.apr) > 0.01) return y.apr - x.apr;
+              return x.balance - y.balance;
+            }
+            // Default: Avalanche (Highest APR first)
+            if (Math.abs(y.apr - x.apr) > 0.01) return y.apr - x.apr;
+            return x.balance - y.balance;
+          });
+
+          for (var k = 0; k < targets.length && pool > 0.005; k++) {
+            var t = targets[k];
+            var extraPay = Math.min(t.balance, pool);
+            t.balance -= extraPay;
+            pool -= extraPay;
+            monthTotalPaid += extraPay;
+            perAccPayments[t.id] = (perAccPayments[t.id] || 0) + extraPay;
+          }
+        }
+
+        // 4. Clean dust & check payoffs
+        var remainingTotal = 0;
+        var paidOffNames = [];
+        for (var m = 0; m < accounts.length; m++) {
+          var item = accounts[m];
+          if (item.balance <= 0.005) {
+            item.balance = 0;
+            if (item.paidOffMonth === null && item.initialBalance > 0) {
+              item.paidOffMonth = month;
+              paidOffNames.push(item.name);
+              milestones.push({
+                id: item.id,
+                name: item.name,
+                category: item.category,
+                initialBalance: item.initialBalance,
+                apr: item.apr,
+                minPay: item.minPay,
+                paidOffMonth: month,
+                payoffDate: addMonthsToNow(month),
+                interestPaid: item.interestAccrued
+              });
+            }
+          }
+          remainingTotal += item.balance;
+        }
+
+        monthPrincipalPaid = Math.max(0, monthTotalPaid - monthInterest);
+        var utilNow = calcRevUtil();
+        if (totalLimits > 0) {
+          if (month30 === null && utilNow < 30) month30 = month;
+          if (month10 === null && utilNow < 10) month10 = month;
+        }
+
+        timeline.push(Math.round(remainingTotal * 100) / 100);
+        scheduleRows.push({
+          month: month,
+          dateLabel: addMonthsToNow(month),
+          payment: monthTotalPaid,
+          principal: monthPrincipalPaid,
+          interest: monthInterest,
+          remaining: remainingTotal,
+          utilPct: utilNow,
+          paidOffNames: paidOffNames,
+          perAccPayments: perAccPayments
+        });
+
+        if (remainingTotal <= 0.005) break;
+      }
+
+      // Add any uncapped accounts to milestones if capped at 600
+      for (var z = 0; z < accounts.length; z++) {
+        if (accounts[z].paidOffMonth === null && accounts[z].initialBalance > 0) {
+          milestones.push({
+            id: accounts[z].id,
+            name: accounts[z].name,
+            category: accounts[z].category,
+            initialBalance: accounts[z].initialBalance,
+            apr: accounts[z].apr,
+            minPay: accounts[z].minPay,
+            paidOffMonth: null,
+            payoffDate: '600+ mos',
+            interestPaid: accounts[z].interestAccrued
+          });
+        }
+      }
+
+      return {
+        months: month,
+        payoffDate: addMonthsToNow(month),
+        totalInterest: totalInterest,
+        timeline: timeline,
+        scheduleRows: scheduleRows,
+        milestones: milestones,
+        month30: month30,
+        month10: month10,
+        capped: month >= maxMonths
+      };
+    }
+
+    // =========================================================================
+    // MASTER RECALCULATE & RENDER PIPELINE
+    // =========================================================================
+    function recalculateAndRender() {
+      // 1. Income Totals
+      var monthlyNetIncome = appState.incomes.reduce(function(sum, inc) {
+        var netCheck = Math.max(0, (Number(inc.gross) || 0) - (Number(inc.taxes) || 0) - (Number(inc.deduct) || 0));
+        return sum + (netCheck * (Number(inc.freq) || 12)) / 12;
+      }, 0);
+
+      // 2. Budget Totals
+      var fixedTotal = 0;
+      var livingTotal = 0;
+      appState.budget.forEach(function(b) {
+        var amt = Math.max(0, Number(b.amount) || 0);
+        if (b.type === 'fixed') fixedTotal += amt;
+        else livingTotal += amt;
+      });
+      var livingAndFixed = fixedTotal + livingTotal;
+
+      // 3. Tradeline Totals
+      var totalDebt = 0;
+      var weightedAprNum = 0;
+      var totalMinPayments = 0;
+      var totalRevBal = 0;
+      var totalRevLimit = 0;
+
+      appState.tradelines.forEach(function(t) {
+        var bal = Math.max(0, Number(t.balance) || 0);
+        var apr = Math.max(0, Number(t.apr) || 0);
+        var minP = Math.max(0, Number(t.minPay) || 0);
+        var lim = Math.max(0, Number(t.limit) || 0);
+        totalDebt += bal;
+        weightedAprNum += bal * apr;
+        totalMinPayments += minP;
+        if (t.category === 'Credit Card' || lim > 0) {
+          totalRevBal += bal;
+          totalRevLimit += lim;
+        }
+      });
+
+      var weightedApr = totalDebt > 0 ? weightedAprNum / totalDebt : 0;
+      var availableSurplus = monthlyNetIncome - livingAndFixed - totalMinPayments;
+      var utilPct = totalRevLimit > 0 ? (totalRevBal / totalRevLimit) * 100 : 0;
+
+      // 4. Simulations across all 4 modes
+      var simMin = simulatePayoff(appState.tradelines, 'avalanche', 0, appState.hybridThreshold, false);
+      var simAva = simulatePayoff(appState.tradelines, 'avalanche', appState.extraBooster, appState.hybridThreshold, true);
+      var simSno = simulatePayoff(appState.tradelines, 'snowball', appState.extraBooster, appState.hybridThreshold, true);
+      var simHyb = simulatePayoff(appState.tradelines, 'hybrid', appState.extraBooster, appState.hybridThreshold, true);
+
+      var activeSim = simAva;
+      var altSim = simSno;
+      if (appState.strategy === 'snowball') {
+        activeSim = simSno;
+        altSim = simAva;
+      } else if (appState.strategy === 'hybrid') {
+        activeSim = simHyb;
+        altSim = simAva;
+      }
+      lastSimulation = activeSim;
+
+      var interestSaved = Math.max(0, simMin.totalInterest - activeSim.totalInterest);
+      var monthsSaved = Math.max(0, simMin.months - activeSim.months);
+
+      // 5. Update Hero KPIs
+      var elDate = document.getElementById('kpi-debt-free-date');
+      var elMonthsDelta = document.getElementById('kpi-months-delta');
+      var elTotalDebt = document.getElementById('kpi-total-debt');
+      var elWeightedApr = document.getElementById('kpi-weighted-apr');
+      var elSurplus = document.getElementById('kpi-monthly-surplus');
+      var elCashRatio = document.getElementById('kpi-cashflow-ratio');
+      var elSaved = document.getElementById('kpi-interest-saved');
+      var elUtil = document.getElementById('kpi-revolving-util');
+
+      if (elDate) elDate.textContent = appState.tradelines.length ? activeSim.payoffDate : 'Debt-Free';
+      if (elMonthsDelta) {
+        if (!appState.tradelines.length) {
+          elMonthsDelta.textContent = 'Add tradelines to compute horizon';
+          elMonthsDelta.className = 'metric-delta muted';
+        } else {
+          elMonthsDelta.textContent = activeSim.months + ' mos (' + monthsSaved + ' mos faster than minimums)';
+          elMonthsDelta.className = monthsSaved > 0 ? 'metric-delta' : 'metric-delta muted';
+        }
+      }
+      if (elTotalDebt) elTotalDebt.textContent = fmtMoney(totalDebt);
+      if (elWeightedApr) elWeightedApr.textContent = weightedApr.toFixed(2) + '% weighted avg APR · ' + appState.tradelines.length + ' accounts';
+      if (elSurplus) elSurplus.textContent = fmtMoney(availableSurplus);
+      if (elCashRatio) {
+        if (availableSurplus < 0) {
+          elCashRatio.textContent = 'Monthly deficit — trim overhead or boost income';
+          elCashRatio.className = 'metric-delta err';
+        } else {
+          var pctSurplus = monthlyNetIncome > 0 ? ((availableSurplus / monthlyNetIncome) * 100).toFixed(1) : '0.0';
+          elCashRatio.textContent = pctSurplus + '% of net pay free for debt strike';
+          elCashRatio.className = 'metric-delta';
+        }
+      }
+      if (elSaved) elSaved.textContent = fmtMoney(interestSaved);
+      if (elUtil) {
+        elUtil.textContent = totalRevLimit > 0 ? utilPct.toFixed(1) + '% revolving credit utilization' : 'No revolving limits tracked';
+        elUtil.className = utilPct >= 50 ? 'metric-delta err' : (utilPct >= 30 ? 'metric-delta warn' : 'metric-delta');
+      }
+
+      // 6. Allocation Summary Box
+      var elAllocMin = document.getElementById('alloc-minimums');
+      var elAllocBoost = document.getElementById('alloc-booster');
+      var elAllocTotal = document.getElementById('alloc-total');
+      var elBoostChip = document.getElementById('booster-status-chip');
+      if (elAllocMin) elAllocMin.textContent = fmtMoney(totalMinPayments);
+      if (elAllocBoost) elAllocBoost.textContent = fmtMoney(appState.extraBooster);
+      if (elAllocTotal) elAllocTotal.textContent = fmtMoney(totalMinPayments + (Number(appState.extraBooster) || 0));
+      if (elBoostChip) elBoostChip.textContent = '+' + fmtMoneyWhole(appState.extraBooster) + '/mo boost';
+
+      // 7. Render Tables, Waterfall, Telemetry & Charts
+      renderStrategyCompareTable(simMin, simAva, simSno, simHyb);
+      renderIncomes(monthlyNetIncome);
+      renderTradelines();
+      renderBudget(monthlyNetIncome, fixedTotal, livingTotal, totalMinPayments, availableSurplus);
+      renderTelemetry(totalRevBal, totalRevLimit, utilPct, activeSim);
+      renderSchedule();
+      renderCharts(simMin, activeSim, altSim);
+    }
+
+    function renderStrategyCompareTable(simMin, simAva, simSno, simHyb) {
+      var tbody = document.getElementById('strategy-compare-tbody');
+      if (!tbody) return;
+      var rows = [
+        { key: 'min', label: 'Minimums Only (Baseline)', sim: simMin },
+        { key: 'avalanche', label: 'Avalanche (Highest APR)', sim: simAva },
+        { key: 'snowball', label: 'Snowball (Smallest Balance)', sim: simSno },
+        { key: 'hybrid', label: 'Hybrid (Quick Wins → APR)', sim: simHyb }
+      ];
+      tbody.innerHTML = rows.map(function(r) {
+        var saved = Math.max(0, simMin.totalInterest - r.sim.totalInterest);
+        var isActive = r.key === appState.strategy;
+        var chip = isActive ? ' <span class="status-chip cyan">Active</span>' : '';
+        return '<tr>' +
+          '<td><strong>' + escapeHtml(r.label) + '</strong>' + chip + '</td>' +
+          '<td class="num">' + (appState.tradelines.length ? r.sim.months : 0) + '</td>' +
+          '<td>' + (appState.tradelines.length ? escapeHtml(r.sim.payoffDate) : '--') + '</td>' +
+          '<td class="num sensitive-val">' + fmtMoney(r.sim.totalInterest) + '</td>' +
+          '<td class="num sensitive-val" style="color: var(--tertiary);">' + (r.key === 'min' ? '—' : fmtMoney(saved)) + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    // =========================================================================
+    // CHARTS (Chart.js using :root CSS tokens)
+    // =========================================================================
+    function renderCharts(simMin, activeSim, altSim) {
+      if (typeof Chart === 'undefined') return;
+
+      var c1 = getTokenColor('--data-1');
+      var c2 = getTokenColor('--data-2');
+      var c3 = getTokenColor('--data-3');
+      var cCtx = getTokenColor('--data-context');
+      var cText = getTokenColor('--on-surface-variant');
+      var cGrid = getTokenColor('--outline-variant');
+      var cFont = getTokenColor('--font-label') || 'monospace';
+
+      // Chart 1: Paydown Trajectory Line Chart
+      var payCtx = document.getElementById('paydown-chart');
+      if (payCtx) {
+        var maxLen = Math.max(simMin.timeline.length, activeSim.timeline.length, altSim.timeline.length, 2);
+        var capLen = Math.min(maxLen, 120); // Focus on actionable 10-year horizon
+        var labels = [];
+        for (var i = 0; i < capLen; i++) {
+          labels.push('Mo ' + i);
+        }
+
+        function padSeries(arr) {
+          var out = [];
+          for (var j = 0; j < capLen; j++) {
+            out.push(j < arr.length ? arr[j] : 0);
+          }
+          return out;
+        }
+
+        if (paydownChartInstance) paydownChartInstance.destroy();
+        paydownChartInstance = new Chart(payCtx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Minimum Only',
+                data: padSeries(simMin.timeline),
+                borderColor: cCtx,
+                borderDash: [5, 5],
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.2
+              },
+              {
+                label: 'Selected Strategy',
+                data: padSeries(activeSim.timeline),
+                borderColor: c1,
+                backgroundColor: getTokenColor('--cyan-chart-fill'),
+                fill: true,
+                borderWidth: 2.5,
+                pointRadius: 0,
+                tension: 0.2
+              },
+              {
+                label: 'Alternate Strategy',
+                data: padSeries(altSim.timeline),
+                borderColor: c2,
+                borderWidth: 1.75,
+                pointRadius: 0,
+                tension: 0.2
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    return ctx.dataset.label + ': ' + (appState.privacyMasked ? '••••' : fmtMoney(ctx.parsed.y));
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: cText, font: { family: cFont, size: 11 }, maxTicksLimit: 8 }
+              },
+              y: {
+                grid: { color: cGrid },
+                ticks: {
+                  color: cText,
+                  font: { family: cFont, size: 11 },
+                  callback: function(v) { return appState.privacyMasked ? '•••' : '$' + Math.round(v / 1000) + 'k'; }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Chart 2: Principal vs Interest by Account Bar Chart
+      var compCtx = document.getElementById('composition-chart');
+      if (compCtx) {
+        var milestones = activeSim.milestones || [];
+        var barLabels = milestones.map(function(m) { return m.name.length > 16 ? m.name.slice(0, 15) + '…' : m.name; });
+        var principals = milestones.map(function(m) { return Math.round(m.initialBalance); });
+        var interests = milestones.map(function(m) { return Math.round(m.interestPaid); });
+
+        if (compositionChartInstance) compositionChartInstance.destroy();
+        compositionChartInstance = new Chart(compCtx, {
+          type: 'bar',
+          data: {
+            labels: barLabels.length ? barLabels : ['No Accounts'],
+            datasets: [
+              {
+                label: 'Principal',
+                data: principals.length ? principals : [0],
+                backgroundColor: c1,
+                borderRadius: 3
+              },
+              {
+                label: 'Projected Interest',
+                data: interests.length ? interests : [0],
+                backgroundColor: c3,
+                borderRadius: 3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: cText, font: { family: cFont, size: 11 } }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    return ctx.dataset.label + ': ' + (appState.privacyMasked ? '••••' : fmtMoney(ctx.parsed.y));
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                stacked: true,
+                grid: { display: false },
+                ticks: { color: cText, font: { family: cFont, size: 11 } }
+              },
+              y: {
+                stacked: true,
+                grid: { color: cGrid },
+                ticks: {
+                  color: cText,
+                  font: { family: cFont, size: 11 },
+                  callback: function(v) { return appState.privacyMasked ? '•••' : '$' + Math.round(v / 1000) + 'k'; }
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // =========================================================================
+    // INCOME & CHECKSTUB INGESTION HANDLERS
+    // =========================================================================
+    function previewCheckstubMath() {
+      var freq = Number((document.getElementById('inc-freq') || {}).value) || 26;
+      var gross = Number((document.getElementById('inc-gross') || {}).value) || 0;
+      var taxes = Number((document.getElementById('inc-taxes') || {}).value) || 0;
+      var deduct = Number((document.getElementById('inc-deduct') || {}).value) || 0;
+      var netCheck = Math.max(0, gross - taxes - deduct);
+      var monthlyNet = (netCheck * freq) / 12;
+      var prev = document.getElementById('inc-net-preview');
+      if (prev) prev.value = fmtMoney(monthlyNet);
+      var ratioEl = document.getElementById('inc-takehome-rate');
+      if (ratioEl) {
+        var pct = gross > 0 ? ((netCheck / gross) * 100).toFixed(1) : '0.0';
+        ratioEl.textContent = 'Net take-home: ' + pct + '% of gross';
+      }
+    }
+
+    function addIncomeStream(e) {
+      e.preventDefault();
+      var nameEl = document.getElementById('inc-name');
+      var freqEl = document.getElementById('inc-freq');
+      var grossEl = document.getElementById('inc-gross');
+      var taxesEl = document.getElementById('inc-taxes');
+      var deductEl = document.getElementById('inc-deduct');
+      if (!nameEl || !freqEl || !grossEl) return;
+
+      appState.incomes.push({
+        id: 'inc-' + Date.now(),
+        name: nameEl.value.trim() || 'Payroll Stream',
+        freq: Number(freqEl.value) || 26,
+        gross: Math.max(0, Number(grossEl.value) || 0),
+        taxes: Math.max(0, Number((taxesEl || {}).value) || 0),
+        deduct: Math.max(0, Number((deductEl || {}).value) || 0)
+      });
+      appState.preset = 'custom';
+      syncUiControlsFromState();
+      recalculateAndRender();
+      persistState();
+      showGlobalStatus('Added income stream and recalculated household surplus.', 'ok');
+    }
+
+    function deleteIncomeStream(id) {
+      appState.incomes = appState.incomes.filter(function(i) { return i.id !== id; });
+      appState.preset = 'custom';
+      syncUiControlsFromState();
+      recalculateAndRender();
+      persistState();
+    }
+
+    function renderIncomes(monthlyNetTotal) {
+      var tbody = document.getElementById('income-tbody');
+      var empty = document.getElementById('income-empty');
+      var badge = document.getElementById('income-monthly-badge');
+      var annualEl = document.getElementById('income-annual-net');
+
+      if (badge) badge.textContent = 'Monthly Net: ' + (appState.privacyMasked ? '••••' : fmtMoney(monthlyNetTotal));
+      if (annualEl) annualEl.textContent = 'Annual Net: ' + (appState.privacyMasked ? '••••' : fmtMoney(monthlyNetTotal * 12));
+
+      if (!tbody || !empty) return;
+      if (appState.incomes.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      var freqLabels = { 52: 'Weekly (52)', 26: 'Bi-Weekly (26)', 24: 'Semi-Mo (24)', 12: 'Monthly (12)' };
+      tbody.innerHTML = appState.incomes.map(function(inc) {
+        var netCheck = Math.max(0, (Number(inc.gross) || 0) - (Number(inc.taxes) || 0) - (Number(inc.deduct) || 0));
+        var monthly = (netCheck * (Number(inc.freq) || 12)) / 12;
+        return '<tr>' +
+          '<td><strong>' + escapeHtml(inc.name) + '</strong></td>' +
+          '<td>' + escapeHtml(freqLabels[inc.freq] || (inc.freq + '/yr')) + '</td>' +
+          '<td class="num sensitive-val">' + fmtMoney(inc.gross) + '</td>' +
+          '<td class="num sensitive-val">' + fmtMoney(netCheck) + '</td>' +
+          '<td class="num sensitive-val" style="color: var(--tertiary);">' + fmtMoney(monthly) + '</td>' +
+          '<td class="num"><button type="button" class="btn btn-secondary btn-sm" onclick="deleteIncomeStream(\'' + escapeHtml(inc.id) + '\')">Remove</button></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function loadSampleCheckstub() {
+      var area = document.getElementById('stub-paste');
+      if (area) {
+        area.value = `Employer: Meridian Operations LLC | Pay Frequency: Bi-Weekly | Gross Pay: $3,680.00 | Federal/State/FICA Taxes: $742.50 | 401k & Medical Deductions: $265.00`;
+      }
+    }
+
+    function parseCheckstubText() {
+      var area = document.getElementById('stub-paste');
+      var msg = document.getElementById('stub-parse-msg');
+      if (!area) return;
+      var txt = area.value || '';
+      if (!txt.trim()) {
+        if (msg) msg.textContent = 'Paste checkstub text first.';
+        return;
+      }
+
+      var grossM = txt.match(/gross(?:\s+pay|\s+earnings)?\s*[:\-]?\s*\$?([\d,]+\.?\d*)/i);
+      var taxM = txt.match(/(?:taxes|withholding|tax)\s*[:\-]?\s*\$?([\d,]+\.?\d*)/i);
+      var dedM = txt.match(/(?:deductions?|401k|benefits|pre-?tax)\s*[:\-]?\s*\$?([\d,]+\.?\d*)/i);
+      var empM = txt.match(/(?:employer|source|company)\s*[:\-]\s*([^|\n]+)/i);
+
+      var freqVal = '26';
+      if (/weekly/i.test(txt) && !/bi-?weekly/i.test(txt)) freqVal = '52';
+      else if (/semi-?monthly/i.test(txt)) freqVal = '24';
+      else if (/monthly/i.test(txt)) freqVal = '12';
+
+      if (empM && document.getElementById('inc-name')) document.getElementById('inc-name').value = empM[1].trim();
+      if (document.getElementById('inc-freq')) document.getElementById('inc-freq').value = freqVal;
+      if (grossM && document.getElementById('inc-gross')) document.getElementById('inc-gross').value = grossM[1].replace(/,/g, '');
+      if (taxM && document.getElementById('inc-taxes')) document.getElementById('inc-taxes').value = taxM[1].replace(/,/g, '');
+      if (dedM && document.getElementById('inc-deduct')) document.getElementById('inc-deduct').value = dedM[1].replace(/,/g, '');
+
+      previewCheckstubMath();
+      if (msg) msg.textContent = grossM ? 'Checkstub extracted into form.' : 'Partial parse — verify fields above.';
+    }
+
+    // =========================================================================
+    // STATEMENT & TRADELINE INGESTION HANDLERS
+    // =========================================================================
+    function addOrUpdateTradeline(e) {
+      e.preventDefault();
+      var editId = (document.getElementById('tl-edit-id') || {}).value || '';
+      var name = ((document.getElementById('tl-name') || {}).value || '').trim() || 'Creditor Account';
+      var category = (document.getElementById('tl-cat') || {}).value || 'Credit Card';
+      var balance = Math.max(0, Number((document.getElementById('tl-bal') || {}).value) || 0);
+      var apr = Math.max(0, Number((document.getElementById('tl-apr') || {}).value) || 0);
+      var minPay = Math.max(1, Number((document.getElementById('tl-min') || {}).value) || 1);
+      var limit = Math.max(0, Number((document.getElementById('tl-limit') || {}).value) || 0);
+      var dueDay = Math.min(31, Math.max(1, Number((document.getElementById('tl-due') || {}).value) || 15));
+
+      if (editId) {
+        var idx = appState.tradelines.findIndex(function(t) { return t.id === editId; });
+        if (idx >= 0) {
+          appState.tradelines[idx] = { id: editId, name: name, category: category, balance: balance, apr: apr, minPay: minPay, limit: limit, dueDay: dueDay };
+        }
+        cancelTradelineEdit();
+        showGlobalStatus('Updated tradeline "' + name + '".', 'ok');
+      } else {
+        appState.tradelines.push({
+          id: 'tl-' + Date.now(),
+          name: name, category: category, balance: balance, apr: apr, minPay: minPay, limit: limit, dueDay: dueDay
+        });
+        showGlobalStatus('Added tradeline "' + name + '" to paydown matrix.', 'ok');
+      }
+
+      appState.preset = 'custom';
+      syncUiControlsFromState();
+      recalculateAndRender();
+      persistState();
+    }
+
+    function editTradeline(id) {
+      var t = appState.tradelines.find(function(item) { return item.id === id; });
+      if (!t) return;
+      document.getElementById('tl-edit-id').value = t.id;
+      document.getElementById('tl-name').value = t.name;
+      document.getElementById('tl-cat').value = t.category;
+      document.getElementById('tl-bal').value = t.balance;
+      document.getElementById('tl-apr').value = t.apr;
+      document.getElementById('tl-min').value = t.minPay;
+      document.getElementById('tl-limit').value = t.limit;
+      document.getElementById('tl-due').value = t.dueDay || 15;
+      document.getElementById('tradeline-form-title').textContent = 'Edit Tradeline';
+      document.getElementById('cancel-edit-btn').style.display = 'inline-flex';
+      document.getElementById('tl-name').focus();
+    }
+
+    function cancelTradelineEdit() {
+      var eid = document.getElementById('tl-edit-id');
+      if (eid) eid.value = '';
+      var title = document.getElementById('tradeline-form-title');
+      if (title) title.textContent = 'Add Debt Tradeline';
+      var cbtn = document.getElementById('cancel-edit-btn');
+      if (cbtn) cbtn.style.display = 'none';
+    }
+
+    function deleteTradeline(id) {
+      appState.tradelines = appState.tradelines.filter(function(t) { return t.id !== id; });
+      appState.preset = 'custom';
+      syncUiControlsFromState();
+      recalculateAndRender();
+      persistState();
+    }
+
+    function renderTradelines() {
+      var tbody = document.getElementById('tradelines-tbody');
+      var empty = document.getElementById('tradelines-empty');
+      var badge = document.getElementById('tradeline-count-badge');
+      var filterSel = document.getElementById('sched-account-filter');
+
+      if (badge) badge.textContent = appState.tradelines.length + ' Active Tradelines';
+
+      if (filterSel) {
+        var prevFilter = filterSel.value;
+        filterSel.innerHTML = '<option value="all">All Tradelines Combined</option>' +
+          appState.tradelines.map(function(t) {
+            return '<option value="' + escapeHtml(t.id) + '">' + escapeHtml(t.name) + '</option>';
+          }).join('');
+        if (appState.tradelines.some(function(t) { return t.id === prevFilter; })) {
+          filterSel.value = prevFilter;
+        }
+      }
+
+      if (!tbody || !empty) return;
+      if (appState.tradelines.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      var sortMode = (document.getElementById('tl-sort') || {}).value || 'priority';
+      var list = appState.tradelines.slice();
+
+      list.sort(function(a, b) {
+        if (sortMode === 'apr_desc') return b.apr - a.apr;
+        if (sortMode === 'bal_asc') return a.balance - b.balance;
+        if (sortMode === 'bal_desc') return b.balance - a.balance;
+        // 'priority' matches active strategy
+        if (appState.strategy === 'snowball') return a.balance - b.balance;
+        if (appState.strategy === 'hybrid') {
+          var aS = a.balance <= appState.hybridThreshold;
+          var bS = b.balance <= appState.hybridThreshold;
+          if (aS && !bS) return -1;
+          if (!aS && bS) return 1;
+          if (aS && bS) return a.balance - b.balance;
+          return b.apr - a.apr;
+        }
+        return b.apr - a.apr;
+      });
+
+      tbody.innerHTML = list.map(function(t, idx) {
+        var util = (t.limit > 0) ? (t.balance / t.limit) * 100 : null;
+        var utilHtml = '<span style="color: var(--on-surface-variant);">—</span>';
+        if (util !== null) {
+          var cls = util >= 50 ? 'err' : (util >= 30 ? 'warn' : '');
+          utilHtml = '<span class="status-chip ' + cls + '">' + util.toFixed(0) + '%</span>';
+        }
+        var targetTag = idx === 0 ? ' <span class="status-chip cyan">#1 Target</span>' : '<span class="tabular-num" style="color: var(--on-surface-variant);">#' + (idx + 1) + '</span>';
+        return '<tr>' +
+          '<td>' + targetTag + '</td>' +
+          '<td><strong>' + escapeHtml(t.name) + '</strong><br><span class="data-label">' + escapeHtml(t.category) + ' · Due ' + (t.dueDay || 15) + 'th</span></td>' +
+          '<td class="num sensitive-val">' + fmtMoney(t.balance) + '</td>' +
+          '<td class="num">' + Number(t.apr).toFixed(2) + '%</td>' +
+          '<td class="num sensitive-val">' + fmtMoney(t.minPay) + '</td>' +
+          '<td class="num">' + utilHtml + '</td>' +
+          '<td class="num"><div class="row-wrap" style="justify-content: flex-end;">' +
+            '<button type="button" class="btn btn-secondary btn-sm" onclick="editTradeline(\'' + escapeHtml(t.id) + '\')">Edit</button>' +
+            '<button type="button" class="btn btn-secondary btn-sm" onclick="deleteTradeline(\'' + escapeHtml(t.id) + '\')">Del</button>' +
+          '</div></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function loadSampleStatement() {
+      var area = document.getElementById('stmt-paste');
+      if (area) {
+        area.value = `Chase Sapphire Reserve | New Balance: $5,840.25 | Purchase APR: 24.49% | Minimum Payment Due: $175.00 | Credit Limit: $10,000 | Due Day: 22`;
+      }
+    }
+
+    function parseStatementText() {
+      var area = document.getElementById('stmt-paste');
+      var msg = document.getElementById('stmt-parse-msg');
+      if (!area) return;
+      var txt = area.value || '';
+      if (!txt.trim()) {
+        if (msg) msg.textContent = 'Paste statement text first.';
+        return;
+      }
+
+      var parts = txt.split('|');
+      var credGuess = parts[0] && !/balance|apr|limit/i.test(parts[0]) ? parts[0].trim() : '';
+      var balM = txt.match(/(?:new\s+balance|current\s+balance|balance)\s*[:\-]?\s*\$?([\d,]+\.?\d*)/i);
+      var aprM = txt.match(/(?:apr|interest\s+rate)\s*[:\-]?\s*([\d.]+)\s*%?/i);
+      var minM = txt.match(/(?:minimum\s+payment(?:\s+due)?|min(?:\s+due|\s+pay)?)\s*[:\-]?\s*\$?([\d,]+\.?\d*)/i);
+      var limM = txt.match(/(?:credit\s+limit|limit)\s*[:\-]?\s*\$?([\d,]+\.?\d*)/i);
+      var dueM = txt.match(/(?:due\s+(?:date|day))\s*[:\-]?\s*(\d{1,2})/i);
+
+      if (credGuess && document.getElementById('tl-name')) document.getElementById('tl-name').value = credGuess;
+      if (balM && document.getElementById('tl-bal')) document.getElementById('tl-bal').value = balM[1].replace(/,/g, '');
+      if (aprM && document.getElementById('tl-apr')) document.getElementById('tl-apr').value = aprM[1];
+      if (minM && document.getElementById('tl-min')) document.getElementById('tl-min').value = minM[1].replace(/,/g, '');
+      if (limM && document.getElementById('tl-limit')) document.getElementById('tl-limit').value = limM[1].replace(/,/g, '');
+      if (dueM && document.getElementById('tl-due')) document.getElementById('tl-due').value = dueM[1];
+
+      if (msg) msg.textContent = balM ? 'Statement fields extracted to intake form.' : 'Check extracted fields above.';
+    }
+
+    // =========================================================================
+    // BUDGET HANDLERS
+    // =========================================================================
+    function addBudgetItem(e) {
+      e.preventDefault();
+      var name = ((document.getElementById('bg-name') || {}).value || '').trim() || 'Expense';
+      var type = (document.getElementById('bg-type') || {}).value || 'fixed';
+      var amt = Math.max(0, Number((document.getElementById('bg-amt') || {}).value) || 0);
+      appState.budget.push({ id: 'bg-' + Date.now(), name: name, type: type, amount: amt });
+      appState.preset = 'custom';
+      syncUiControlsFromState();
+      recalculateAndRender();
+      persistState();
+    }
+
+    function updateBudgetAmount(id, val) {
+      var item = appState.budget.find(function(b) { return b.id === id; });
+      if (!item) return;
+      item.amount = Math.max(0, Number(val) || 0);
+      appState.preset = 'custom';
+      recalculateAndRender();
+      persistState();
+    }
+
+    function deleteBudgetItem(id) {
+      appState.budget = appState.budget.filter(function(b) { return b.id !== id; });
+      appState.preset = 'custom';
+      syncUiControlsFromState();
+      recalculateAndRender();
+      persistState();
+    }
+
+    function renderBudget(netIncome, fixedTotal, livingTotal, minPayments, surplus) {
+      var denom = Math.max(netIncome, fixedTotal + livingTotal + minPayments + Math.max(0, surplus), 1);
+      var wFixed = (fixedTotal / denom) * 100;
+      var wLiving = (livingTotal / denom) * 100;
+      var wMin = (minPayments / denom) * 100;
+      var wSurplus = (Math.max(0, surplus) / denom) * 100;
+
+      var sFix = document.getElementById('wf-fixed-seg');
+      var sLiv = document.getElementById('wf-living-seg');
+      var sMin = document.getElementById('wf-min-seg');
+      var sSur = document.getElementById('wf-surplus-seg');
+      if (sFix) sFix.style.width = wFixed.toFixed(1) + '%';
+      if (sLiv) sLiv.style.width = wLiving.toFixed(1) + '%';
+      if (sMin) sMin.style.width = wMin.toFixed(1) + '%';
+      if (sSur) sSur.style.width = wSurplus.toFixed(1) + '%';
+
+      if (document.getElementById('lg-fixed')) document.getElementById('lg-fixed').textContent = fmtMoneyWhole(fixedTotal);
+      if (document.getElementById('lg-living')) document.getElementById('lg-living').textContent = fmtMoneyWhole(livingTotal);
+      if (document.getElementById('lg-min')) document.getElementById('lg-min').textContent = fmtMoneyWhole(minPayments);
+      if (document.getElementById('lg-surplus')) document.getElementById('lg-surplus').textContent = fmtMoneyWhole(surplus);
+
+      var wfText = document.getElementById('wf-summary-text');
+      if (wfText) wfText.textContent = fmtMoney(fixedTotal + livingTotal + minPayments) + ' committed / ' + fmtMoney(netIncome) + ' net';
+
+      var badge = document.getElementById('budget-health-badge');
+      if (badge) {
+        if (surplus < 0) {
+          badge.textContent = 'Deficit: ' + fmtMoney(surplus);
+          badge.className = 'status-chip err';
+        } else if (surplus < 150) {
+          badge.textContent = 'Tight Margin';
+          badge.className = 'status-chip warn';
+        } else {
+          badge.textContent = 'Surplus: ' + fmtMoney(surplus);
+          badge.className = 'status-chip';
+        }
+      }
+
+      var ohRatio = document.getElementById('bg-overhead-ratio');
+      if (ohRatio) {
+        var rPct = netIncome > 0 ? (((fixedTotal + livingTotal) / netIncome) * 100).toFixed(1) : '0.0';
+        ohRatio.textContent = 'Overhead & living ratio: ' + rPct + '% of net';
+      }
+
+      var bgTotLbl = document.getElementById('bg-total-label');
+      if (bgTotLbl) bgTotLbl.textContent = 'Total Living & Fixed: ' + fmtMoney(fixedTotal + livingTotal);
+
+      var tbody = document.getElementById('budget-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = appState.budget.map(function(b) {
+        var share = netIncome > 0 ? ((b.amount / netIncome) * 100).toFixed(1) + '%' : '0.0%';
+        var bucketTag = b.type === 'fixed'
+          ? '<span class="status-chip warn">Fixed</span>'
+          : '<span class="status-chip cyan">Living</span>';
+        return '<tr>' +
+          '<td><strong>' + escapeHtml(b.name) + '</strong></td>' +
+          '<td>' + bucketTag + '</td>' +
+          '<td class="num"><input type="number" aria-label="Monthly amount for ' + escapeHtml(b.name) + '" min="0" step="10" style="width: 105px; min-height: 36px; text-align: right;" value="' + b.amount + '" onchange="updateBudgetAmount(\'' + escapeHtml(b.id) + '\', this.value)"></td>' +
+          '<td class="num">' + share + '</td>' +
+          '<td class="num"><button type="button" class="btn btn-secondary btn-sm" onclick="deleteBudgetItem(\'' + escapeHtml(b.id) + '\')">Remove</button></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    // =========================================================================
+    // TELEMETRY & PAYOFF SCHEDULE HANDLERS
+    // =========================================================================
+    function renderTelemetry(revBal, revLimit, utilPct, activeSim) {
+      var elPct = document.getElementById('tel-util-pct');
+      var elBar = document.getElementById('tel-util-bar');
+      var elChip = document.getElementById('util-status-chip');
+      var elTo30 = document.getElementById('tel-to-30');
+      var elTo10 = document.getElementById('tel-to-10');
+      var elDate30 = document.getElementById('tel-date-30');
+      var elDate10 = document.getElementById('tel-date-10');
+
+      if (elPct) elPct.textContent = revLimit > 0 ? utilPct.toFixed(1) + '%' : 'N/A';
+      if (elBar) {
+        elBar.style.width = Math.min(100, utilPct).toFixed(1) + '%';
+        elBar.className = 'util-fill' + (utilPct >= 50 ? ' err' : (utilPct >= 30 ? ' warn' : ''));
+      }
+      if (elChip) {
+        if (revLimit <= 0) {
+          elChip.textContent = 'No Revolving Limits';
+          elChip.className = 'status-chip cyan';
+        } else if (utilPct >= 50) {
+          elChip.textContent = 'High Utilization (' + utilPct.toFixed(0) + '%)';
+          elChip.className = 'status-chip err';
+        } else if (utilPct >= 30) {
+          elChip.textContent = 'Moderate Utilization (' + utilPct.toFixed(0) + '%)';
+          elChip.className = 'status-chip warn';
+        } else {
+          elChip.textContent = 'Optimal Utilization (<30%)';
+          elChip.className = 'status-chip';
+        }
+      }
+
+      var need30 = Math.max(0, revBal - revLimit * 0.299);
+      var need10 = Math.max(0, revBal - revLimit * 0.099);
+      if (elTo30) elTo30.textContent = revLimit > 0 ? (need30 > 0 ? fmtMoney(need30) + ' paydown needed' : 'Already below 30%') : '—';
+      if (elTo10) elTo10.textContent = revLimit > 0 ? (need10 > 0 ? fmtMoney(need10) + ' paydown needed' : 'Already below 10%') : '—';
+
+      if (elDate30) elDate30.textContent = revLimit > 0 ? (activeSim.month30 !== null ? (activeSim.month30 === 0 ? 'Current' : addMonthsToNow(activeSim.month30) + ' (Mo ' + activeSim.month30 + ')') : 'Beyond cap') : '—';
+      if (elDate10) elDate10.textContent = revLimit > 0 ? (activeSim.month10 !== null ? (activeSim.month10 === 0 ? 'Current' : addMonthsToNow(activeSim.month10) + ' (Mo ' + activeSim.month10 + ')') : 'Beyond cap') : '—';
+    }
+
+    function toggleBureauFreeze(bureau) {
+      appState.freezes[bureau] = !appState.freezes[bureau];
+      renderBureauFreezes();
+      persistState();
+    }
+
+    function renderBureauFreezes() {
+      var map = [
+        { key: 'equifax', id: 'freeze-badge-eq' },
+        { key: 'experian', id: 'freeze-badge-ex' },
+        { key: 'transunion', id: 'freeze-badge-tu' }
+      ];
+      map.forEach(function(item) {
+        var el = document.getElementById(item.id);
+        if (!el) return;
+        var active = Boolean(appState.freezes[item.key]);
+        el.textContent = active ? 'Frozen' : 'Unfrozen';
+        el.className = active ? 'status-chip' : 'status-chip warn';
+      });
+    }
+
+    function renderSchedule() {
+      var thead = document.getElementById('schedule-thead');
+      var tbody = document.getElementById('schedule-tbody');
+      if (!thead || !tbody || !lastSimulation) return;
+
+      var mode = (document.getElementById('sched-view-mode') || {}).value || 'milestones';
+      var filterId = (document.getElementById('sched-account-filter') || {}).value || 'all';
+
+      if (mode === 'milestones') {
+        thead.innerHTML = '<tr>' +
+          '<th>Creditor</th>' +
+          '<th class="num">Starting Bal</th>' +
+          '<th class="num">APR</th>' +
+          '<th class="num">Interest Paid</th>' +
+          '<th>Payoff Month</th>' +
+          '<th>Debt-Free Date</th>' +
+          '</tr>';
+
+        var ms = (lastSimulation.milestones || []).filter(function(m) {
+          return filterId === 'all' || m.id === filterId;
+        });
+        if (ms.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--on-surface-variant);">No tradelines to schedule.</td></tr>';
+          return;
+        }
+        ms.sort(function(a, b) {
+          return (a.paidOffMonth || 9999) - (b.paidOffMonth || 9999);
+        });
+        tbody.innerHTML = ms.map(function(m) {
+          return '<tr>' +
+            '<td><strong>' + escapeHtml(m.name) + '</strong><br><span class="data-label">' + escapeHtml(m.category) + '</span></td>' +
+            '<td class="num sensitive-val">' + fmtMoney(m.initialBalance) + '</td>' +
+            '<td class="num">' + m.apr.toFixed(2) + '%</td>' +
+            '<td class="num sensitive-val">' + fmtMoney(m.interestPaid) + '</td>' +
+            '<td>' + (m.paidOffMonth !== null ? '<span class="status-chip">Month ' + m.paidOffMonth + '</span>' : '<span class="status-chip warn">600+</span>') + '</td>' +
+            '<td><strong>' + escapeHtml(m.payoffDate) + '</strong></td>' +
+            '</tr>';
+        }).join('');
+      } else {
+        thead.innerHTML = '<tr>' +
+          '<th>Mo</th>' +
+          '<th>Date</th>' +
+          '<th class="num">Payment</th>' +
+          '<th class="num">Principal</th>' +
+          '<th class="num">Interest</th>' +
+          '<th class="num">Remaining Bal</th>' +
+          '<th>Cleared</th>' +
+          '</tr>';
+
+        var rows = lastSimulation.scheduleRows || [];
+        if (rows.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--on-surface-variant);">No scheduled payments.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = rows.slice(0, 120).map(function(r) {
+          var payVal = filterId === 'all' ? r.payment : (r.perAccPayments[filterId] || 0);
+          var clearedHtml = r.paidOffNames.length
+            ? r.paidOffNames.map(function(n) { return '<span class="status-chip">' + escapeHtml(n) + ' $0</span>'; }).join(' ')
+            : '—';
+          return '<tr>' +
+            '<td class="tabular-num">' + r.month + '</td>' +
+            '<td>' + escapeHtml(r.dateLabel) + '</td>' +
+            '<td class="num sensitive-val">' + fmtMoney(payVal) + '</td>' +
+            '<td class="num sensitive-val">' + (filterId === 'all' ? fmtMoney(r.principal) : '—') + '</td>' +
+            '<td class="num sensitive-val">' + (filterId === 'all' ? fmtMoney(r.interest) : '—') + '</td>' +
+            '<td class="num sensitive-val">' + fmtMoney(r.remaining) + '</td>' +
+            '<td>' + clearedHtml + '</td>' +
+            '</tr>';
+        }).join('');
+      }
+    }
+
+    // =========================================================================
+    // STRATEGY, BOOSTER & TOOLBAR CONTROLS (DEDICATED SYNC HANDLERS)
+    // =========================================================================
+    function setStrategy(strat) {
+      appState.strategy = strat;
+      updateStrategyButtons();
+      recalculateAndRender();
+      persistState();
+    }
+
+    function updateStrategyButtons() {
+      ['avalanche', 'snowball', 'hybrid'].forEach(function(k) {
+        var btn = document.getElementById('strat-' + k);
+        if (btn) {
+          if (appState.strategy === k) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+      });
+      var hybWrap = document.getElementById('hybrid-threshold-wrap');
+      if (hybWrap) hybWrap.style.display = appState.strategy === 'hybrid' ? 'flex' : 'none';
+
+      var badge = document.getElementById('active-strategy-badge');
+      var names = { avalanche: 'Avalanche Active', snowball: 'Snowball Active', hybrid: 'Hybrid Active' };
+      if (badge) badge.textContent = names[appState.strategy] || 'Avalanche Active';
+    }
+
+    function updateHybridThreshold(val) {
+      appState.hybridThreshold = Math.max(0, Number(val) || 0);
+      recalculateAndRender();
+      persistState();
+    }
+
+    function syncBoosterFromSlider(val) {
+      var num = Math.max(0, Number(val) || 0);
+      var numEl = document.getElementById('booster-number');
+      if (numEl) numEl.value = num;
+      appState.extraBooster = num;
+      recalculateAndRender();
+      persistState();
+    }
+
+    function syncBoosterFromNumber(val) {
+      var num = Math.max(0, Number(val) || 0);
+      var sliderEl = document.getElementById('booster-slider');
+      if (sliderEl) sliderEl.value = Math.min(3000, num);
+      appState.extraBooster = num;
+      recalculateAndRender();
+      persistState();
+    }
+
+    function applyBoosterPreset(val) {
+      appState.extraBooster = val;
+      var sliderEl = document.getElementById('booster-slider');
+      var numEl = document.getElementById('booster-number');
+      if (sliderEl) sliderEl.value = Math.min(3000, val);
+      if (numEl) numEl.value = val;
+      recalculateAndRender();
+      persistState();
+    }
+
+    function applyAvailableSurplus() {
+      var monthlyNet = appState.incomes.reduce(function(sum, inc) {
+        var netCheck = Math.max(0, (Number(inc.gross) || 0) - (Number(inc.taxes) || 0) - (Number(inc.deduct) || 0));
+        return sum + (netCheck * (Number(inc.freq) || 12)) / 12;
+      }, 0);
+      var overhead = appState.budget.reduce(function(s, b) { return s + (Number(b.amount) || 0); }, 0);
+      var mins = appState.tradelines.reduce(function(s, t) { return s + (Number(t.minPay) || 0); }, 0);
+      var avail = Math.max(0, Math.floor(monthlyNet - overhead - mins));
+      applyBoosterPreset(avail);
+      showGlobalStatus('Applied full available budget surplus (' + fmtMoneyWhole(avail) + '/mo) to debt strike.', 'ok');
+    }
+
+    function loadPreset(key) {
+      if (key === 'custom') return;
+      Object.assign(appState, buildPresetData(key));
+      syncUiControlsFromState();
+      recalculateAndRender();
+      persistState();
+      var labels = { reference: 'Reference Household ($60,043)', experian: 'Experian 3-Card Benchmark ($16,000)', blank: 'Blank Slate ($0.00)' };
+      showGlobalStatus('Loaded ' + (labels[key] || key) + '.', 'info');
+    }
+
+    function resetToBlank(btn) {
+      if (btn.dataset.armed !== 'true') {
+        btn.dataset.armed = 'true';
+        btn.innerHTML = '<i data-lucide="alert-triangle" aria-hidden="true"></i><span>Confirm Wipe</span>';
+        if (window.lucide) window.lucide.createIcons();
+        setTimeout(function() {
+          if (btn.dataset.armed === 'true') {
+            btn.dataset.armed = 'false';
+            btn.innerHTML = '<i data-lucide="rotate-ccw" aria-hidden="true"></i><span>Reset Blank</span>';
+            if (window.lucide) window.lucide.createIcons();
+          }
+        }, 4000);
+        return;
+      }
+      btn.dataset.armed = 'false';
+      btn.innerHTML = '<i data-lucide="rotate-ccw" aria-hidden="true"></i><span>Reset Blank</span>';
+      if (window.lucide) window.lucide.createIcons();
+      loadPreset('blank');
+    }
+
+    function togglePrivacyMask() {
+      appState.privacyMasked = !appState.privacyMasked;
+      syncUiControlsFromState();
+      recalculateAndRender();
+      persistState();
+    }
+
+    function scrollToSection(id, btn) {
+      var target = document.getElementById(id);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelectorAll('.jump-pill').forEach(function(p) { p.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+    }
+
+    function exportScheduleCsv() {
+      if (!lastSimulation || !lastSimulation.scheduleRows || lastSimulation.scheduleRows.length === 0) {
+        showGlobalStatus('Add at least one tradeline before exporting a payoff schedule.', 'err');
+        return;
+      }
+      var lines = ['Month,Date,TotalPayment,PrincipalPaid,InterestPaid,RemainingBalance,RevolvingUtilizationPct'];
+      lastSimulation.scheduleRows.forEach(function(r) {
+        lines.push([
+          r.month,
+          r.dateLabel,
+          r.payment.toFixed(2),
+          r.principal.toFixed(2),
+          r.interest.toFixed(2),
+          r.remaining.toFixed(2),
+          r.utilPct.toFixed(2)
+        ].join(','));
+      });
+      var csv = lines.join('\n');
+      if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === 'function') {
+        window.notebookAppApi.triggerFileDownload({
+          content: csv,
+          contentType: 'text/csv',
+          encoding: 'UTF-8',
+          filename: 'nexus-prime-payoff-schedule.csv'
+        });
+        showGlobalStatus('Exported payoff schedule CSV.', 'ok');
+      } else {
+        showGlobalStatus('CSV generated (' + lastSimulation.scheduleRows.length + ' months).', 'info');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
